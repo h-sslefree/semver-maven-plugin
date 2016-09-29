@@ -9,7 +9,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<maven.plugin-version>3.3.9</maven.plugin-version>
+		<maven.plugin-version>3.3.3</maven.plugin-version>
 		<maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
 		<maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
 

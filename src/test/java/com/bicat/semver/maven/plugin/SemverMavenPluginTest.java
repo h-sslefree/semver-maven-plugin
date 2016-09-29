@@ -2,39 +2,33 @@ package com.bicat.semver.maven.plugin;
 
 import java.io.File;
 
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.plugin.testing.MojoRule;
+import org.apache.maven.plugin.testing.resources.TestResources;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 
-import com.bicat.semver.maven.plugin.goal.SemverMavenPluginGoalMinor;
 import com.bicat.semver.maven.plugin.goal.SemverMavenPluginGoalPatch;
 
-public class SemverMavenPluginTest extends AbstractMojoTestCase {
+public class SemverMavenPluginTest {
 
-  /**
-   * @see junit.framework.TestCase#setUp()
-   */
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
+	@Rule
+	public MojoRule rule = new MojoRule();
 
-  /**
-   * @throws Exception
-   */
-  public void testSemverMavenPluginGoalPatch() throws Exception {
-    File testPom = new File(getBasedir(), "src/test/resources/com/bicat/semver/maven/plugin/test-plugin-pom.xml");
+	@Rule
+	public TestResources resources = new TestResources();
 
-    SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch)lookupMojo("com.bicat:semver-maven-plugin:1.0.0-SNAPSHOT:patch", testPom);
+	@Test
+	public void testSemverMavenPluginProject() throws Exception {
 
-    assertNotNull(mojo);
-  }
-  
-  /**
-   * @throws Exception
-   */
-  public void testSemverMavenPluginGoalMinor() throws Exception {
-    File testPom = new File(getBasedir(), "src/test/resources/unit/basic-test/basic-test-plugin-pom.xml");
+		File projectCopy = this.resources.getBasedir("semver-maven-plugin");
+		File pom = new File(projectCopy, "pom.xml");
+		Assert.assertNotNull(pom);
+		Assert.assertTrue(pom.exists());
 
-    SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor)lookupMojo("com.bicat:semver-maven-plugin:minor", testPom);
+		SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch) this.rule.lookupMojo("patch", pom);
+		Assert.assertNotNull(mojo);
+		mojo.execute();
+	}
 
-    assertNotNull(mojo);
-  }
 }
