@@ -2,33 +2,37 @@ package com.bicat.semver.maven.plugin;
 
 import java.io.File;
 
-import org.apache.maven.plugin.testing.MojoRule;
-import org.apache.maven.plugin.testing.resources.TestResources;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 import com.bicat.semver.maven.plugin.goal.SemverMavenPluginGoalPatch;
 
-public class SemverMavenPluginTest {
+/**
+ * 
+ * <p>Bij het runnen van de tests moet eerst het project met maven zijn gebuild</p>
+ * 
+ * 
+ * 
+ * @author sido
+ *
+ */
+public class SemverMavenPluginTest extends AbstractMojoTestCase {
 
-	@Rule
-	public MojoRule rule = new MojoRule();
+  
+  protected void setUp() throws Exception {
+    super.setUp();
+  }
 
-	@Rule
-	public TestResources resources = new TestResources();
+  @Test
+  public void testSemverMavenPluginPatch() throws Exception {
 
-	@Test
-	public void testSemverMavenPluginProject() throws Exception {
+    File testPom = new File(getBasedir(), "src/test/resources/com/bicat/semver/maven/plugin/pom.xml");
+    Assert.assertTrue(testPom.exists());
 
-		File projectCopy = this.resources.getBasedir("semver-maven-plugin");
-		File pom = new File(projectCopy, "pom.xml");
-		Assert.assertNotNull(pom);
-		Assert.assertTrue(pom.exists());
-
-		SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch) this.rule.lookupMojo("patch", pom);
-		Assert.assertNotNull(mojo);
-		mojo.execute();
-	}
+    SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch)lookupMojo("patch", testPom);
+    Assert.assertNotNull(mojo);
+    mojo.execute();
+  }
 
 }
