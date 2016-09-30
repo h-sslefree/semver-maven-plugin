@@ -29,7 +29,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     int minorVersion = 0;
     int patchVersion = 1;
     
-    String[] rawVersion = version.split(".");
+    String[] rawVersion = version.split("\\.");
     if(rawVersion.length == 3) {
       log.debug("Set version-variables from POM.xml");
       log.debug("--------------------------------------------------");
@@ -72,7 +72,6 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     } catch (IOException err) {
       log.error(err.getMessage());
     }
-    log.info("--------------------------------------------------");
     
   }
   

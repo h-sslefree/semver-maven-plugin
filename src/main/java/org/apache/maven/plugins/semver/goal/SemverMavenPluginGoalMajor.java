@@ -74,7 +74,6 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     } catch (IOException err) {
       log.error(err.getMessage());
     }
-    log.info("--------------------------------------------------");
   }
 
 }
