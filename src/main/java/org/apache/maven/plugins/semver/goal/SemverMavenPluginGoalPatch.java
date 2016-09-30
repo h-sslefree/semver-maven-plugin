@@ -15,13 +15,13 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin;
 @Mojo(name = "patch", requiresProject = true)
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
+  private Log log = getLog();
+  
   public void execute() throws MojoExecutionException, MojoFailureException {
-    Log log = getLog();
     log.info("Semver-goal                       : PATCH");
     log.info("Run-mode                          : " + runMode);
     log.info("Version from POM                  : " + project.getVersion());
     log.info("--------------------------------------------------");
-    
     
     String version = project.getVersion();
    
@@ -52,6 +52,20 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     log.info("New RELEASE-version               : " + releaseVersion);
     log.info("--------------------------------------------------");
     
+    if(runMode.equals(RUN_MODE.RELEASE.getKey())) {
+      createReleaseProperties(developmentVersion, releaseVersion);
+    } else if (runMode.equals(RUN_MODE.NATIVE.getKey())) {
+      createReleaseNative(developmentVersion, releaseVersion);
+    }
+    
+  }
+  
+  private void createReleaseNative(String developmentVersion, String releaseVersion) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private void createReleaseProperties(String developmentVersion, String releaseVersion) {
     String mavenProjectRelease = "project.rel.com.bicat:" + project.getArtifactId() + "=" + releaseVersion; 
     String mavenProjectDevelopment = "project.dev.com.bicat:" + project.getArtifactId() + "=" + developmentVersion;
     String mavenProjectScm = "scm.tag="+ releaseVersion; 
@@ -72,7 +86,8 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     } catch (IOException err) {
       log.error(err.getMessage());
     }
-    
   }
+  
+  
   
 }
