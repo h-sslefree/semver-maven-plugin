@@ -8,6 +8,23 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</name>
 	<url>http://maven.apache.org</url>
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.bicat.com/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>Internal Snapshots</name>
+			<url>http://nexus.bicat.com/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<scm>
+		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
+		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
+		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
+	</scm>
 
 	<properties>
 
