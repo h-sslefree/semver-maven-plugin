@@ -33,7 +33,7 @@
 		<maven.sonar.plugin-version>3.0.1</maven.sonar.plugin-version>
 		<maven.release.plugin-version>2.5.3</maven.release.plugin-version>
 		<maven.exec.plugin-version>1.5.0</maven.exec.plugin-version>
-		<maven.semver.plugin-version>0.0.2-SNAPSHOT</maven.semver.plugin-version>
+<!-- 		<maven.semver.plugin-version>0.0.2</maven.semver.plugin-version> -->
 		<maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
 
 		<maven.plugin-version>3.3.9</maven.plugin-version>
@@ -66,11 +66,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>semver-maven-plugin</artifactId>
-				<version>${maven.semver.plugin-version}</version>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>semver-maven-plugin</artifactId> -->
+<!-- 				<version>${maven.semver.plugin-version}</version> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
