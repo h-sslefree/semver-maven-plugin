@@ -8,6 +8,12 @@
 	<packaging>jar</packaging>
 	<name>Test Semver Plugin</name>
 
+	<scm>
+		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</url>
+		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</connection>
+		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</developerConnection>
+	</scm>
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

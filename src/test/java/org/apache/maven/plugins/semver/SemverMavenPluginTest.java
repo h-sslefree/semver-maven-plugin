@@ -2,9 +2,9 @@ package org.apache.maven.plugins.semver;
 
 import java.io.File;
 
-import org.apache.maven.plugins.semver.goal.SemverMavenPluginGoalMajor;
-import org.apache.maven.plugins.semver.goal.SemverMavenPluginGoalMinor;
-import org.apache.maven.plugins.semver.goal.SemverMavenPluginGoalPatch;
+import org.apache.maven.plugins.semver.goals.SemverMavenPluginGoalMajor;
+import org.apache.maven.plugins.semver.goals.SemverMavenPluginGoalMinor;
+import org.apache.maven.plugins.semver.goals.SemverMavenPluginGoalPatch;
 import org.apache.maven.plugins.test.mojo.AbstractSemverMojoTestCase;
 import org.junit.Assert;
 import org.junit.Test;
