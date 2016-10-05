@@ -23,7 +23,6 @@
 		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
 		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
 		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
-	  <tag>0.0.3/git/notifyCommit?url=http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</tag>
   </scm>
 
 	<properties>
