@@ -85,8 +85,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
   
   protected void createReleaseProperties(String developmentVersion, String releaseVersion) {
-    String mavenProjectRelease = "project.rel."+ project.getGroupId() + "\u003A" + project.getArtifactId() + "\u003D" + releaseVersion; 
-    String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
+    String mavenProjectRelease = "project.rel."+ project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + releaseVersion; 
+    String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
     String mavenProjectScm = "scm.tag=build-"+ releaseVersion; 
     
     File releaseProperties = new File("release.properties"); 
