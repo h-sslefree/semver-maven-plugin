@@ -152,13 +152,11 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>${maven.release.plugin-version}</version>
 				<configuration>
-					<arguments>-Dtype=DO_NOTHING</arguments>
 					<tagNameFormat>@{project.version}</tagNameFormat>
 					<checkModificationExcludes>
 						<checkModificationExclude>pom.xml</checkModificationExclude>
 						<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
 					</checkModificationExcludes>
-					<completionGoals>release:clean</completionGoals>
 				</configuration>
 			</plugin>
 		</plugins>
