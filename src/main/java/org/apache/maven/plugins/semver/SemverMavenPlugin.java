@@ -50,10 +50,10 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public MavenProject project;
 
   @Parameter(property = "username", defaultValue = "")
-  public String scmUsername;
+  public String scmUsername = ""; 
 
   @Parameter(property = "password", defaultValue = "")
-  public String scmPassword;
+  public String scmPassword= "";
 
   @Parameter(property = "tag")
   public String preparedReleaseTag;
@@ -68,32 +68,38 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     log.info("Check for lost-tags");
     log.info("------------------------------------------------------------------------");
 
-    CredentialsProvider cp = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
+    if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
 
-    Git currentProject = new Git(repo);
-    currentProject.pull().setCredentialsProvider(cp).call();
-    List<Ref> refs = currentProject.tagList().call();
-    log.info(refs.toString());
-    if (refs.size() > 0) {
-      boolean found = false;
-      for (Ref ref : refs) {
-        if (ref.getName().contains(releaseVersion)) {
-          found = true;
-          log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
-          currentProject.tagDelete().setTags(ref.getName()).call();
-          RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
-          log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
-          currentProject.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(cp).call();
+      CredentialsProvider cp = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
+
+      Git currentProject = new Git(repo);
+      currentProject.pull().setCredentialsProvider(cp).call();
+      List<Ref> refs = currentProject.tagList().call();
+      log.info(refs.toString());
+      if (refs.size() > 0) {
+        boolean found = false;
+        for (Ref ref : refs) {
+          if (ref.getName().contains(releaseVersion)) {
+            found = true;
+            log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+            currentProject.tagDelete().setTags(ref.getName()).call();
+            RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
+            log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+            currentProject.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(cp).call();
+          }
         }
-      }
-      if (!found) {
+        if (!found) {
+          log.info("No local or remote lost tags found");
+        }
+      } else {
         log.info("No local or remote lost tags found");
       }
+      currentProject.close();
     } else {
-      log.info("No local or remote lost tags found");
+      log.error("Could not load tags from remote repo. Failed to determine credentials");
+      log.error("Please enter username and password for GIT-repo (-Dusername=#username# -Dpassword=#password#)");
     }
 
-    currentProject.close();
     log.info("------------------------------------------------------------------------");
   }
 

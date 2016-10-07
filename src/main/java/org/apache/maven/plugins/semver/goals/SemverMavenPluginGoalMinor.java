@@ -1,22 +1,17 @@
 package org.apache.maven.plugins.semver.goals;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 @Mojo( name = "minor")
 public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
-  private Log log = getLog();
-  
   public void execute() throws MojoExecutionException, MojoFailureException {
     
     String version = project.getVersion();
@@ -34,7 +29,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     try {
       versions = determineVersions(version);
     } catch (Exception e) {
-      log.error(e.getMessage());
+      log.error(e);
     }
     
     if(runMode.equals(RUN_MODE.RELEASE.getKey())) {
@@ -59,7 +54,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
       log.debug("------------------------------------------------------------------------");
       majorVersion = Integer.valueOf(rawVersion[0]);
       minorVersion = Integer.valueOf(rawVersion[1]);
-      patchVersion = Integer.valueOf(rawVersion[2].substring(0, 1));
+      patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf("-")));
     }
 
     log.debug("MAJOR-version                    : " + majorVersion);
@@ -80,14 +75,8 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     versions.add(DEVELOPMENT, developmentVersion);
     versions.add(RELEASE, releaseVersion);
 
-    try {
-      cleanupGitLocalAndRemoteTags(releaseVersion);
-    } catch (IOException e) {
-      log.error(e.getMessage());
-    } catch (GitAPIException e) {
-      log.error(e.getMessage());
-    }
-      
+    cleanupGitLocalAndRemoteTags(releaseVersion);
+    
     return versions;
   }
 
