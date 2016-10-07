@@ -57,7 +57,6 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     Git currentProject = new Git(repo);
     currentProject.pull().setCredentialsProvider(cp).call();
     List<Ref> refs = currentProject.tagList().call();
-    log.info(refs.toString());
     if(refs.size() > 0) {
       boolean found = false;
       for (Ref ref : refs) {
@@ -76,10 +75,6 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     } else {
       log.info("No local or remote prepared GIT-tags found");  
     }
-    
-    
-    
-    
     
     currentProject.close();
     log.info("------------------------------------------------------------------------");

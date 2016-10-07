@@ -1,6 +1,7 @@
 package org.apache.maven.plugins.semver.goals;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 @Mojo(name = "major")
 public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
@@ -75,6 +77,14 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
     versions.add(DEVELOPMENT, developmentVersion);
     versions.add(RELEASE, releaseVersion);
+    
+    try {
+      cleanupGitLocalAndRemoteTags(releaseVersion);
+    } catch (IOException e) {
+      log.error(e.getMessage());
+    } catch (GitAPIException e) {
+      log.error(e.getMessage());
+    }
 
     return versions;
   }
