@@ -1,7 +1,9 @@
-# semver-maven-plugin-0.1.1
+# semver-maven-plugin-0.1.2
 
 
+**0.1.2**  
 **0.1.1**  
+07-10-2016 06:46:30    PATCH \[info to debug show remote tags\] (sido)  
 07-10-2016 06:42:49    PATCH \[delete lost tags when performing a release rollback\] (sido)  
 07-10-2016 06:26:53    CHORE \[version rollback\] (sido)  
 07-10-2016 06:24:40    CHORE \[cannot contain it's own plugin\] (sido)  
