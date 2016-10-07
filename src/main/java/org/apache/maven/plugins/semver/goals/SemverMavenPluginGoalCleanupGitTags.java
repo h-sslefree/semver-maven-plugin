@@ -25,7 +25,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
 
-    log.info("Semver-goal                       : MAJOR");
+    log.info("Semver-goal                       : CLEANUP-GIT-TAGS");
     log.info("Run-mode                          : " + runMode);
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
@@ -57,10 +57,11 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     Git currentProject = new Git(repo);
     currentProject.pull().setCredentialsProvider(cp).call();
     List<Ref> refs = currentProject.tagList().call();
+    log.info(refs.toString());
     if(refs.size() > 0) {
       boolean found = false;
       for (Ref ref : refs) {
-        if(ref.getName().contains("build-")) {
+        if(ref.getName().contains(preparedReleaseTag)) {
           found = true;
           log.info("Delete local GIT-tag                 : " + ref.getName().substring(10));
           currentProject.tagDelete().setTags(ref.getName()).call();
@@ -70,10 +71,10 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
         } 
       }
       if (!found) {
-        log.info("No local or remote GIT-tags with the prefix 'build-' found");
+        log.info("No local or remote prepared GIT-tags found");
       }
     } else {
-      log.info("No local or remote GIT-tags found");  
+      log.info("No local or remote prepared GIT-tags found");  
     }
     
     

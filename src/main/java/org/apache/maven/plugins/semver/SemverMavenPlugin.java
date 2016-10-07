@@ -5,17 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
@@ -53,41 +48,14 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "password", defaultValue = "")
   public String scmPassword;
   
-  protected void cleanupGitTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
-    FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-    repoBuilder.addCeilingDirectory(scmRoot);
-    repoBuilder.findGitDir(scmRoot);
-
-    repo = repoBuilder.build();
-
-    log.info("Determine local tags for GIT-repo");
-    log.info("------------------------------------------------------------------------");
-    
-    Git currentProject = new Git(repo); 
-    List<Ref> refs = currentProject.tagList().call();
-    if(refs.size() > 0) {
-      boolean found = false;
-      for (Ref ref : refs) {
-        if(ref.getName().contains("build-")) {
-          found = true;
-          log.info("Delete local GIT-tag                      : " + ref.getName().substring(10));
-          currentProject.tagDelete().setTags(ref.getName()).call();
-        } 
-      }
-      if (!found) {
-        log.info("No local tags with the prefix 'build-' found");
-      }
-    } else {
-      log.info("No local tags found");  
-    }
-    currentProject.close();
-    log.info("------------------------------------------------------------------------");
-  }
+  @Parameter(property = "tag")
+  public String preparedReleaseTag;
+  
   
   protected void createReleaseProperties(String developmentVersion, String releaseVersion) {
     String mavenProjectRelease = "project.rel."+ project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + releaseVersion; 
     String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
-    String mavenProjectScm = "scm.tag=build-"+ releaseVersion; 
+    String mavenProjectScm = "scm.tag="+ releaseVersion; 
     
     File releaseProperties = new File("release.properties"); 
     
