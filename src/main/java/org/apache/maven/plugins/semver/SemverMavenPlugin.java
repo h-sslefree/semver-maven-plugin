@@ -75,6 +75,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       Git currentProject = new Git(repo);
       currentProject.pull().setCredentialsProvider(cp).call();
       List<Ref> refs = currentProject.tagList().call();
+      log.debug("Remote tags: " + refs.toString());
       if (refs.size() > 0) {
         boolean found = false;
         for (Ref ref : refs) {
