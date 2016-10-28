@@ -1,5 +1,9 @@
-# semver-maven-plugin-0.7.0
+# semver-maven-plugin-0.8.0
 
+
+**0.8.0**  
+28-10-2016 12:01:06    PATCH \[added build metadata\] (sido)  
+28-10-2016 10:37:39    CHORE \[update release pom\] (sido)  
 
 **0.7.0**  
 **0.6.0**  
