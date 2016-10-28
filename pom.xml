@@ -4,7 +4,7 @@
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>semver-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>0.3.0</version>
+	<version>0.3.0-SNAPSHOT</version>
 	<name>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</name>
 	<url>http://maven.apache.org</url>
 	<distributionManagement>
@@ -23,7 +23,7 @@
 		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
 		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
 		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
-    <tag>0.3.0</tag>
+    <tag>0.2.0</tag>
   </scm>
 
 	<properties>
