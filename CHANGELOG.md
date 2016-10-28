@@ -1,6 +1,16 @@
-# semver-maven-plugin-0.0.1
+# semver-maven-plugin-0.7.0
 
 
+**0.7.0**  
+**0.6.0**  
+28-10-2016 10:35:08    PATCH \[default introduced for runMode\] (sido)  
+
+**0.5.0**  
+28-10-2016 10:30:58    CHORE \[version upgrade\] (sido)  
+
+**0.4.0**  
+**0.3.0**  
+**0.1.0**  
 **0.0.1**  
 **0.2.0**  
 28-10-2016 10:16:21    PATCH \[expression wrongly implemented\] (sido)  
