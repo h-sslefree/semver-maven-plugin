@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * 
  * <p>Bij het runnen van de tests moet eerst het project met maven zijn gebuild</p>
- * 
+ * LETOP de configuratie van de plugin in test wordt niet geladen!!!!!
  * 
  * 
  * @author sido
@@ -26,9 +26,9 @@ public class SemverMavenPluginTest extends AbstractSemverMojoTestCase {
   }
 
   @Test
-  public void testSemverMavenPluginPatch() throws Exception {
+  public void testSemverMavenPluginPatchRelease() throws Exception {
 
-    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/pom.xml");
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/release/pom.xml");
     Assert.assertTrue(testPom.exists());
 
     SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch)lookupConfiguredMojo(testPom, "patch");
@@ -37,9 +37,9 @@ public class SemverMavenPluginTest extends AbstractSemverMojoTestCase {
   }
 
   @Test
-  public void testSemverMavenPluginMinor() throws Exception {
+  public void testSemverMavenPluginMinorRelease() throws Exception {
 
-    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/pom.xml");
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/release/pom.xml");
     Assert.assertTrue(testPom.exists());
 
     SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor)lookupConfiguredMojo(testPom, "minor");
@@ -48,13 +48,48 @@ public class SemverMavenPluginTest extends AbstractSemverMojoTestCase {
   }
   
   @Test
-  public void testSemverMavenPluginMajor() throws Exception {
+  public void testSemverMavenPluginMajorRelease() throws Exception {
 
-    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/pom.xml");
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/release/pom.xml");
     Assert.assertTrue(testPom.exists());
 
     SemverMavenPluginGoalMajor mojo = (SemverMavenPluginGoalMajor)lookupConfiguredMojo(testPom, "major");
     Assert.assertNotNull(mojo);
     mojo.execute();
   }
+  
+  @Test
+  public void testSemverMavenPluginPatchRpm() throws Exception {
+
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/rpm/pom.xml");
+    Assert.assertTrue(testPom.exists());
+
+    SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch)lookupConfiguredMojo(testPom, "patch");
+    Assert.assertNotNull(mojo);
+    mojo.execute();
+  }
+
+  @Test
+  public void testSemverMavenPluginMinorRpm() throws Exception {
+
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/rpm/pom.xml");
+    Assert.assertTrue(testPom.exists());
+
+    SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor)lookupConfiguredMojo(testPom, "minor");
+    Assert.assertNotNull(mojo);
+    mojo.execute();
+  }
+  
+  @Test
+  public void testSemverMavenPluginMajorRpm() throws Exception {
+
+    File testPom = new File(getBasedir(), "src/test/resources/org/apache/maven/plugins/semver/rpm/pom.xml");
+    Assert.assertTrue(testPom.exists());
+
+    SemverMavenPluginGoalMajor mojo = (SemverMavenPluginGoalMajor)lookupConfiguredMojo(testPom, "major");
+    Assert.assertNotNull(mojo);
+    mojo.execute();
+  }
+  
+  
 }

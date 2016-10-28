@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -24,39 +25,97 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   protected Log log = getLog();
 
-  protected int DEVELOPMENT = 0;
-  protected int RELEASE = 1;
-
   protected Repository repo;
 
-  public static enum RUN_MODE {
-    RELEASE("release"), NATIVE("native");
+  public static enum VERSION {
+    DEVELOPMENT(0), RELEASE(1), MAJOR(2), MINOR(3), PATCH(4);
 
-    private String key;
+    private int index;
 
-    private RUN_MODE(String key) {
-      this.key = key;
+    private VERSION(int index) {
+      this.index = index;
     }
 
-    public String getKey() {
-      return this.key;
-    };
+    public int getIndex() {
+      return this.index;
+    }
+
   }
 
-  @Parameter(defaultValue = "release")
-  public String runMode;
+  /**
+   * <ul>
+   * <li>release: maak gebruik van normale semantic-versioning en release-plugin</li>
+   * <li>release-rpm</li>
+   * <li>native</li>
+   * <li>native-rpm</li>
+   * 
+   * @author sido
+   */
+  public static enum RUNMODE {
+    RELEASE, RELEASE_RPM, NATIVE, NATIVE_RPM, RUNMODE_NOT_SPECIFIED;
+
+    public static RUNMODE convertToEnum(String runMode) {
+      RUNMODE value = RUNMODE_NOT_SPECIFIED;
+      if (runMode != null) {
+        if (runMode.equals("RELEASE")) {
+          value = RELEASE;
+        } else if (runMode.equals("RELEASE_RPM")) {
+          value = RELEASE_RPM;
+        } else if (runMode.equals("NATIVE")) {
+          value = NATIVE;
+        } else if (runMode.equals("NATIVE_RPM")) {
+          value = NATIVE_RPM;
+        }
+      }
+      return value;
+    }
+  }
+
+  @Parameter(property = "runMode", required = true, name="runMode can be RELEASE, RELEASE_RPM, NATIVE and NATIVE_RPM")
+  private RUNMODE runMode;
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
-  public MavenProject project;
+  protected MavenProject project;
 
   @Parameter(property = "username", defaultValue = "")
-  public String scmUsername = ""; 
+  protected String scmUsername = "";
 
   @Parameter(property = "password", defaultValue = "")
-  public String scmPassword= "";
+  protected String scmPassword = "";
 
   @Parameter(property = "tag")
-  public String preparedReleaseTag;
+  protected String preparedReleaseTag;
+
+  @Parameter(defaultValue = "${session}", readonly = true, required = true)
+  protected MavenSession session;
+
+  @Parameter(property = "branchVersion", defaultValue = "6.4.0")
+  private String branchVersion;
+
+  public void setRunMode(RUNMODE runMode) {
+    this.runMode = runMode;
+  }
+
+  public void setBranchVersion(String branchVersion) {
+    this.branchVersion = branchVersion;
+  }
+
+  protected SemverConfiguration getConfiguration() {
+    SemverConfiguration config = new SemverConfiguration();
+    String userRunMode = session.getUserProperties().getProperty("runMode");
+    String userBranchVersion = session.getUserProperties().getProperty("branchVersion");
+
+    if (userRunMode != null) {
+      runMode = RUNMODE.convertToEnum(userRunMode);
+    }
+    if (userBranchVersion != null) {
+      branchVersion = userBranchVersion;
+    }
+
+    if (runMode != null) config.setRunMode(runMode);
+    if (branchVersion != null) config.setBranchVersion(branchVersion);
+    return config;
+  }
 
   protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws IOException, GitAPIException {
     FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
@@ -101,6 +160,25 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
 
     log.info("------------------------------------------------------------------------");
+  }
+
+  protected void createReleaseNative(String developmentVersion, String releaseVersion) {
+    // TODO Auto-generated method stub
+
+  }
+
+  protected void createReleaseRpm(String developmentVersion, int major, int minor, int patch) {
+
+    log.info("NEW versions on RPM base");
+    
+    String releaseVersion = branchVersion + "-" + String.format("%03d%03d%03d", major, minor, patch);
+    
+    log.info("New DEVELOPMENT-version               : " + developmentVersion);
+    log.info("New RPM GIT-version                   : " + releaseVersion);
+    log.info("New RPM RELEASE-version               : " + releaseVersion);
+    log.info("------------------------------------------------------------------------");
+
+    createReleaseProperties(developmentVersion, releaseVersion);
   }
 
   protected void createReleaseProperties(String developmentVersion, String releaseVersion) {

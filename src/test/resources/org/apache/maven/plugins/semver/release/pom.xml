@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.bicat</groupId>
+	<artifactId>semver-maven-plugin-test</artifactId>
+	<version>0.0.12-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Test Semver Plugin</name>
+
+	<scm>
+		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</url>
+		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</connection>
+		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin-test.git</developerConnection>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.bicat</groupId>
+				<artifactId>semver-maven-plugin</artifactId>
+				<configuration>
+					<runMode>RELEASE</runMode>
+					<branchVersion>6.3.4</branchVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -9,7 +9,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 
-@Mojo(name = "patch", requiresProject = true)
+@Mojo(name = "patch", aggregator = true)
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -19,7 +19,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     File scmRoot = project.getBasedir();
     
     log.info("Semver-goal                       : PATCH");
-    log.info("Run-mode                          : " + runMode);
+    log.info("Run-mode                          : " + getConfiguration().getRunMode());
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
@@ -32,10 +32,12 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
       log.error(e);
     }
     
-    if(runMode.equals(RUN_MODE.RELEASE.getKey())) {
-      createReleaseProperties(versions.get(DEVELOPMENT), versions.get(RELEASE));
-    } else if (runMode.equals(RUN_MODE.NATIVE.getKey())) {
-      createReleaseNative(versions.get(DEVELOPMENT), versions.get(RELEASE));
+    if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
+      createReleaseProperties(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
+    } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
+      createReleaseNative(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
+    } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_RPM) {
+      createReleaseRpm(versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
     }
     
   }
@@ -66,22 +68,22 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
+    log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
     log.info("New DEVELOPMENT-version           : " + developmentVersion);
     log.info("New GIT-version                   : " + releaseVersion);
     log.info("New RELEASE-version               : " + releaseVersion);
     log.info("------------------------------------------------------------------------");
 
-    versions.add(DEVELOPMENT, developmentVersion);
-    versions.add(RELEASE, releaseVersion);
+    versions.add(VERSION.DEVELOPMENT.getIndex(), developmentVersion);
+    versions.add(VERSION.RELEASE.getIndex(), releaseVersion);
+    versions.add(VERSION.MAJOR.getIndex(), String.valueOf(majorVersion));
+    versions.add(VERSION.MINOR.getIndex(), String.valueOf(minorVersion));
+    versions.add(VERSION.PATCH.getIndex(), String.valueOf(patchVersion));
 
     cleanupGitLocalAndRemoteTags(releaseVersion);
     
     return versions;
   }
   
-  private void createReleaseNative(String developmentVersion, String releaseVersion) {
-    // TODO Auto-generated method stub
-    
-  }
   
 }

@@ -29,7 +29,8 @@
 				<groupId>com.bicat</groupId>
 				<artifactId>semver-maven-plugin</artifactId>
 				<configuration>
-					<runMode>native</runMode>
+					<runMode>RELEASE_RPM</runMode>
+					<branchVersion>6.3.4</branchVersion>
 				</configuration>
 			</plugin>
 		</plugins>

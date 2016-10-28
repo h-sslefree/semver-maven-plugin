@@ -18,7 +18,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
-
+  
   public void execute() throws MojoExecutionException, MojoFailureException {
 
     String version = project.getVersion();
@@ -26,7 +26,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     File scmRoot = project.getBasedir();
 
     log.info("Semver-goal                       : CLEANUP-GIT-TAGS");
-    log.info("Run-mode                          : " + runMode);
+    log.info("Run-mode                          : " + getConfiguration().getRunMode());
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
