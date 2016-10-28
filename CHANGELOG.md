@@ -1,5 +1,10 @@
-# semver-maven-plugin-0.1.2
+# semver-maven-plugin-0.0.1
 
+
+**0.0.1**  
+**0.2.0**  
+28-10-2016 10:16:21    PATCH \[expression wrongly implemented\] (sido)  
+28-10-2016 10:12:30    FEATURE \[implemented RELEASE_RPM configuration\] (sido)  
 
 **0.1.2**  
 **0.1.1**  
