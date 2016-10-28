@@ -33,7 +33,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     }
     
     if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
-      createReleaseProperties(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
+      createReleaseProperties(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
       createReleaseNative(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_RPM) {
