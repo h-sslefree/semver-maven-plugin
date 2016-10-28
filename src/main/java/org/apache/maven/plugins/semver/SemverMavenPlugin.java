@@ -71,7 +71,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
-  @Parameter(property = "runMode", required = true, name="runMode can be RELEASE, RELEASE_RPM, NATIVE and NATIVE_RPM")
+  @Parameter(property = "runMode", required = true, name = "runMode can be RELEASE, RELEASE_RPM, NATIVE and NATIVE_RPM")
   private RUNMODE runMode;
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
