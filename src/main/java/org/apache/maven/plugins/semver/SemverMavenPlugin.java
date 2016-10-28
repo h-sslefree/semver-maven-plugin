@@ -173,8 +173,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     
     String releaseVersion = branchVersion + "-" + String.format("%03d%03d%03d", major, minor, patch);
     
+    String buildMetaData = major + "." + minor + "." + patch;
+    String scmVersion = releaseVersion + "+" + buildMetaData;
+    
     log.info("New DEVELOPMENT-version               : " + developmentVersion);
-    log.info("New RPM GIT-version                   : " + releaseVersion);
+    log.info("New RPM GIT build metadata            : " + buildMetaData);
+    log.info("New RPM GIT-version                   : " + scmVersion);
     log.info("New RPM RELEASE-version               : " + releaseVersion);
     log.info("------------------------------------------------------------------------");
 
