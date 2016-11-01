@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>semver-maven-plugin</artifactId>
@@ -23,8 +24,8 @@
 		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
 		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
 		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
-    <tag>0.4.0</tag>
-  </scm>
+		<tag>0.4.0</tag>
+	</scm>
 
 	<properties>
 
@@ -41,14 +42,15 @@
 		<maven.release.plugin-version>2.5.3</maven.release.plugin-version>
 		<maven.exec.plugin-version>1.5.0</maven.exec.plugin-version>
 		<maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
+		<helper.maven.plugin-version>2.3.2</helper.maven.plugin-version>
 
 		<maven.plugin-version>3.3.9</maven.plugin-version>
 		<maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
-		
+
 		<org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
-		
+
 		<maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
-		<junit-version>4.11</junit-version>
+		<junit-version>4.12</junit-version>
 
 	</properties>
 
@@ -59,16 +61,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>${maven.plugin.plugin-version}</version>
+				<configuration>
+					<goalPrefix>semver</goalPrefix>
+				</configuration>
 				<executions>
 					<execution>
-						<id>descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-						<configuration>
-							<goalPrefix>semver</goalPrefix>
-							<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-						</configuration>
+						<id>default-descriptor</id>
+						<phase>process-classes</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -154,9 +153,10 @@
 					</checkModificationExcludes>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -193,11 +193,18 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.nuiton</groupId>
+			<artifactId>helper-maven-plugin</artifactId>
+			<version>${helper.maven.plugin-version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.maven.plugin-testing</groupId>
 			<artifactId>maven-plugin-testing-harness</artifactId>
 			<version>${maven.plugin.testing.harness-version}</version>
 			<scope>test</scope>
 		</dependency>
+		
 
 		<dependency>
 			<groupId>junit</groupId>

@@ -100,7 +100,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     this.branchVersion = branchVersion;
   }
 
-  protected SemverConfiguration getConfiguration() {
+  public SemverConfiguration getConfiguration() {
     SemverConfiguration config = new SemverConfiguration();
     String userRunMode = session.getUserProperties().getProperty("runMode");
     String userBranchVersion = session.getUserProperties().getProperty("branchVersion");

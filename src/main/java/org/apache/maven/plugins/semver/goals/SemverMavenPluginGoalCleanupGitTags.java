@@ -16,6 +16,12 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+/**
+ * 
+ * 
+ * @author sido
+ *
+ */
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   
