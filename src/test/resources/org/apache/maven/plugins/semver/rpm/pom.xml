@@ -28,6 +28,7 @@
 			<plugin>
 				<groupId>com.bicat</groupId>
 				<artifactId>semver-maven-plugin</artifactId>
+				<version>0.8.0</version>
 				<configuration>
 					<runMode>RELEASE_RPM</runMode>
 					<branchVersion>6.3.4</branchVersion>

@@ -9,7 +9,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 
-@Mojo(name = "patch", aggregator = true)
+/**
+ * 
+ * @author sido
+ *
+ */
+@Mojo(name = "patch")
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
   public void execute() throws MojoExecutionException, MojoFailureException {
