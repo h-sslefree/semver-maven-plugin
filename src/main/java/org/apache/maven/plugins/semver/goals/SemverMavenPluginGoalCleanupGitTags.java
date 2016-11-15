@@ -8,13 +8,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 /**
  * 
@@ -48,31 +44,25 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   }
   
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
-    
-    FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-    repoBuilder.addCeilingDirectory(scmRoot);
-    repoBuilder.findGitDir(scmRoot);
-
-    repo = repoBuilder.build();
-
     log.info("Determine local and remote GIT-tags for GIT-repo");
     log.info("------------------------------------------------------------------------");
-    
-    CredentialsProvider cp = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
-    
-    Git currentProject = new Git(repo);
-    currentProject.pull().setCredentialsProvider(cp).call();
-    List<Ref> refs = currentProject.tagList().call();
+    try {
+	  initializeRepository();
+	} catch (Exception e) {
+      log.error(e.getMessage());
+	}
+    currentGitRepo.pull().setCredentialsProvider(credProvider).call();
+    List<Ref> refs = currentGitRepo.tagList().call();
     if(refs.size() > 0) {
       boolean found = false;
       for (Ref ref : refs) {
         if(ref.getName().contains(preparedReleaseTag)) {
           found = true;
           log.info("Delete local GIT-tag                 : " + ref.getName().substring(10));
-          currentProject.tagDelete().setTags(ref.getName()).call();
+          currentGitRepo.tagDelete().setTags(ref.getName()).call();
           RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
           log.info("Delete remote GIT-tag                : " + ref.getName().substring(10));
-          currentProject.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(cp).call();
+          currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
         } 
       }
       if (!found) {
@@ -82,7 +72,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
       log.info("No local or remote prepared GIT-tags found");  
     }
     
-    currentProject.close();
+    currentGitRepo.close();
     log.info("------------------------------------------------------------------------");
     
   }

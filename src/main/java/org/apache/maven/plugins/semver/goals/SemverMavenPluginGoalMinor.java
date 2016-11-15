@@ -74,7 +74,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
+    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_RPM) {
+      log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
+    }
     log.info("New DEVELOPMENT-version           : " + developmentVersion);
     log.info("New GIT-version                   : " + releaseVersion);
     log.info("New RELEASE-version               : " + releaseVersion);

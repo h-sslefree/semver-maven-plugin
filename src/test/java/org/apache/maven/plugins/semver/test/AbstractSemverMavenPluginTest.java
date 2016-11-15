@@ -22,6 +22,6 @@ public class AbstractSemverMavenPluginTest {
 	public MojoRule mojoRule = new MojoRule();
 
 	protected File loadPom(String targetPom) {
-		return new File("src/test/resources/org/apache/maven/plugins/semver/" + targetPom);
+		return new File("src/test/resources/org/apache/maven/plugins/semver/goals/" + targetPom);
 	}
 }

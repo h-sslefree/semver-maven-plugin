@@ -8,6 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 
 /**
  * 
@@ -75,7 +76,9 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
+    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_RPM) {
+      log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
+    }
     log.info("New DEVELOPMENT-version           : " + developmentVersion);
     log.info("New GIT-version                   : " + releaseVersion);
     log.info("New RELEASE-version               : " + releaseVersion);

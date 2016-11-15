@@ -1,6 +1,6 @@
 package org.apache.maven.plugins.semver.goals;
 
-import org.apache.maven.plugins.semver.AbstractSemverMavenPluginTest;
+import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.junit.Assert;
 import org.junit.Test;
 

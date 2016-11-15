@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
@@ -25,10 +26,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   protected Log log = getLog();
 
-  protected Repository repo;
+  protected Git currentGitRepo;
+  protected CredentialsProvider credProvider;
 
   public static enum VERSION {
-    DEVELOPMENT(0), RELEASE(1), MAJOR(2), MINOR(3), PATCH(4);
+    DEVELOPMENT(0), 
+    RELEASE(1), 
+    MAJOR(2), 
+    MINOR(3), 
+    PATCH(4);
 
     private int index;
 
@@ -52,7 +58,11 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @author sido
    */
   public static enum RUNMODE {
-    RELEASE, RELEASE_RPM, NATIVE, NATIVE_RPM, RUNMODE_NOT_SPECIFIED;
+    RELEASE, 
+    RELEASE_RPM, 
+    NATIVE, 
+    NATIVE_RPM, 
+    RUNMODE_NOT_SPECIFIED;
 
     public static RUNMODE convertToEnum(String runMode) {
       RUNMODE value = RUNMODE_NOT_SPECIFIED;
@@ -89,7 +99,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   protected MavenSession session;
 
-  @Parameter(property = "branchVersion", defaultValue = "6.4.0")
+  @Parameter(property = "branchVersion")
   private String branchVersion;
 
   public void setRunMode(RUNMODE runMode) {
@@ -108,8 +118,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     if (userRunMode != null) {
       runMode = RUNMODE.convertToEnum(userRunMode);
     }
-    if (userBranchVersion != null) {
-      branchVersion = userBranchVersion;
+    if(runMode == RUNMODE.RELEASE_RPM) {
+      if (userBranchVersion != null) {
+        branchVersion = userBranchVersion;
+      } 
+      if(branchVersion == null) {
+        branchVersion = determineBranchVersionFromGitBranch();
+      }
+    } else {
+      branchVersion = "";
     }
 
     if (runMode != null) config.setRunMode(runMode);
@@ -117,48 +134,98 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     return config;
   }
 
+  private String determineBranchVersionFromGitBranch() {
+	String value = null;
+	log.info("------------------------------------------------------------------------");  
+	log.info("Determine current branchVersion from GIT-repository");	
+	try {
+      initializeRepository();	
+	} catch (Exception err) {
+	  log.error(err.getMessage());
+	}
+	
+	try {  
+	  String branch = currentGitRepo.getRepository().getBranch();
+	  log.info("Current branch                    : " + branch);
+	  if(branch.matches("\\d+.\\d+.\\d+.*")) {
+        log.info("Current branch matches            : \\d+.\\d+.\\d+.*");
+        value = branch;
+	  } else if (branch.matches("v\\d+_\\d+_\\d+.*")) {
+		log.info("Current branch matches            : v\\d+_\\d+_\\d+.*");
+		String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
+		value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
+ 	  } else {
+		log.error("Current branch does not match    : diget.diget.diget");
+		log.error("Branch is not set, semantic versioning for RPM is terminated");
+	  }
+	} catch(Exception err) {
+	  log.error("An error occured while trying to reach GIT-repo: " + err.getMessage());
+	}
+	log.info("------------------------------------------------------------------------");  
+	
+	return value;
+  }
+  
+  protected void initializeRepository() throws Exception {
+	if(currentGitRepo == null && credProvider == null) {
+      log.info("Initializing GIT-repository");
+      FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+	  repoBuilder.addCeilingDirectory(project.getBasedir());
+	  repoBuilder.findGitDir(project.getBasedir());
+	  Repository repo = null;
+	  try {
+		repo = repoBuilder.build();
+		currentGitRepo = new Git(repo);
+		log.info(" - GIT-repository is initialized");
+	  } catch (Exception err) {
+	    log.error("This is not a valid GIT-repository.");
+	    log.error("Please run this goal in a valid GIT-repository");
+	    throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
+	  }
+	  if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
+	    credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
+		log.info(" - GIT-credential provider is initialized");
+	  } else {
+	    log.error("There are no valid credentials for the GIT-repo entered");
+	    log.error("Please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
+	    throw new Exception("There are no valid credentials for the GIT-repo entered"
+	    		+ "\nPlease enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
+	  }
+	} else {
+	  log.debug(" - GIT repository and the credentialsprovider are already initialized");
+	}
+  }
+  
   protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws IOException, GitAPIException {
-    FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-    repoBuilder.addCeilingDirectory(project.getBasedir());
-    repoBuilder.findGitDir(project.getBasedir());
-
-    repo = repoBuilder.build();
-
     log.info("Check for lost-tags");
     log.info("------------------------------------------------------------------------");
-
-    if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
-
-      CredentialsProvider cp = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
-
-      Git currentProject = new Git(repo);
-      currentProject.pull().setCredentialsProvider(cp).call();
-      List<Ref> refs = currentProject.tagList().call();
-      log.debug("Remote tags: " + refs.toString());
-      if (refs.size() > 0) {
-        boolean found = false;
-        for (Ref ref : refs) {
-          if (ref.getName().contains(releaseVersion)) {
-            found = true;
-            log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
-            currentProject.tagDelete().setTags(ref.getName()).call();
-            RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
-            log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
-            currentProject.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(cp).call();
-          }
+    try {
+      initializeRepository();
+	} catch (Exception e) {
+	  log.error(e.getMessage());	
+	}  
+    currentGitRepo.pull().setCredentialsProvider(credProvider).call();
+    List<Ref> refs = currentGitRepo.tagList().call();
+    log.debug("Remote tags: " + refs.toString());
+    if (refs.size() > 0) {
+      boolean found = false;
+      for (Ref ref : refs) {
+        if (ref.getName().contains(releaseVersion)) {
+          found = true;
+          log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+          currentGitRepo.tagDelete().setTags(ref.getName()).call();
+          RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
+          log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+          currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
         }
-        if (!found) {
-          log.info("No local or remote lost tags found");
-        }
-      } else {
+      }
+      if (!found) {
         log.info("No local or remote lost tags found");
       }
-      currentProject.close();
     } else {
-      log.error("Could not load tags from remote repo. Failed to determine credentials");
-      log.error("Please enter username and password for GIT-repo (-Dusername=#username# -Dpassword=#password#)");
+      log.info("No local or remote lost tags found");
     }
-
+    currentGitRepo.close();
     log.info("------------------------------------------------------------------------");
   }
 
@@ -205,6 +272,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       log.info("New release.properties prepared   : " + releaseProperties.getAbsolutePath());
     } catch (IOException err) {
       log.error(err.getMessage());
+      System.exit(0);
     }
   }
 

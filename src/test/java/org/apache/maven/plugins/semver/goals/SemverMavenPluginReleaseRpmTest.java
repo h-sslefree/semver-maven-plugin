@@ -2,9 +2,7 @@ package org.apache.maven.plugins.semver.goals;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-
-import org.apache.maven.plugins.semver.AbstractSemverMavenPluginTest;
+import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +18,7 @@ import org.junit.Test;
  * @author sido
  *
  */
-public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTest{
+public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTest {
 
 	@Test
 	public void testSemverMavenPluginPatchRpm() throws Exception {
