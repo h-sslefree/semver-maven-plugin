@@ -29,6 +29,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   protected Git currentGitRepo;
   protected CredentialsProvider credProvider;
 
+  /**
+   * 
+   * <p></p>
+   * 
+   * @author sido
+   *
+   */
   public static enum VERSION {
     DEVELOPMENT(0), 
     RELEASE(1), 
@@ -102,14 +109,33 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "branchVersion")
   private String branchVersion;
 
+  /**
+   * 
+   * <p>Override runMode through configuration properties</p>
+   * 
+   * 
+   * @param runMode
+   */
   public void setRunMode(RUNMODE runMode) {
     this.runMode = runMode;
   }
 
+  /**
+   * 
+   * <p>Override branchVersion through configuration properties</p>
+   * 
+   * @param branchVersion
+   */
   public void setBranchVersion(String branchVersion) {
     this.branchVersion = branchVersion;
   }
-
+  
+  /**
+   * 
+   * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
+   * 
+   * @return {@link SemverConfiguration}
+   */
   public SemverConfiguration getConfiguration() {
     SemverConfiguration config = new SemverConfiguration();
     String userRunMode = session.getUserProperties().getProperty("runMode");
@@ -134,6 +160,48 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     return config;
   }
 
+  /**
+   * 
+   * <p>Initialize GIT-repo for determining branch and tag information.</p>
+   * 
+   * @throws Exception
+   */
+  protected void initializeRepository() throws Exception {
+	if(currentGitRepo == null && credProvider == null) {
+	  log.info("Initializing GIT-repository");
+	  FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+	  repoBuilder.addCeilingDirectory(project.getBasedir());
+	  repoBuilder.findGitDir(project.getBasedir());
+	  Repository repo = null;
+	  try {
+		repo = repoBuilder.build();
+		currentGitRepo = new Git(repo);
+		log.info(" - GIT-repository is initialized");
+	  } catch (Exception err) {
+	    log.error("This is not a valid GIT-repository.");
+	    log.error("Please run this goal in a valid GIT-repository");
+	    throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
+	  }
+	  if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
+	    credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
+		log.info(" - GIT-credential provider is initialized");
+	  } else {
+	    log.error("There are no valid credentials for the GIT-repo entered");
+	    log.error("Please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
+	    throw new Exception("There are no valid credentials for the GIT-repo entered"
+	    		+ "\nPlease enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
+	  }
+	} else {
+	  log.debug(" - GIT repository and the credentialsprovider are already initialized");
+	}
+  }
+  
+  /**
+   * 
+   * <p>When {@link RUNMODE} = RELEASE_RPM then determine branchVersion from GIT-branch</p>
+   * 
+   * @return branchVersion
+   */
   private String determineBranchVersionFromGitBranch() {
 	String value = null;
 	log.info("------------------------------------------------------------------------");  
@@ -165,37 +233,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 	
 	return value;
   }
-  
-  protected void initializeRepository() throws Exception {
-	if(currentGitRepo == null && credProvider == null) {
-      log.info("Initializing GIT-repository");
-      FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-	  repoBuilder.addCeilingDirectory(project.getBasedir());
-	  repoBuilder.findGitDir(project.getBasedir());
-	  Repository repo = null;
-	  try {
-		repo = repoBuilder.build();
-		currentGitRepo = new Git(repo);
-		log.info(" - GIT-repository is initialized");
-	  } catch (Exception err) {
-	    log.error("This is not a valid GIT-repository.");
-	    log.error("Please run this goal in a valid GIT-repository");
-	    throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
-	  }
-	  if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
-	    credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
-		log.info(" - GIT-credential provider is initialized");
-	  } else {
-	    log.error("There are no valid credentials for the GIT-repo entered");
-	    log.error("Please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
-	    throw new Exception("There are no valid credentials for the GIT-repo entered"
-	    		+ "\nPlease enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
-	  }
-	} else {
-	  log.debug(" - GIT repository and the credentialsprovider are already initialized");
-	}
-  }
-  
+ 
+  /**
+   * 
+   * 
+   * 
+   * @param releaseVersion
+   * @throws IOException
+   * @throws GitAPIException
+   */
   protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws IOException, GitAPIException {
     log.info("Check for lost-tags");
     log.info("------------------------------------------------------------------------");
@@ -234,6 +280,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   }
 
+  /**
+   * 
+   * @param developmentVersion
+   * @param major
+   * @param minor
+   * @param patch
+   */
   protected void createReleaseRpm(String developmentVersion, int major, int minor, int patch) {
 
     log.info("NEW versions on RPM base");
@@ -252,6 +305,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     createReleaseProperties(developmentVersion, releaseVersion, scmVersion);
   }
 
+  /**
+   * 
+   * @param developmentVersion
+   * @param releaseVersion
+   * @param scmVersion
+   */
   protected void createReleaseProperties(String developmentVersion, String releaseVersion, String scmVersion) {
     String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + releaseVersion;
     String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
