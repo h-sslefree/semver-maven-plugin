@@ -16,10 +16,10 @@
 		</repository>
 	</distributionManagement>
 	<scm>
-		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
-		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
-		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
-	</scm>
+		<url>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</url>
+		<connection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</connection>
+		<developerConnection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</developerConnection>
+  </scm>
 
 	<properties>
 
