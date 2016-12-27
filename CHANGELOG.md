@@ -1,6 +1,7 @@
-# semver-maven-plugin-0.9.0
+# semver-maven-plugin-1.0.0
 
 
+**1.0.0**  
 **0.9.0**  
 27-12-2016 02:43:17    PATCH \[updated scm config\] (sido)  
 27-12-2016 02:38:30    PATCH \[updated config for obtaining username and password\] (sido)  
