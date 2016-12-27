@@ -16,10 +16,14 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import org.apache.maven.plugins.semver.exceptions.SemverException;
+
 import java.io.*;
 import java.util.List;
 
 public abstract class SemverMavenPlugin extends AbstractMojo {
+
+  private boolean isRemoteEnabled = false;
 
   protected static final String LINE_BREAK = "------------------------------------------------------------------------";
 
@@ -35,7 +39,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @author sido
    *
    */
-  public static enum VERSION {
+  public enum VERSION {
     DEVELOPMENT(0), 
     RELEASE(1), 
     MAJOR(2), 
@@ -63,7 +67,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * 
    * @author sido
    */
-  public static enum RUNMODE {
+  public enum RUNMODE {
     RELEASE, 
     RELEASE_RPM, 
     NATIVE, 
@@ -73,13 +77,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     public static RUNMODE convertToEnum(String runMode) {
       RUNMODE value = RUNMODE_NOT_SPECIFIED;
       if (runMode != null) {
-        if (runMode.equals("RELEASE")) {
+        if ("RELEASE".equals(runMode)) {
           value = RELEASE;
-        } else if (runMode.equals("RELEASE_RPM")) {
+        } else if ("RELEASE_RPM".equals(runMode)) {
           value = RELEASE_RPM;
-        } else if (runMode.equals("NATIVE")) {
+        } else if ("NATIVE".equals(runMode)) {
           value = NATIVE;
-        } else if (runMode.equals("NATIVE_RPM")) {
+        } else if ("NATIVE_RPM".equals(runMode)) {
           value = NATIVE_RPM;
         }
       }
@@ -169,9 +173,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * 
    * @throws Exception
    */
-  protected void initializeRepository() throws Exception {
+  protected void initializeRepository() throws SemverException {
     if(currentGitRepo == null && credProvider == null) {
-      log.info("Initializing GIT-repository");
+      log.info("*** Initializing GIT-repository");
       FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
       repoBuilder.addCeilingDirectory(project.getBasedir());
       repoBuilder.findGitDir(project.getBasedir());
@@ -184,18 +188,20 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         log.error(" - This is not a valid GIT-repository.");
         log.error(" - Please run this goal in a valid GIT-repository");
         log.error(" - Could not initialize repostory", err);
-        throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
+        throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
       }
       if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
+        isRemoteEnabled = true;
         credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
         log.info(" - GIT-credential provider is initialized");
       } else {
-        log.warn(" - There is no connection to the remote repository");
+        log.warn(" - There is no connection to the remote GIT-repository");
         log.warn(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
       }
 	  } else {
 	    log.debug(" - GIT repository and the credentialsprovider are already initialized");
 	  }
+    log.info("*** GIT-repository initializing finished");
   }
   
   /**
@@ -244,34 +250,39 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @throws IOException
    * @throws GitAPIException
    */
-  protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws IOException, GitAPIException {
+  protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws SemverException, IOException, GitAPIException {
     log.info("Check for lost-tags");
     log.info(LINE_BREAK);
     try {
       initializeRepository();
-	} catch (Exception e) {
-	  log.error("Could not initialize GIT-repository", e);
-	}  
-    currentGitRepo.pull().setCredentialsProvider(credProvider).call();
-    List<Ref> refs = currentGitRepo.tagList().call();
-    log.debug("Remote tags: " + refs.toString());
-    if (refs.isEmpty()) {
-      boolean found = false;
-      for (Ref ref : refs) {
-        if (ref.getName().contains(releaseVersion)) {
-          found = true;
-          log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
-          currentGitRepo.tagDelete().setTags(ref.getName()).call();
-          RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
-          log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
-          currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
+    } catch (Exception e) {
+	    log.error("Could not initialize GIT-repository", e);
+	  }
+	  if(isRemoteEnabled) {
+      currentGitRepo.pull().setCredentialsProvider(credProvider).call();
+      List<Ref> refs = currentGitRepo.tagList().call();
+      log.debug("Remote tags: " + refs.toString());
+      if (refs.isEmpty()) {
+        boolean found = false;
+        for (Ref ref : refs) {
+          if (ref.getName().contains(releaseVersion)) {
+            found = true;
+            log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+            currentGitRepo.tagDelete().setTags(ref.getName()).call();
+            RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
+            log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+            currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
+          }
         }
-      }
-      if (!found) {
+        if (!found) {
+          log.info("No local or remote lost tags found");
+        }
+      } else {
         log.info("No local or remote lost tags found");
       }
     } else {
-      log.info("No local or remote lost tags found");
+      log.warn("Remote is not initialized. Could not delete remote tags");
+//      throw new SemverException("Remote is not initialized. Could not delete remote tags");
     }
     currentGitRepo.close();
     log.info(LINE_BREAK);
@@ -330,8 +341,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         }
       }
       FileWriter fileWriter = new FileWriter(releaseProperties);
-      fileWriter.close();
-
       StringBuilder releaseText = new StringBuilder();
       releaseText.append(mavenProjectRelease);
       releaseText.append("\n");
@@ -340,7 +349,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       releaseText.append(mavenProjectScm);
 
       log.info("New release.properties prepared   : " + releaseProperties.getAbsolutePath());
+
       writeReleaseProperties(fileWriter, releaseText.toString());
+      fileWriter.close();
     } catch (IOException err) {
       log.error("Semver plugin is terminating");
       log.error("Error when creating new release.properties", err);

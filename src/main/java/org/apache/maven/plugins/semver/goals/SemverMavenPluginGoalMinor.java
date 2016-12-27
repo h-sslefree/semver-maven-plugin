@@ -33,7 +33,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
 
     List<String> versions = new ArrayList<String>();
     try {

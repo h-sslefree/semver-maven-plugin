@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>semver-maven-plugin</artifactId>
@@ -10,21 +9,15 @@
 	<url>http://maven.apache.org</url>
 	<distributionManagement>
 		<repository>
-			<id>nexus-releases</id>
+			<id>maven-releases</id>
 			<name>Internal Releases</name>
-			<url>http://nexus.bicat.com/nexus/content/repositories/releases</url>
+			<url>http://repository.bicat.com/repository/maven-releases</url>
 		</repository>
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>Internal Snapshots</name>
-			<url>http://nexus.bicat.com/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
 	</distributionManagement>
 	<scm>
 		<url>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</url>
 		<connection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</connection>
 		<developerConnection>scm:git:http://git.bicat.com/scm/build-configuration/semver-maven-plugin.git</developerConnection>
-		<tag>0.4.0</tag>
 	</scm>
 
 	<properties>
@@ -32,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.sourceCompiler>1.6</project.build.sourceCompiler>
 
-		<gitlog-pattern>^(?!PATCH \[.*\]|FEATURE \[.*\]|CHORE \[.*\]).*</gitlog-pattern>
+		<gitlog-pattern>^(?!PATCH \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING \[.*\]).*</gitlog-pattern>
 
 		<sonar.host.url>http://sonar.bicat.com/</sonar.host.url>
 
