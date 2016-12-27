@@ -145,8 +145,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @throws SemverException exception for not initializing local and remote repository
    */
   protected void initializeRepository() throws SemverException {
+    log.info(FUNCTION_LINE_BREAK);
     if (currentGitRepo == null && credProvider == null) {
-      log.info(FUNCTION_LINE_BREAK);
       log.info("Initializing GIT-repository");
       FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
       repoBuilder.addCeilingDirectory(project.getBasedir());
@@ -171,7 +171,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         log.debug(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
       }
     } else {
-      log.debug(" - GIT repository and the credentialsprovider are already initialized");
+      log.debug("GIT repository and the credentialsprovider are already initialized");
     }
     log.info("GIT-repository initializing finished");
     log.info(FUNCTION_LINE_BREAK);
@@ -222,6 +222,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
+    log.info("Setup HttpClient connection to: " + getConfiguration().getBranchConversionUrl() + branch) ;
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     CloseableHttpResponse response = null;
     try {
@@ -229,7 +230,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       httpGet.addHeader("Content-Type", "application/json");
       response = httpClient.execute(httpGet);
       log.info("Versionizer returned response-code: " + response.getStatusLine());
-      branchVersion = EntityUtils.toString(response.getEntity());
+      HttpEntity entity = response.getEntity();
+      branchVersion = EntityUtils.toString(entity);
       if (branchVersion != null) {
         log.info("Versionizer returned branch version: " + branchVersion);
       } else {
