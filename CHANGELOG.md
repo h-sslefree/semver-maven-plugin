@@ -1,5 +1,8 @@
-# semver-maven-plugin-1.0.2
+# semver-maven-plugin-1.0.3
 
+
+**1.0.3**  
+27-12-2016 04:55:30    PATCH \[patch branchConversionUrl\] (sido)  
 
 **1.0.2**  
 27-12-2016 04:45:33    PATCH \[close httpclient at right moment\] (sido)  
