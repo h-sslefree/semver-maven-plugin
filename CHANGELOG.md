@@ -1,5 +1,18 @@
-# semver-maven-plugin-0.8.0
+# semver-maven-plugin-0.9.0
 
+
+**0.9.0**  
+27-12-2016 02:43:17    PATCH \[updated scm config\] (sido)  
+27-12-2016 02:38:30    PATCH \[updated config for obtaining username and password\] (sido)  
+27-12-2016 01:14:52    CHORE \[changed artifact name\] (sido)  
+27-12-2016 01:10:52    CHORE \[refactored to make logging more explicit\] (sido)  
+27-12-2016 12:12:47    PATCH \[added breaking to gitlog and updated git repo initialition\] (sido)  
+27-12-2016 11:05:54    PATCH \[added own exception\] (sido)  
+27-12-2016 11:03:29    PATCH \[more compliant to sonar way\] (sido)  
+27-12-2016 10:00:42    PATCH \[added fuctionality for determining git branch from repo\] (sido)  
+15-11-2016 09:59:07    CHORE \[added javadoc for readability\] (sido)  
+15-11-2016 09:47:07    FEATURE \[determine wise-version from branch\] (sido)  
+01-11-2016 10:43:47    PATCH \[different setup for test to load configuration\] (sido)  
 
 **0.8.0**  
 28-10-2016 12:01:06    PATCH \[added build metadata\] (sido)  
