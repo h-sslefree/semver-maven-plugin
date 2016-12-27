@@ -34,7 +34,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
-    log.info(LINE_BREAK);
+    log.info(MOJO_LINE_BREAK);
     
     try {
       cleanupGitRemoteTags(scmConnection, scmRoot);
@@ -47,7 +47,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
     log.info("Determine local and remote GIT-tags for GIT-repo");
-    log.info(LINE_BREAK);
+    log.info(MOJO_LINE_BREAK);
     try {
 	  initializeRepository();
 	} catch (Exception e) {
@@ -75,7 +75,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     }
     
     currentGitRepo.close();
-    log.info(LINE_BREAK);
+    log.info(MOJO_LINE_BREAK);
     
   }
 

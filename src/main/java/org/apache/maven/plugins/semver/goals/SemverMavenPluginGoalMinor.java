@@ -33,7 +33,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
-    log.info(LINE_BREAK);
+    log.info(MOJO_LINE_BREAK);
 
     List<String> versions = new ArrayList<String>();
     try {
@@ -63,10 +63,10 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String[] rawVersion = version.split("\\.");
     if (rawVersion.length > 0 && rawVersion.length == 3) {
       log.debug("Set version-variables from POM.xml");
-      log.debug(LINE_BREAK);
+      log.debug(MOJO_LINE_BREAK);
       majorVersion = Integer.valueOf(rawVersion[0]);
       minorVersion = Integer.valueOf(rawVersion[1]);
-      patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf("-")));
+      patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
     } else {
       log.error("Unrecognized version-pattern");
       log.error("Semver plugin is terminating");
@@ -76,20 +76,21 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     log.debug("MAJOR-version                    : " + majorVersion);
     log.debug("MINOR-version                    : " + minorVersion);
     log.debug("PATCH-version                    : " + patchVersion);
-    log.debug(LINE_BREAK);
+    log.debug(MOJO_LINE_BREAK);
 
     minorVersion = minorVersion + 1;
     patchVersion = 0;
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
+    String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     if(getConfiguration().getRunMode() == RUNMODE.RELEASE_RPM) {
       log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
     }
     log.info("New DEVELOPMENT-version           : " + developmentVersion);
-    log.info("New GIT-version                   : " + releaseVersion);
+    log.info("New GIT-version                   : " + scmVersion);
     log.info("New RELEASE-version               : " + releaseVersion);
-    log.info(LINE_BREAK);
+    log.info(MOJO_LINE_BREAK);
 
     versions.add(VERSION.DEVELOPMENT.getIndex(), developmentVersion);
     versions.add(VERSION.RELEASE.getIndex(), releaseVersion);
@@ -97,7 +98,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     versions.add(VERSION.MINOR.getIndex(), String.valueOf(minorVersion));
     versions.add(VERSION.PATCH.getIndex(), String.valueOf(patchVersion));
 
-    cleanupGitLocalAndRemoteTags(releaseVersion);
+    cleanupGitLocalAndRemoteTags(scmVersion);
     
     return versions;
   }
