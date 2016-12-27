@@ -30,6 +30,8 @@ import java.util.List;
 
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
+  private SemverConfiguration configuration;
+
   protected static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
   private static final String FUNCTION_LINE_BREAK = "************************************************************************";
   protected Log log = getLog();
@@ -77,66 +79,69 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @return {@link SemverConfiguration}
    */
   public SemverConfiguration getConfiguration() {
-    SemverConfiguration config = new SemverConfiguration();
-    String userRunMode = session.getUserProperties().getProperty("runMode");
-    String userBranchVersion = session.getUserProperties().getProperty("branchVersion");
-    String userScmUsername = session.getUserProperties().getProperty("username");
-    String userScmPassword = session.getUserProperties().getProperty("password");
-    String userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
+    if (configuration == null) {
+      configuration = new SemverConfiguration();
+      String userRunMode = session.getUserProperties().getProperty("runMode");
+      String userBranchVersion = session.getUserProperties().getProperty("branchVersion");
+      String userScmUsername = session.getUserProperties().getProperty("username");
+      String userScmPassword = session.getUserProperties().getProperty("password");
+      String userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
 
-    if (userRunMode != null) {
-      runMode = RUNMODE.convertToEnum(userRunMode);
-    }
-    if (runMode == RUNMODE.RELEASE_RPM) {
-      if (userBranchVersion != null) {
-        branchVersion = userBranchVersion;
+      if (userRunMode != null) {
+        runMode = RUNMODE.convertToEnum(userRunMode);
       }
-      if (branchVersion == null) {
-        branchVersion = determineBranchVersionFromGitBranch();
+      if (runMode == RUNMODE.RELEASE_RPM) {
+        if (userBranchVersion != null) {
+          branchVersion = userBranchVersion;
+        }
+        if (branchVersion == null) {
+          branchVersion = determineBranchVersionFromGitBranch();
+        }
+      } else {
+        branchVersion = "";
       }
-    } else {
-      branchVersion = "";
-    }
 
-    if (scmUsername == null || scmUsername.isEmpty()) {
-      scmUsername = userScmUsername;
       if (scmUsername == null || scmUsername.isEmpty()) {
-        scmUsername = "";
-        //TODO:SH Get username from settings.xml via plugin config
+        scmUsername = userScmUsername;
+        if (scmUsername == null || scmUsername.isEmpty()) {
+          scmUsername = "";
+          //TODO:SH Get username from settings.xml via plugin config
+        }
       }
-    }
 
-    if (scmPassword == null || scmPassword.isEmpty()) {
-      scmPassword = userScmPassword;
       if (scmPassword == null || scmPassword.isEmpty()) {
-        scmPassword = "";
-        //TODO:SH Get password from settings.xml via plugin config
+        scmPassword = userScmPassword;
+        if (scmPassword == null || scmPassword.isEmpty()) {
+          scmPassword = "";
+          //TODO:SH Get password from settings.xml via plugin config
+        }
       }
-    }
 
-    if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
-      branchConversionUrl = userBranchConversionUrl;
-    } else if (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl)) {
-      branchConversionUrl = userBranchConversionUrl;
-    }
+      if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
+        branchConversionUrl = userBranchConversionUrl;
+      } else if (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl)) {
+        branchConversionUrl = userBranchConversionUrl;
+      }
 
-    if (runMode != null) {
-      config.setRunMode(runMode);
+      if (runMode != null) {
+        configuration.setRunMode(runMode);
+      }
+      if (branchVersion != null) {
+        configuration.setBranchVersion(branchVersion);
+      }
+      if (scmUsername != null) {
+        configuration.setScmUsername(scmUsername);
+      }
+      if (scmPassword != null) {
+        configuration.setScmPassword(scmPassword);
+      }
+      if (branchConversionUrl != null) {
+        configuration.setBranchConversionUrl(branchConversionUrl);
+      }
+      return configuration;
+    } else {
+      return configuration;
     }
-    if (branchVersion != null) {
-      config.setBranchVersion(branchVersion);
-    }
-    if (scmUsername != null) {
-      config.setScmUsername(scmUsername);
-    }
-    if (scmPassword != null) {
-      config.setScmPassword(scmPassword);
-    }
-    if (branchConversionUrl != null) {
-      config.setBranchConversionUrl(branchConversionUrl);
-    }
-
-    return config;
   }
 
   /**
