@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.semver;
+package org.apache.maven.plugins.semver.configuration;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 

@@ -1,13 +1,17 @@
 package org.apache.maven.plugins.semver.goals;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.eclipse.jgit.api.errors.GitAPIException;
+
+import org.apache.maven.plugins.semver.exceptions.SemverException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -17,6 +21,7 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin;
 @Mojo(name = "major")
 public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
+  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
     String version = project.getVersion();
@@ -28,7 +33,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
 
     List<String> versions = new ArrayList<String>();
     try {
@@ -47,7 +52,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
   }
 
-  private List<String> determineVersions(String version) throws Exception {
+  private List<String> determineVersions(String version) throws SemverException, IOException, GitAPIException {
 
     List<String> versions = new ArrayList<String>();
 
@@ -56,18 +61,22 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     int patchVersion = 0;
 
     String[] rawVersion = version.split("\\.");
-    if (rawVersion.length == 3) {
+    if (rawVersion.length > 0 && rawVersion.length == 3) {
       log.debug("Set version-variables from POM.xml");
-      log.debug("------------------------------------------------------------------------");
+      log.debug(LINE_BREAK);
       majorVersion = Integer.valueOf(rawVersion[0]);
       minorVersion = Integer.valueOf(rawVersion[1]);
       patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf("-")));
+    } else {
+      log.error("Unrecognized version-pattern");
+      log.error("Semver plugin is terminating");
+      throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parseble version-pattern");
     }
 
     log.debug("MAJOR-version                    : " + majorVersion);
     log.debug("MINOR-version                    : " + minorVersion);
     log.debug("PATCH-version                    : " + patchVersion);
-    log.debug("------------------------------------------------------------------------");
+    log.debug(LINE_BREAK);
 
     majorVersion = majorVersion + 1;
     minorVersion = 0;
@@ -81,7 +90,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     log.info("New DEVELOPMENT-version           : " + developmentVersion);
     log.info("New GIT-version                   : " + releaseVersion);
     log.info("New RELEASE-version               : " + releaseVersion);
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
 
     versions.add(VERSION.DEVELOPMENT.getIndex(), developmentVersion);
     versions.add(VERSION.RELEASE.getIndex(), releaseVersion);

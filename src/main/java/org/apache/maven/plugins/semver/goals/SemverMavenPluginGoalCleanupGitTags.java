@@ -16,12 +16,13 @@ import org.eclipse.jgit.transport.RefSpec;
  * 
  * 
  * @author sido
- *
+ * @deprecated
  */
 @Deprecated
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
-  
+
+  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
     String version = project.getVersion();
@@ -33,7 +34,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     log.info("Version from POM                  : " + version);
     log.info("SCM-connection                    : " + scmConnection);
     log.info("SCM-root                          : " + scmRoot);
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
     
     try {
       cleanupGitRemoteTags(scmConnection, scmRoot);
@@ -46,15 +47,15 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
     log.info("Determine local and remote GIT-tags for GIT-repo");
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
     try {
 	  initializeRepository();
 	} catch (Exception e) {
-      log.error(e.getMessage());
+      log.error("Could not initialize GIT-reposiroty", e);
 	}
     currentGitRepo.pull().setCredentialsProvider(credProvider).call();
     List<Ref> refs = currentGitRepo.tagList().call();
-    if(refs.size() > 0) {
+    if(refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {
         if(ref.getName().contains(preparedReleaseTag)) {
@@ -74,7 +75,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     }
     
     currentGitRepo.close();
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
     
   }
 

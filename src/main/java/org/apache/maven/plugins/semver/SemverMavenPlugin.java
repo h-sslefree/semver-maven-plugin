@@ -5,6 +5,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -19,6 +20,8 @@ import java.io.*;
 import java.util.List;
 
 public abstract class SemverMavenPlugin extends AbstractMojo {
+
+  protected static final String LINE_BREAK = "------------------------------------------------------------------------";
 
   protected Log log = getLog();
 
@@ -167,33 +170,32 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @throws Exception
    */
   protected void initializeRepository() throws Exception {
-	if(currentGitRepo == null && credProvider == null) {
-	  log.info("Initializing GIT-repository");
-	  FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-	  repoBuilder.addCeilingDirectory(project.getBasedir());
-	  repoBuilder.findGitDir(project.getBasedir());
-	  Repository repo = null;
-	  try {
-		  repo = repoBuilder.build();
-		  currentGitRepo = new Git(repo);
-		  log.info(" - GIT-repository is initialized");
-	  } catch (Exception err) {
-	    log.error("This is not a valid GIT-repository.");
-	    log.error("Please run this goal in a valid GIT-repository");
-	    throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
-	  }
-	  if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
-	    credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
-		  log.info(" - GIT-credential provider is initialized");
+    if(currentGitRepo == null && credProvider == null) {
+      log.info("Initializing GIT-repository");
+      FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+      repoBuilder.addCeilingDirectory(project.getBasedir());
+      repoBuilder.findGitDir(project.getBasedir());
+      Repository repo = null;
+      try {
+        repo = repoBuilder.build();
+        currentGitRepo = new Git(repo);
+        log.info(" - GIT-repository is initialized");
+      } catch (Exception err) {
+        log.error(" - This is not a valid GIT-repository.");
+        log.error(" - Please run this goal in a valid GIT-repository");
+        log.error(" - Could not initialize repostory", err);
+        throw new Exception("This is not a valid GIT-repository. \nPlease run this goal in a valid GIT-repository");
+      }
+      if (!(scmPassword.isEmpty() || scmUsername.isEmpty())) {
+        credProvider = new UsernamePasswordCredentialsProvider(scmUsername, scmPassword);
+        log.info(" - GIT-credential provider is initialized");
+      } else {
+        log.warn(" - There is no connection to the remote repository");
+        log.warn(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
+      }
 	  } else {
-	    log.error("There are no valid credentials for the GIT-repo entered");
-	    log.error("Please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
-	    throw new Exception("There are no valid credentials for the GIT-repo entered"
-	    		+ "\nPlease enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize GIT correctly");
+	    log.debug(" - GIT repository and the credentialsprovider are already initialized");
 	  }
-	} else {
-	  log.debug(" - GIT repository and the credentialsprovider are already initialized");
-	}
   }
   
   /**
@@ -204,12 +206,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   private String determineBranchVersionFromGitBranch() {
 	String value = null;
-	log.info("------------------------------------------------------------------------");  
+	log.info(LINE_BREAK);
 	log.info("Determine current branchVersion from GIT-repository");	
 	try {
     initializeRepository();
 	} catch (Exception err) {
-	  log.error(err.getMessage());
+	  log.error("Could not initialize GIT-repository", err);
 	}
 	
 	try {  
@@ -227,7 +229,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 		  log.error("Branch is not set, semantic versioning for RPM is terminated");
 	  }
 	} catch(Exception err) {
-	  log.error("An error occured while trying to reach GIT-repo: " + err.getMessage());
+	  log.error("An error occured while trying to reach GIT-repo: ", err);
 	}
 	log.info("------------------------------------------------------------------------");  
 	
@@ -244,16 +246,16 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   protected void cleanupGitLocalAndRemoteTags(String releaseVersion) throws IOException, GitAPIException {
     log.info("Check for lost-tags");
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
     try {
       initializeRepository();
 	} catch (Exception e) {
-	  log.error(e.getMessage());	
+	  log.error("Could not initialize GIT-repository", e);
 	}  
     currentGitRepo.pull().setCredentialsProvider(credProvider).call();
     List<Ref> refs = currentGitRepo.tagList().call();
     log.debug("Remote tags: " + refs.toString());
-    if (refs.size() > 0) {
+    if (refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {
         if (ref.getName().contains(releaseVersion)) {
@@ -272,7 +274,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       log.info("No local or remote lost tags found");
     }
     currentGitRepo.close();
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
   }
 
   protected void createReleaseNative(String developmentVersion, String releaseVersion) {
@@ -281,7 +283,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * 
+   *
+   *
+   *
    * @param developmentVersion
    * @param major
    * @param minor
@@ -300,7 +304,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     log.info("New RPM GIT build metadata            : " + buildMetaData);
     log.info("New RPM GIT-version                   : " + scmVersion);
     log.info("New RPM RELEASE-version               : " + releaseVersion);
-    log.info("------------------------------------------------------------------------");
+    log.info(LINE_BREAK);
 
     createReleaseProperties(developmentVersion, releaseVersion, scmVersion);
   }
@@ -316,8 +320,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
     String mavenProjectScm = "scm.tag=" + scmVersion;
 
-
-
     try {
       File releaseProperties = new File("release.properties");
       if (releaseProperties.exists()) {
@@ -329,25 +331,42 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       }
       FileWriter fileWriter = new FileWriter(releaseProperties);
       fileWriter.close();
-      try {
-        Writer output = new BufferedWriter(fileWriter);
-        output.append(mavenProjectRelease + "\n");
-        output.append(mavenProjectDevelopment + "\n");
-        output.append(mavenProjectScm);
-        output.close();
-        log.info("New release.properties prepared   : " + releaseProperties.getAbsolutePath());
-      } catch (IOException err) {
-        log.error("Semver plugin is terminating");
-        log.error("Error when creating new release.properties", err);
-        Runtime.getRuntime().exit(0);
-      }
+
+      StringBuilder releaseText = new StringBuilder();
+      releaseText.append(mavenProjectRelease);
+      releaseText.append("\n");
+      releaseText.append(mavenProjectDevelopment);
+      releaseText.append("\n");
+      releaseText.append(mavenProjectScm);
+
+      log.info("New release.properties prepared   : " + releaseProperties.getAbsolutePath());
+      writeReleaseProperties(fileWriter, releaseText.toString());
     } catch (IOException err) {
       log.error("Semver plugin is terminating");
       log.error("Error when creating new release.properties", err);
-      Runtime.getRuntime().exit(0);
+      Runtime.getRuntime().exit(1);
     }
 
 
+  }
+
+  /**
+   *
+   * <p>Write actual file to disk</p>
+   *
+   * @param fileWriter
+   * @param releaseText
+   */
+  private void writeReleaseProperties(FileWriter fileWriter, String releaseText) {
+    try {
+      Writer output = new BufferedWriter(fileWriter);
+      output.append(releaseText);
+      output.close();
+    } catch (IOException err) {
+      log.error("Semver plugin is terminating");
+      log.error("Error when creating new release.properties", err);
+      Runtime.getRuntime().exit(1);
+    }
   }
 
 }
