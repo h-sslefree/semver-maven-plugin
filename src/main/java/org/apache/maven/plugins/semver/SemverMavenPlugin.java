@@ -227,6 +227,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       HttpGet httpGet = new HttpGet(getConfiguration().getBranchConversionUrl() + branch);
       httpGet.addHeader("Content-Type", "application/json");
       response = httpClient.execute(httpGet);
+      httpClient.close();
       log.info("Versionizer returned response-code: " + response.getStatusLine());
       branchVersion = EntityUtils.toString(response.getEntity());
       if (branchVersion != null) {
@@ -234,12 +235,17 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       } else {
         log.error("No branch version could be determined");
       }
+
     } catch (IOException err) {
       log.error("Could not make request to versionizer", err);
     } finally {
       try {
-        response.close();
-        httpClient.close();
+        if(response != null) {
+          response.close();
+        }
+        if(httpClient != null) {
+          httpClient.close();
+        }
       } catch (IOException err) {
         log.error("Could not close request to versionizer", err);
       }
