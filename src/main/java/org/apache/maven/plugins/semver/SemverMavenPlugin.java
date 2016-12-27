@@ -164,6 +164,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     if(scmUsername == null || scmUsername.isEmpty()) {
       scmUsername = userScmUsername;
       if(scmUsername == null || scmUsername.isEmpty()) {
+        scmUsername = "";
         //TODO:SH Get username from settings.xml via plugin config
       }
     }
@@ -171,6 +172,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     if(scmPassword == null || scmPassword.isEmpty()) {
       scmPassword = userScmPassword;
       if(scmPassword == null || scmPassword.isEmpty()) {
+        scmPassword = "";
         //TODO:SH Get password from settings.xml via plugin config
       }
     }
