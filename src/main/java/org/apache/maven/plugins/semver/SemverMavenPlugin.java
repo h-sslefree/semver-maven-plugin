@@ -5,6 +5,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.execution.MavenSession;
@@ -22,6 +23,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import sun.misc.IOUtils;
 
 import java.io.*;
 import java.util.List;
@@ -220,14 +222,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
-    CloseableHttpClient httpClient = null;
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     CloseableHttpResponse response = null;
     try {
-      httpClient = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(getConfiguration().getBranchConversionUrl() + branch);
       httpGet.addHeader("Content-Type", "application/json");
       response = httpClient.execute(httpGet);
-      httpClient.close();
       log.info("Versionizer returned response-code: " + response.getStatusLine());
       branchVersion = EntityUtils.toString(response.getEntity());
       if (branchVersion != null) {
@@ -235,7 +235,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       } else {
         log.error("No branch version could be determined");
       }
-
     } catch (IOException err) {
       log.error("Could not make request to versionizer", err);
     } finally {
