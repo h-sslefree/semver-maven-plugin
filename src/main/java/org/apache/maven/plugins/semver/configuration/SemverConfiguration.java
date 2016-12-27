@@ -8,7 +8,8 @@ public class SemverConfiguration {
   private String branchVersion;
   private String scmUsername;
   private String scmPassword;
-  
+  private String branchConversionUrl;
+
   public RUNMODE getRunMode() {
     return runMode;
   }
@@ -39,6 +40,14 @@ public class SemverConfiguration {
 
   public void setScmPassword(String scmPassword) {
     this.scmPassword = scmPassword;
+  }
+
+  public String getBranchConversionUrl() {
+    return this.branchConversionUrl;
+  }
+
+  public void setBranchConversionUrl(String branchConversionUrl) {
+    this.branchConversionUrl= branchConversionUrl;
   }
 
 }

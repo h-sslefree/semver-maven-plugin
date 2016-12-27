@@ -43,6 +43,7 @@
 		<maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
 
 		<org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
+        <org.apache.httpcomponents.httpclient-version>4.5.2</org.apache.httpcomponents.httpclient-version>
 
 		<maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
 		<junit-version>4.12</junit-version>
@@ -189,8 +190,14 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>${org.eclipse.jgit-version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${org.apache.httpcomponents.httpclient-version}</version>
+        </dependency>
 
-		<dependency>
+
+        <dependency>
 			<groupId>org.nuiton</groupId>
 			<artifactId>helper-maven-plugin</artifactId>
 			<version>${helper.maven.plugin-version}</version>
