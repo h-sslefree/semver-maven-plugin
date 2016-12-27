@@ -204,13 +204,19 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
           String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
           value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
         } else if (branch.equals("master")) {
+          log.info("Current branch matches            : master");
           value = determineVersionFromMasterBranch(branch);
         } else {
           log.error("Current branch does not match        : diget.diget.diget");
           log.error("And current branch does not match    : v+diget.diget.diget+*");
           log.error("And current branch does is not       : master");
           log.error("Branch is not set, semantic versioning for RPM is terminated");
+          Runtime.getRuntime().exit(1);
         }
+      } else {
+        log.error("Current branch is empty or null");
+        log.error("Branch is not set, semantic versioning for RPM is terminated");
+        Runtime.getRuntime().exit(1);
       }
     } catch (Exception err) {
       log.error("An error occured while trying to reach GIT-repo: ", err);
