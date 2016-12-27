@@ -18,6 +18,7 @@ import org.eclipse.jgit.transport.RefSpec;
  * @author sido
  *
  */
+@Deprecated
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   
@@ -37,9 +38,9 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     try {
       cleanupGitRemoteTags(scmConnection, scmRoot);
     } catch (IOException e) {
-      log.error(e.getMessage());
+      log.error("Error when determining config", e);
     } catch (GitAPIException e) {
-      log.error(e.getMessage());
+      log.error("Error when determining GIT-repo", e);
     }
   }
   
