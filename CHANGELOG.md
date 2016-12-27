@@ -1,5 +1,8 @@
-# semver-maven-plugin-1.0.0
+# semver-maven-plugin-1.0.1
 
+
+**1.0.1**  
+27-12-2016 04:36:24    PATCH \[closing httpclient else the repsonse is ongoing\] (sido)  
 
 **1.0.0**  
 **0.9.0**  
