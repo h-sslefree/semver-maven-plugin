@@ -6,7 +6,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -23,7 +22,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import sun.misc.IOUtils;
 
 import java.io.*;
 import java.util.List;
@@ -31,6 +29,8 @@ import java.util.List;
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private SemverConfiguration configuration;
+
+  private static final String BRANCH_CONVERSION_URL = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/";
 
   protected static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
   private static final String FUNCTION_LINE_BREAK = "************************************************************************";
@@ -52,7 +52,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private RUNMODE runMode;
   @Parameter(property = "branchVersion")
   private String branchVersion;
-  @Parameter(property = "branchConversionUrl", defaultValue = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/")
+  @Parameter(property = "branchConversionUrl", defaultValue = BRANCH_CONVERSION_URL)
   private String branchConversionUrl;
 
   /**
@@ -117,10 +117,11 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         }
       }
 
-      if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
+      if ((branchConversionUrl == null || branchConversionUrl.isEmpty()) ||
+              (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl))) {
         branchConversionUrl = userBranchConversionUrl;
-      } else if (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl)) {
-        branchConversionUrl = userBranchConversionUrl;
+      } else {
+        branchConversionUrl = BRANCH_CONVERSION_URL;
       }
 
       if (runMode != null) {
