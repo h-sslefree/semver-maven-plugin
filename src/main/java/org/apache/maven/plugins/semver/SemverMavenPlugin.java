@@ -183,7 +183,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
-    log.info("Setup HttpClient connection to  : " + getConfiguration().getBranchConversionUrl() + branch) ;
+    log.info("Setup connection to            : " + getConfiguration().getBranchConversionUrl() + branch) ;
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     CloseableHttpResponse response = null;
     try {
@@ -269,14 +269,14 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   protected void createReleaseBranch(String developmentVersion, int major, int minor, int patch) {
 
-    log.info("NEW versions on RPM base");
+    log.info("NEW versions on BRANCH base");
 
     String releaseVersion = getConfiguration().getBranchVersion() + "-" + String.format("%03d%03d%03d", major, minor, patch);
 
     String buildMetaData = major + "." + minor + "." + patch;
     String scmVersion = releaseVersion + "+" + buildMetaData;
 
-    log.info("New DEVELOPMENT-version               : " + developmentVersion);
+    log.info("New DEVELOPMENT-version                  : " + developmentVersion);
     log.info("New BRANCH GIT build metadata            : " + buildMetaData);
     log.info("New BRANCH GIT-version                   : " + scmVersion);
     log.info("New BRANCH RELEASE-version               : " + releaseVersion);
