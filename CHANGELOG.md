@@ -1,5 +1,10 @@
-# semver-maven-plugin-1.0.6
+# semver-maven-plugin-1.0.7
 
+
+**1.0.7**  
+28-12-2016 01:03:54    PATCH \[versionizer is now called right\] (sido)  
+28-12-2016 12:49:42    PATCH \[updated tests for branch versioning\] (sido)  
+28-12-2016 12:26:34    PATCH \[load configuration at startup\] (sido)  
 
 **1.0.6**  
 28-12-2016 09:59:14    PATCH \[set default url for branchconversion\] (sido)  
