@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.junit.Test;
 
@@ -23,11 +24,13 @@ public class SemverMavenPluginBranchConversionUrlTest extends AbstractSemverMave
 
   @Test
   public void testBranchConversionUrl() {
+    SemverConfiguration config = new SemverConfiguration();
+
     CloseableHttpClient httpClient = null;
     CloseableHttpResponse response = null;
     try {
       httpClient = HttpClients.createDefault();
-      HttpGet httpGet = new HttpGet("http://versionizer.bicat.com/v2/convert/branch_to_milestone/master");
+      HttpGet httpGet = new HttpGet(config.getBranchConversionUrl());
       httpGet.addHeader("Content-Type", "application/json");
       response = httpClient.execute(httpGet);
       log.info("Versionizer returned response-code: " + response.getStatusLine());
@@ -41,8 +44,12 @@ public class SemverMavenPluginBranchConversionUrlTest extends AbstractSemverMave
       log.error("Could not make request to versionizer", err);
     } finally {
       try {
-        response.close();
-        httpClient.close();
+        if(response != null) {
+          response.close();
+        }
+        if(httpClient != null) {
+          httpClient.close();
+        }
       } catch (IOException err) {
         log.error("Could not close request to versionizer", err);
       }

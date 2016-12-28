@@ -1,8 +1,11 @@
 package org.apache.maven.plugins.semver.configuration;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 
 public class SemverConfiguration {
+
+  private static final String BRANCH_CONVERSION_URL = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/";
 
   private RUNMODE runMode;
   private String branchVersion;
@@ -10,12 +13,92 @@ public class SemverConfiguration {
   private String scmPassword;
   private String branchConversionUrl;
 
+  private MavenSession session;
+
+  /**
+   * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
+   *
+   * @return {@link SemverConfiguration}
+   */
+  public SemverConfiguration(MavenSession session) {
+    this.session = session;
+    mergeConfiguration();
+  }
+
+  private void mergeConfiguration() {
+    String userRunMode = "";
+    String userBranchVersion = "";
+    String userScmUsername = "";
+    String userScmPassword = "";
+    String userBranchConversionUrl = "";
+    if(session != null) {
+      userRunMode = session.getUserProperties().getProperty("runMode");
+      userBranchVersion = session.getUserProperties().getProperty("branchVersion");
+      userScmUsername = session.getUserProperties().getProperty("username");
+      userScmPassword = session.getUserProperties().getProperty("password");
+      userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
+    }
+
+    if (userRunMode != null) {
+      runMode = RUNMODE.convertToEnum(userRunMode);
+    }
+    if (runMode == RUNMODE.RELEASE_BRANCH) {
+      if (userBranchVersion != null) {
+        branchVersion = userBranchVersion;
+      }
+      if (branchVersion == null) {
+        branchVersion = "";
+      }
+    }
+
+    if (scmUsername == null || scmUsername.isEmpty()) {
+      scmUsername = userScmUsername;
+      if (scmUsername == null || scmUsername.isEmpty()) {
+        scmUsername = "";
+        //TODO:SH Get username from settings.xml via plugin config
+      }
+    }
+
+    if (scmPassword == null || scmPassword.isEmpty()) {
+      scmPassword = userScmPassword;
+      if (scmPassword == null || scmPassword.isEmpty()) {
+        scmPassword = "";
+        //TODO:SH Get password from settings.xml via plugin config
+      }
+    }
+
+    if ((branchConversionUrl == null || branchConversionUrl.isEmpty()) ||
+            (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl))) {
+      branchConversionUrl = userBranchConversionUrl;
+    } else {
+      branchConversionUrl = BRANCH_CONVERSION_URL;
+    }
+
+    if (runMode != null) {
+      this.setRunMode(runMode);
+    }
+    if (branchVersion != null) {
+      this.setBranchVersion(branchVersion);
+    }
+    if (scmUsername != null) {
+      this.setScmUsername(scmUsername);
+    }
+    if (scmPassword != null) {
+      this.setScmPassword(scmPassword);
+    }
+    if (branchConversionUrl != null) {
+      this.setBranchConversionUrl(branchConversionUrl);
+    }
+
+  }
+
   public RUNMODE getRunMode() {
     return runMode;
   }
   
   public void setRunMode(RUNMODE runMode) {
     this.runMode = runMode;
+    mergeConfiguration();
   }
   
   public String getBranchVersion() {
@@ -24,6 +107,7 @@ public class SemverConfiguration {
   
   public void setBranchVersion(String branchVersion) {
     this.branchVersion = branchVersion;
+    mergeConfiguration();
   }
 
   public String getScmUsername() {
@@ -32,6 +116,7 @@ public class SemverConfiguration {
 
   public void setScmUsername(String scmUsername) {
     this.scmUsername = scmUsername;
+    mergeConfiguration();
   }
 
   public String getScmPassword() {
@@ -40,6 +125,7 @@ public class SemverConfiguration {
 
   public void setScmPassword(String scmPassword) {
     this.scmPassword = scmPassword;
+    mergeConfiguration();
   }
 
   public String getBranchConversionUrl() {
@@ -48,6 +134,9 @@ public class SemverConfiguration {
 
   public void setBranchConversionUrl(String branchConversionUrl) {
     this.branchConversionUrl= branchConversionUrl;
+    mergeConfiguration();
   }
+
+
 
 }

@@ -30,29 +30,39 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private SemverConfiguration configuration;
 
-  private static final String BRANCH_CONVERSION_URL = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/";
-
   protected static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
   private static final String FUNCTION_LINE_BREAK = "************************************************************************";
+
   protected Log log = getLog();
+
   protected Git currentGitRepo;
+
   protected CredentialsProvider credProvider;
+
+  private boolean isRemoteEnabled = false;
+
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
+
   @Parameter(property = "username", defaultValue = "")
   protected String scmUsername = "";
+
   @Parameter(property = "password", defaultValue = "")
   protected String scmPassword = "";
+
   @Parameter(property = "tag")
   protected String preparedReleaseTag;
+
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   protected MavenSession session;
-  private boolean isRemoteEnabled = false;
+
   @Parameter(property = "runMode", required = true, defaultValue = "RELEASE")
   private RUNMODE runMode;
+
   @Parameter(property = "branchVersion")
   private String branchVersion;
-  @Parameter(property = "branchConversionUrl", defaultValue = BRANCH_CONVERSION_URL)
+
+  @Parameter(property = "branchConversionUrl")
   private String branchConversionUrl;
 
   /**
@@ -73,76 +83,14 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     this.branchVersion = branchVersion;
   }
 
+
   /**
-   * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
+   * <p>Override branchConversionUrl through configuration properties</p>
    *
-   * @return {@link SemverConfiguration}
+   * @param branchConversionUrl get branchConversionUrl from plugin configuration
    */
-  public SemverConfiguration getConfiguration() {
-    if (configuration == null) {
-      configuration = new SemverConfiguration();
-      String userRunMode = session.getUserProperties().getProperty("runMode");
-      String userBranchVersion = session.getUserProperties().getProperty("branchVersion");
-      String userScmUsername = session.getUserProperties().getProperty("username");
-      String userScmPassword = session.getUserProperties().getProperty("password");
-      String userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
-
-      if (userRunMode != null) {
-        runMode = RUNMODE.convertToEnum(userRunMode);
-      }
-      if (runMode == RUNMODE.RELEASE_RPM) {
-        if (userBranchVersion != null) {
-          branchVersion = userBranchVersion;
-        }
-        if (branchVersion == null) {
-          branchVersion = determineBranchVersionFromGitBranch();
-        }
-      } else {
-        branchVersion = "";
-      }
-
-      if (scmUsername == null || scmUsername.isEmpty()) {
-        scmUsername = userScmUsername;
-        if (scmUsername == null || scmUsername.isEmpty()) {
-          scmUsername = "";
-          //TODO:SH Get username from settings.xml via plugin config
-        }
-      }
-
-      if (scmPassword == null || scmPassword.isEmpty()) {
-        scmPassword = userScmPassword;
-        if (scmPassword == null || scmPassword.isEmpty()) {
-          scmPassword = "";
-          //TODO:SH Get password from settings.xml via plugin config
-        }
-      }
-
-      if ((branchConversionUrl == null || branchConversionUrl.isEmpty()) ||
-              (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl))) {
-        branchConversionUrl = userBranchConversionUrl;
-      } else {
-        branchConversionUrl = BRANCH_CONVERSION_URL;
-      }
-
-      if (runMode != null) {
-        configuration.setRunMode(runMode);
-      }
-      if (branchVersion != null) {
-        configuration.setBranchVersion(branchVersion);
-      }
-      if (scmUsername != null) {
-        configuration.setScmUsername(scmUsername);
-      }
-      if (scmPassword != null) {
-        configuration.setScmPassword(scmPassword);
-      }
-      if (branchConversionUrl != null) {
-        configuration.setBranchConversionUrl(branchConversionUrl);
-      }
-      return configuration;
-    } else {
-      return configuration;
-    }
+  public void setBranchConversionUrl(String branchConversionUrl) {
+    this.branchConversionUrl = branchConversionUrl;
   }
 
   /**
@@ -151,6 +99,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @throws SemverException exception for not initializing local and remote repository
    */
   protected void initializeRepository() throws SemverException {
+
     log.info(FUNCTION_LINE_BREAK);
     if (currentGitRepo == null && credProvider == null) {
       log.info("Initializing GIT-repository");
@@ -429,9 +378,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   public enum RUNMODE {
     RELEASE,
-    RELEASE_RPM,
+    RELEASE_BRANCH,
     NATIVE,
-    NATIVE_RPM,
+    NATIVE_BRANCH,
     RUNMODE_NOT_SPECIFIED;
 
     public static RUNMODE convertToEnum(String runMode) {
@@ -439,16 +388,28 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       if (runMode != null) {
         if ("RELEASE".equals(runMode)) {
           value = RELEASE;
-        } else if ("RELEASE_RPM".equals(runMode)) {
-          value = RELEASE_RPM;
+        } else if ("RELEASE_BRANCH".equals(runMode)) {
+          value = RELEASE_BRANCH;
         } else if ("NATIVE".equals(runMode)) {
           value = NATIVE;
-        } else if ("NATIVE_RPM".equals(runMode)) {
-          value = NATIVE_RPM;
+        } else if ("NATIVE_BRANCH".equals(runMode)) {
+          value = NATIVE_BRANCH;
         }
       }
       return value;
     }
+  }
+
+  protected SemverConfiguration getConfiguration() {
+    if(configuration == null) {
+      configuration  = new SemverConfiguration(session);
+      configuration.setScmUsername(scmUsername);
+      configuration.setScmPassword(scmPassword);
+      configuration.setRunMode(runMode);
+      configuration.setBranchVersion(determineBranchVersionFromGitBranch());
+      configuration.setBranchConversionUrl(branchConversionUrl);
+    }
+    return configuration;
   }
 
 }
