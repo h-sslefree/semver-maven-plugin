@@ -2,6 +2,7 @@ package org.apache.maven.plugins.semver.goals;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 import org.junit.Assert;
@@ -20,6 +21,8 @@ import org.junit.Test;
  */
 public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTest {
 
+  private MavenSession session;
+
 	@Test
 	public void testSemverMavenPluginPatchRpm() throws Exception {
 		
@@ -27,7 +30,7 @@ public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTe
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 		assertEquals("6.3.4", mojo.getConfiguration().getBranchVersion());
-		assertEquals(RUNMODE.RELEASE_RPM, mojo.getConfiguration().getRunMode());
+		assertEquals(RUNMODE.RELEASE_BRANCH, mojo.getConfiguration().getRunMode());
 	}
 
 	@Test
@@ -36,7 +39,7 @@ public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTe
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 		assertEquals("6.3.4", mojo.getConfiguration().getBranchVersion());
-		assertEquals(RUNMODE.RELEASE_RPM, mojo.getConfiguration().getRunMode());
+		assertEquals(RUNMODE.RELEASE_BRANCH, mojo.getConfiguration().getRunMode());
 	}
 
 	@Test
@@ -45,7 +48,7 @@ public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTe
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 		assertEquals("6.3.4", mojo.getConfiguration().getBranchVersion());
-		assertEquals(RUNMODE.RELEASE_RPM, mojo.getConfiguration().getRunMode());
+		assertEquals(RUNMODE.RELEASE_BRANCH, mojo.getConfiguration().getRunMode());
 	}
 
 }

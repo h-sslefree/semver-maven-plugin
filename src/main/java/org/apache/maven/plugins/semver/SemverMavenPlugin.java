@@ -400,7 +400,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
-  protected SemverConfiguration getConfiguration() {
+  public SemverConfiguration getConfiguration() {
     if(configuration == null) {
       configuration  = new SemverConfiguration(session);
       configuration.setScmUsername(scmUsername);

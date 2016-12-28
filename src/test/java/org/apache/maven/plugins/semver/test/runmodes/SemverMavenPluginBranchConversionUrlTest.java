@@ -24,7 +24,7 @@ public class SemverMavenPluginBranchConversionUrlTest extends AbstractSemverMave
 
   @Test
   public void testBranchConversionUrl() {
-    SemverConfiguration config = new SemverConfiguration();
+    SemverConfiguration config = new SemverConfiguration(null);
 
     CloseableHttpClient httpClient = null;
     CloseableHttpResponse response = null;
