@@ -1,5 +1,8 @@
-# semver-maven-plugin-1.0.5
+# semver-maven-plugin-1.0.6
 
+
+**1.0.6**  
+28-12-2016 09:59:14    PATCH \[set default url for branchconversion\] (sido)  
 
 **1.0.5**  
 27-12-2016 05:10:22    PATCH \[patch branchConversionUrl\] (sido)  
