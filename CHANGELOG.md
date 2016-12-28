@@ -1,5 +1,8 @@
-# semver-maven-plugin-1.0.7
+# semver-maven-plugin-1.0.8
 
+
+**1.0.8**  
+28-12-2016 01:38:34    PATCH \[branchversion from configuration instead of hardcoded\] (sido)  
 
 **1.0.7**  
 28-12-2016 01:03:54    PATCH \[versionizer is now called right\] (sido)  
