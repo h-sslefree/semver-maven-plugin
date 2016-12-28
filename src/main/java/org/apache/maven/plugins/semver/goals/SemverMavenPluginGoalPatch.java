@@ -46,7 +46,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
       createReleaseNative(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH) {
-      createReleaseRpm(versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
+      createReleaseBranch(versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
     }
     
   }

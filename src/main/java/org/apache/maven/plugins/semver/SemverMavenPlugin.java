@@ -267,19 +267,19 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param minor              semantic minor-version to determine release-version and scm-tag version
    * @param patch              semantic patch-version to determine release-version and scm-tag version
    */
-  protected void createReleaseRpm(String developmentVersion, int major, int minor, int patch) {
+  protected void createReleaseBranch(String developmentVersion, int major, int minor, int patch) {
 
     log.info("NEW versions on RPM base");
 
-    String releaseVersion = branchVersion + "-" + String.format("%03d%03d%03d", major, minor, patch);
+    String releaseVersion = getConfiguration().getBranchVersion() + "-" + String.format("%03d%03d%03d", major, minor, patch);
 
     String buildMetaData = major + "." + minor + "." + patch;
     String scmVersion = releaseVersion + "+" + buildMetaData;
 
     log.info("New DEVELOPMENT-version               : " + developmentVersion);
-    log.info("New RPM GIT build metadata            : " + buildMetaData);
-    log.info("New RPM GIT-version                   : " + scmVersion);
-    log.info("New RPM RELEASE-version               : " + releaseVersion);
+    log.info("New BRANCH GIT build metadata            : " + buildMetaData);
+    log.info("New BRANCH GIT-version                   : " + scmVersion);
+    log.info("New BRANCH RELEASE-version               : " + releaseVersion);
     log.info(MOJO_LINE_BREAK);
 
     createReleaseProperties(developmentVersion, releaseVersion, scmVersion);
