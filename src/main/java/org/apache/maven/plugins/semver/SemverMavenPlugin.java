@@ -183,7 +183,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
-    log.info("Setup HttpClient connection to: " + getConfiguration().getBranchConversionUrl() + branch) ;
+    log.info("Setup HttpClient connection to  : " + getConfiguration().getBranchConversionUrl() + branch) ;
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     CloseableHttpResponse response = null;
     try {
@@ -194,7 +194,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       HttpEntity entity = response.getEntity();
       branchVersion = EntityUtils.toString(entity);
       if (branchVersion != null) {
-        log.info("Versionizer returned branch version: " + branchVersion);
+        log.info("Versionizer returned branchversion: " + branchVersion);
       } else {
         log.error("No branch version could be determined");
       }

@@ -67,27 +67,12 @@ public class SemverConfiguration {
       }
     }
 
-    if ((branchConversionUrl == null || branchConversionUrl.isEmpty()) ||
-            (userBranchConversionUrl != null && !userBranchConversionUrl.equals(branchConversionUrl))) {
-      branchConversionUrl = userBranchConversionUrl;
-    } else {
-      branchConversionUrl = BRANCH_CONVERSION_URL;
-    }
-
-    if (runMode != null) {
-      this.setRunMode(runMode);
-    }
-    if (branchVersion != null) {
-      this.setBranchVersion(branchVersion);
-    }
-    if (scmUsername != null) {
-      this.setScmUsername(scmUsername);
-    }
-    if (scmPassword != null) {
-      this.setScmPassword(scmPassword);
-    }
-    if (branchConversionUrl != null) {
-      this.setBranchConversionUrl(branchConversionUrl);
+    if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
+      if (userBranchConversionUrl != null && !userBranchConversionUrl.isEmpty()) {
+        branchConversionUrl = userBranchConversionUrl;
+      } else {
+        branchConversionUrl = BRANCH_CONVERSION_URL;
+      }
     }
 
   }
