@@ -271,12 +271,16 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
     log.info("NEW versions on RPM base");
 
-    String releaseVersion = getConfiguration().getBranchVersion() + "-" + String.format("%03d%03d%03d", major, minor, patch);
+    String releaseMetaData = major + "." + minor + "." + patch;
+    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+      releaseMetaData = String.format("%03d%03d%03d", major, minor, patch);
+    }
 
+    String releaseVersion = getConfiguration().getBranchVersion() + "-" + releaseMetaData;
     String buildMetaData = major + "." + minor + "." + patch;
     String scmVersion = releaseVersion + "+" + buildMetaData;
 
-    log.info("New DEVELOPMENT-version               : " + developmentVersion);
+    log.info("New DEVELOPMENT-version                  : " + developmentVersion);
     log.info("New BRANCH GIT build metadata            : " + buildMetaData);
     log.info("New BRANCH GIT-version                   : " + scmVersion);
     log.info("New BRANCH RELEASE-version               : " + releaseVersion);
@@ -379,6 +383,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public enum RUNMODE {
     RELEASE,
     RELEASE_BRANCH,
+    RELEASE_BRANCH_HOSEE,
     NATIVE,
     NATIVE_BRANCH,
     RUNMODE_NOT_SPECIFIED;
@@ -390,6 +395,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
           value = RELEASE;
         } else if ("RELEASE_BRANCH".equals(runMode)) {
           value = RELEASE_BRANCH;
+        } else if ("RELEASE_BRANCH_HOSEE".equals(runMode)) {
+          value = RELEASE_BRANCH_HOSEE;
         } else if ("NATIVE".equals(runMode)) {
           value = NATIVE;
         } else if ("NATIVE_BRANCH".equals(runMode)) {
