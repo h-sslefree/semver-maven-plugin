@@ -28,8 +28,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.sourceCompiler>1.6</project.build.sourceCompiler>
 
-    <gitlog-pattern>^(?!PATCH \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING \[.*\]).*</gitlog-pattern>
-
     <sonar.host.url>http://sonar.bicat.com/</sonar.host.url>
 
     <maven.plugin.plugin-version>3.5</maven.plugin.plugin-version>
