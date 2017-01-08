@@ -45,7 +45,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
       createReleaseProperties(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
       createReleaseNative(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
-    } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH) {
+    } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
       createReleaseBranch(versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
     }
     
@@ -82,7 +82,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH) {
+    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
       log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
     }
     log.info("New DEVELOPMENT-version           : " + developmentVersion);

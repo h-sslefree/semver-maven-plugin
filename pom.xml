@@ -1,222 +1,173 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>semver-maven-plugin</artifactId>
-	<packaging>maven-plugin</packaging>
-	<version>1.0.8-SNAPSHOT</version>
-	<name>Semantic Versioning Plugin</name>
-    <description>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</description>
-	<url>http://maven.apache.org</url>
-	<distributionManagement>
-		<repository>
-			<id>maven-releases</id>
-			<name>Internal Releases</name>
-			<url>http://repository.bicat.com/repository/maven-releases</url>
-		</repository>
-	</distributionManagement>
-	<scm>
-		<url>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</url>
-		<connection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</connection>
-		<developerConnection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</developerConnection>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>semver-maven-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>2.0.2-SNAPSHOT</version>
+  <name>Semantic Versioning Plugin</name>
+  <description>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</description>
+  <url>http://maven.apache.org</url>
+  <distributionManagement>
+    <repository>
+      <id>maven-releases</id>
+      <name>Internal Releases</name>
+      <url>http://repository.bicat.com/repository/maven-releases-components</url>
+    </repository>
+  </distributionManagement>
+  <scm>
+    <url>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</url>
+    <connection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</connection>
+    <developerConnection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
-	<properties>
+  <properties>
 
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.sourceCompiler>1.6</project.build.sourceCompiler>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.sourceCompiler>1.6</project.build.sourceCompiler>
 
-		<gitlog-pattern>^(?!PATCH \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING \[.*\]).*</gitlog-pattern>
+    <sonar.host.url>http://sonar.bicat.com/</sonar.host.url>
 
-		<sonar.host.url>http://sonar.bicat.com/</sonar.host.url>
+    <maven.plugin.plugin-version>3.5</maven.plugin.plugin-version>
+    <maven.compiler.plugin-version>3.1</maven.compiler.plugin-version>
+    <maven.sonar.plugin-version>3.0.1</maven.sonar.plugin-version>
+    <maven.release.plugin-version>2.5.3</maven.release.plugin-version>
+    <maven.exec.plugin-version>1.5.0</maven.exec.plugin-version>
+    <maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
+    <helper.maven.plugin-version>2.3.2</helper.maven.plugin-version>
 
-		<maven.plugin.plugin-version>3.5</maven.plugin.plugin-version>
-		<maven.compiler.plugin-version>3.1</maven.compiler.plugin-version>
-		<maven.sonar.plugin-version>3.0.1</maven.sonar.plugin-version>
-		<maven.release.plugin-version>2.5.3</maven.release.plugin-version>
-		<maven.exec.plugin-version>1.5.0</maven.exec.plugin-version>
-		<maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
-		<helper.maven.plugin-version>2.3.2</helper.maven.plugin-version>
+    <maven.plugin-version>3.3.9</maven.plugin-version>
+    <maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
 
-		<maven.plugin-version>3.3.9</maven.plugin-version>
-		<maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
+    <org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
+    <org.apache.httpcomponents.httpclient-version>4.5.2</org.apache.httpcomponents.httpclient-version>
 
-		<org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
-        <org.apache.httpcomponents.httpclient-version>4.5.2</org.apache.httpcomponents.httpclient-version>
+    <maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
+    <junit-version>4.12</junit-version>
 
-		<maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
-		<junit-version>4.12</junit-version>
-
-	</properties>
+  </properties>
 
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-plugin-plugin</artifactId>
-				<version>${maven.plugin.plugin-version}</version>
-				<configuration>
-					<goalPrefix>semver</goalPrefix>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-descriptor</id>
-						<phase>process-classes</phase>
-                        <goals>
-                           <goal>descriptor</goal>
-                        </goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven.compiler.plugin-version}</version>
-				<configuration>
-					<source>${project.build.sourceCompiler}</source>
-					<target>${project.build.sourceCompiler}</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>${maven.sonar.plugin-version}</version>
-				<executions>
-					<execution>
-						<id>update-sonarcube</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>sonar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.github.danielflower.mavenplugins</groupId>
-				<artifactId>gitlog-maven-plugin</artifactId>
-				<version>${maven.gitlog.plugin-version}</version>
-				<executions>
-					<execution>
-						<phase>deploy</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<!-- Use PATCH [*]: = Bugfix FEATURE [*]: = Feature CHORE [*]: = Git 
-								ignore bijwerken bijvoorbeeld -->
-							<excludeCommitsPattern>${gitlog-pattern}</excludeCommitsPattern>
-							<dateFormat>dd-MM-yyyy hh:mm:ss</dateFormat>
-							<reportTitle>${project.artifactId}-${project.version}</reportTitle>
-							<generatePlainTextChangeLog>false</generatePlainTextChangeLog>
-							<generateJSONChangeLog>false</generateJSONChangeLog>
-							<generateMarkdownChangeLog>true</generateMarkdownChangeLog>
-							<markdownChangeLogFilename>CHANGELOG.md</markdownChangeLogFilename>
-							<generateSimpleHTMLChangeLog>true</generateSimpleHTMLChangeLog>
-							<simpleHTMLChangeLogFilename>CHANGELOG.html</simpleHTMLChangeLogFilename>
-							<excludeCommiters>
-								<commiter>jenkins</commiter>
-							</excludeCommiters>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>${maven.exec.plugin-version}</version>
-				<executions>
-					<execution>
-						<id>generate-changelog</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>/usr/share/local/jenkins/copy_changelog.sh</executable>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>${maven.release.plugin-version}</version>
-				<configuration>
-					<tagNameFormat>@{project.version}</tagNameFormat>
-					<checkModificationExcludes>
-						<checkModificationExclude>pom.xml</checkModificationExclude>
-						<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
-					</checkModificationExcludes>
-				</configuration>
-			</plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${maven.plugin.plugin-version}</version>
+        <configuration>
+          <goalPrefix>semver</goalPrefix>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-descriptor</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin-version}</version>
+        <configuration>
+          <source>${project.build.sourceCompiler}</source>
+          <target>${project.build.sourceCompiler}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>${maven.sonar.plugin-version}</version>
+        <executions>
+          <execution>
+            <id>update-sonarcube</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>sonar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${maven.release.plugin-version}</version>
+        <configuration>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+          <checkModificationExcludes>
+            <checkModificationExclude>pom.xml</checkModificationExclude>
+            <checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
+          </checkModificationExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
-		</plugins>
-	</build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven.plugin-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${maven.plugin-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${maven.plugin-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>${maven.plugin-version}</version>
+    </dependency>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<version>${maven.plugin-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>${maven.plugin-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-			<version>${maven.plugin-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-compat</artifactId>
-			<version>${maven.plugin-version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>${maven.plugin.annotations-version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>${maven.plugin.annotations-version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.jgit</groupId>
-			<artifactId>org.eclipse.jgit</artifactId>
-			<version>${org.eclipse.jgit-version}</version>
-		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${org.apache.httpcomponents.httpclient-version}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>${org.eclipse.jgit-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${org.apache.httpcomponents.httpclient-version}</version>
+    </dependency>
 
 
-        <dependency>
-			<groupId>org.nuiton</groupId>
-			<artifactId>helper-maven-plugin</artifactId>
-			<version>${helper.maven.plugin-version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.nuiton</groupId>
+      <artifactId>helper-maven-plugin</artifactId>
+      <version>${helper.maven.plugin-version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.maven.plugin-testing</groupId>
-			<artifactId>maven-plugin-testing-harness</artifactId>
-			<version>${maven.plugin.testing.harness-version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+    <dependency>
+      <groupId>org.apache.maven.plugin-testing</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <version>${maven.plugin.testing.harness-version}</version>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit-version}</version>
-			<scope>test</scope>
-		</dependency>
 
-	</dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit-version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
 </project>
