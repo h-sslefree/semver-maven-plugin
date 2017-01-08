@@ -2,7 +2,7 @@ node {
   def mvnHome
   def versionTag = gitTag;
   def gitRemoteUser = 'jenkins';
-  def gitRemotUrl = 'git.bicat.com/scm/build/semver-maven-plugin';
+  def gitRemoteUrl = 'git.bicat.com/scm/build/semver-maven-plugin';
   def artifactId = "semver-maven-plugin";
   stage('Preparation') {
     // Clean workspace
