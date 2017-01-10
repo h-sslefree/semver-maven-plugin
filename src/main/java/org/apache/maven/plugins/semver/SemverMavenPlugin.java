@@ -152,48 +152,51 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   private String determineBranchVersionFromGitBranch() {
     String value = null;
-    log.info(MOJO_LINE_BREAK);
-    log.info("Determine current branchVersion from GIT-repository");
-    try {
-      initializeRepository();
-    } catch (Exception err) {
-      log.error("Could not initialize GIT-repository", err);
-    }
+    if(branchVersion == null || branchVersion.isEmpty()) {
+      log.info(MOJO_LINE_BREAK);
+      log.info("Determine current branchVersion from GIT-repository");
+      try {
+        initializeRepository();
+      } catch (Exception err) {
+        log.error("Could not initialize GIT-repository", err);
+      }
 
-    try {
-      String branch = currentGitRepo.getRepository().getBranch();
-      log.info("Current branch                    : " + branch);
-      if (branch != null && !branch.isEmpty()) {
-        if (branch.matches("\\d+.\\d+.\\d+.*")) {
-          log.info("Current branch matches            : \\d+.\\d+.\\d+.*");
-          value = branch;
-        } else if (branch.matches("v\\d+_\\d+_\\d+.*")) {
-          log.info("Current branch matches            : v\\d+_\\d+_\\d+.*");
-          String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
-          value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
-        } else if (branch.equals("master")) {
-          log.info("Current branch matches            : master");
-          value = determineVersionFromMasterBranch(branch);
-        } else if(branch.matches("^[a-z0-9]")) {
-          log.warn("Current branch matches md5-hash       : ^[a-z0-9]");
-          log.warn("Application is running tests");
+      try {
+        String branch = currentGitRepo.getRepository().getBranch();
+        log.info("Current branch                    : " + branch);
+        if (branch != null && !branch.isEmpty()) {
+          if (branch.matches("\\d+.\\d+.\\d+.*")) {
+            log.info("Current branch matches            : \\d+.\\d+.\\d+.*");
+            value = branch;
+          } else if (branch.matches("v\\d+_\\d+_\\d+.*")) {
+            log.info("Current branch matches            : v\\d+_\\d+_\\d+.*");
+            String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
+            value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
+          } else if (branch.equals("master")) {
+            log.info("Current branch matches            : master");
+            value = determineVersionFromMasterBranch(branch);
+          } else if (branch.matches("^[a-z0-9]")) {
+            log.warn("Current branch matches md5-hash       : ^[a-z0-9]");
+            log.warn("Application is running tests");
+          } else {
+            log.error("Current branch does not match        : digit.digit.digit");
+            log.error("And current branch does not match    : v+digit.digit.digit+*");
+            log.error("And current branch does is not       : master");
+            log.error("Branch is not set, semantic versioning for RPM is terminated");
+            Runtime.getRuntime().exit(1);
+          }
         } else {
-          log.error("Current branch does not match        : digit.digit.digit");
-          log.error("And current branch does not match    : v+digit.digit.digit+*");
-          log.error("And current branch does is not       : master");
+          log.error("Current branch is empty or null");
           log.error("Branch is not set, semantic versioning for RPM is terminated");
           Runtime.getRuntime().exit(1);
         }
-      } else {
-        log.error("Current branch is empty or null");
-        log.error("Branch is not set, semantic versioning for RPM is terminated");
-        Runtime.getRuntime().exit(1);
+      } catch (Exception err) {
+        log.error("An error occured while trying to reach GIT-repo: ", err);
       }
-    } catch (Exception err) {
-      log.error("An error occured while trying to reach GIT-repo: ", err);
+      log.info("------------------------------------------------------------------------");
+    } else {
+      value = branchVersion;
     }
-    log.info("------------------------------------------------------------------------");
-
     return value;
   }
 
