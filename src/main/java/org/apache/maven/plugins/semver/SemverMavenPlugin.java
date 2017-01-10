@@ -62,6 +62,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "branchVersion")
   private String branchVersion;
 
+  @Parameter(property = "metaData")
+  private String metaData;
+
   @Parameter(property = "branchConversionUrl")
   private String branchConversionUrl;
 
@@ -91,6 +94,16 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    */
   public void setBranchConversionUrl(String branchConversionUrl) {
     this.branchConversionUrl = branchConversionUrl;
+  }
+
+  /**
+   *
+   * <p>Create a postfix for the versionTag</p>
+   *
+   * @param metaData for example "-solr"
+   */
+  public void setMetaData(String metaData) {
+    this.metaData = metaData;
   }
 
   /**
@@ -271,14 +284,20 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
     log.info("NEW versions on BRANCH base");
 
-    String releaseMetaData = major + "." + minor + "." + patch;
+    String releaseTag = major + "." + minor + "." + patch;
     if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-      releaseMetaData = String.format("%03d%03d%03d", major, minor, patch);
+      releaseTag = String.format("%03d%03d%03d", major, minor, patch);
     }
 
-    String releaseVersion = getConfiguration().getBranchVersion() + "-" + releaseMetaData;
+    String releaseVersion = getConfiguration().getBranchVersion() + "-" + releaseTag;
     String buildMetaData = major + "." + minor + "." + patch;
-    String scmVersion = releaseVersion + "+" + buildMetaData;
+    String scmVersion = releaseVersion;
+    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+      scmVersion = releaseVersion + "+" + buildMetaData;
+    }
+    if(!getConfiguration().getMetaData().isEmpty()) {
+      scmVersion = scmVersion + "-" + getConfiguration().getMetaData();
+    }
 
     log.info("New DEVELOPMENT-version                  : " + developmentVersion);
     log.info("New BRANCH GIT build metadata            : " + buildMetaData);
@@ -415,6 +434,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setRunMode(runMode);
       configuration.setBranchVersion(determineBranchVersionFromGitBranch());
       configuration.setBranchConversionUrl(branchConversionUrl);
+      configuration.setMetaData(metaData);
     }
     return configuration;
   }

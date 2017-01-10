@@ -10,7 +10,7 @@
   <url>http://maven.apache.org</url>
   <distributionManagement>
     <repository>
-      <id>maven-releases</id>
+      <id>maven-releases-components</id>
       <name>Internal Releases</name>
       <url>http://repository.bicat.com/repository/maven-releases-components</url>
     </repository>

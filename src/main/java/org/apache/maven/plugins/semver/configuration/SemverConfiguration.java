@@ -12,6 +12,7 @@ public class SemverConfiguration {
   private String scmUsername;
   private String scmPassword;
   private String branchConversionUrl;
+  private String metaData;
 
   private MavenSession session;
 
@@ -31,12 +32,14 @@ public class SemverConfiguration {
     String userScmUsername = "";
     String userScmPassword = "";
     String userBranchConversionUrl = "";
+    String userMetaData = "";
     if(session != null) {
       userRunMode = session.getUserProperties().getProperty("runMode");
       userBranchVersion = session.getUserProperties().getProperty("branchVersion");
       userScmUsername = session.getUserProperties().getProperty("username");
       userScmPassword = session.getUserProperties().getProperty("password");
       userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
+      userMetaData = session.getUserProperties().getProperty("userMetaData");
     }
 
     if (userRunMode != null) {
@@ -72,6 +75,14 @@ public class SemverConfiguration {
         branchConversionUrl = userBranchConversionUrl;
       } else {
         branchConversionUrl = BRANCH_CONVERSION_URL;
+      }
+    }
+
+    if (metaData == null || metaData.isEmpty()) {
+      if (userMetaData != null && !userMetaData.isEmpty()) {
+        metaData = userMetaData;
+      } else {
+        metaData = "";
       }
     }
 
@@ -120,6 +131,15 @@ public class SemverConfiguration {
   public void setBranchConversionUrl(String branchConversionUrl) {
     this.branchConversionUrl= branchConversionUrl;
     mergeConfiguration();
+  }
+
+  public void setMetaData(String metaData) {
+    this.metaData = metaData;
+    mergeConfiguration();
+  }
+
+  public String getMetaData() {
+    return this.metaData;
   }
 
 
