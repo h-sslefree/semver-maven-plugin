@@ -23,12 +23,12 @@ node {
     junit '**/target/surefire-reports/TEST-*.xml'
   }
   stage('Release') {
-    echo 'Deploy on release repo';
+    echo "Deploy artifact: ${artifactId} on release-components repo";
     // deploy it in the staging repo
     sh "'${mvnHome}/bin/mvn' deploy"
     // push changelog to doc.bicat.com
     sh "'${mvnHome}/bin/mvn' gitlog:generate"
-    sh "/usr/share/local/jenkins/copy_changelog.sh " + artifactId;
+    sh "'/usr/share/local/jenkins/copy_changelog.sh' ${artifactId}"
     // email everbody with new changelog
     emailext body: '''Hi everybody,
       <br>
