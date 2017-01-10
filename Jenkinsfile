@@ -8,7 +8,7 @@ node {
     // Clean workspace
     step([$class: 'WsCleanup', cleanWhenFailure: false])
     // Get some code from git.bicat.com
-    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/tags/${gitTag}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-git', url: 'http://' + gitRemoteUser + '@' + gitRemoteUrl + '.git']]]
+    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-git', url: 'http://' + gitRemoteUser + '@' + gitRemoteUrl + '.git']]]
     // Get the Maven tool.
     mvnHome = tool 'MAVEN'
     // Set buildname
@@ -20,7 +20,7 @@ node {
   }
   stage('Test') {
     echo 'Gather testresults and push them to sonar';
-    //junit '**/target/surefire-reports/TEST-*.xml'
+    junit '**/target/surefire-reports/TEST-*.xml'
   }
   stage('Release') {
     echo 'Deploy on release repo';
