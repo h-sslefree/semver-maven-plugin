@@ -27,6 +27,7 @@ node {
     // deploy it in the staging repo
     sh "'${mvnHome}/bin/mvn' deploy"
     // push changelog to doc.bicat.com
+    sh "'${mvnHome}/bin/mvn' gitlog:generate"
     sh "/usr/share/local/jenkins/copy_changelog.sh " + artifactId;
     // email everbody with new changelog
     emailext body: '''Hi everybody,
