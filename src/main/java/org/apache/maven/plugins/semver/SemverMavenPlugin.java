@@ -302,7 +302,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       scmVersion = releaseVersion + "+" + buildMetaData;
     }
     if(!getConfiguration().getMetaData().isEmpty()) {
-      scmVersion = scmVersion + "-" + getConfiguration().getMetaData();
+      scmVersion = scmVersion + "+" + getConfiguration().getMetaData();
     }
 
     log.info("New DEVELOPMENT-version                  : " + developmentVersion);
