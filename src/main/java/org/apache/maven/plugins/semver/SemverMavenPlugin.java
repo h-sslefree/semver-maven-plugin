@@ -175,7 +175,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
           } else if (branch.equals("master")) {
             log.info("Current branch matches            : master");
             value = determineVersionFromMasterBranch(branch);
-          } else if (branch.matches("^[a-z0-9]")) {
+          } else if (branch.matches("^[a-z0-9]*")) {
             log.warn("Current branch matches md5-hash       : ^[a-z0-9]");
             log.warn("Application is running tests");
           } else {
