@@ -19,7 +19,7 @@ Include the following depedency in your pom.xml
 The latest version of the semver-maven-plugin is:
 
 ```
-<semver.maven.plugin-version>0.1.0</semver.maven.plugin-version>
+<semver.maven.plugin-version>2.2.1</semver.maven.plugin-version>
 ```
 
 It has be used in combination with the **maven-release-plugin**. 
