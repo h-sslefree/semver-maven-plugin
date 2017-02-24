@@ -40,12 +40,12 @@ Create a non-breaking new feature on your project: 0.x.0.
 
 * *major*
 
-Create a breaking changes in ygour project: x.0.0.
+Create a breaking changes in your project: x.0.0.
 
 **not yet implemented (will be avaiable in version 3.0.0)**
 * *rollback*
 
-Create a breaking changes in ygour project: x.0.0.
+Rollback a patch, minor or major version. Also deletes created GIT-tags on local and remote repository.
 
 *@Deprecated*
 * *cleanup-git-tags*
