@@ -12,8 +12,12 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+
 /**
- * 
+ *
+ * <p>Determine PATCH version for MAVEN-project.</p>
+ * <p>Example: move version x.x.1 to x.x.2.</p>
+ *
  * @author sido
  *
  */
@@ -50,7 +54,18 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     }
     
   }
-  
+
+
+  /**
+   *
+   * <p>Determine PATCHversion from POM-version.</p>
+   *
+   * @param version example: x.x.0-SNAPSHOT
+   * @return list of development, git and release-version
+   * @throws SemverException
+   * @throws IOException
+   * @throws GitAPIException
+   */
   private List<String> determineVersions(String version) throws SemverException, IOException, GitAPIException {
 
     List<String> versions = new ArrayList<String>();

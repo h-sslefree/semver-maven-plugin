@@ -13,8 +13,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * 
+ *
+ * <p>Determine MINOR version for MAVEN-project.</p>
+ * <p>Example: move version x.1.x to x.2.x.</p>
+ *
  * @author sido
  *
  */
@@ -51,7 +55,18 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     }
     
   }
-  
+
+
+  /**
+   *
+   * <p>Determine MINOR version from POM-version.</p>
+   *
+   * @param version example: x.0.x-SNAPSHOT
+   * @return list of development, git and release-version
+   * @throws SemverException
+   * @throws IOException
+   * @throws GitAPIException
+   */
   private List<String> determineVersions(String version) throws SemverException, IOException, GitAPIException {
 
     List<String> versions = new ArrayList<String>();

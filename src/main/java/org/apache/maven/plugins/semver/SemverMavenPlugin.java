@@ -27,41 +27,40 @@ import java.io.*;
 import java.util.List;
 
 /**
- *
  * <p>Abstract class to use as template for each goal in the plugin.</p>
+ *
+ * <p>Possible usages are:</p>
+ * <ul>
+ *   <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
+ *   <li>When {@link RUNMODE} = RELEASE_RPM then determine version from POM-version</li>
+ *   <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
+ *   <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
+ *   <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
+ *   <li>When {@link RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+ *   <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
+ * </ul>
  *
  * @author sido
  */
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
-  private SemverConfiguration configuration;
-
   protected static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
   private static final String FUNCTION_LINE_BREAK = "************************************************************************";
-
   protected Log log = getLog();
-
   protected Git currentGitRepo;
-
   protected CredentialsProvider credProvider;
-
-  private boolean isRemoteEnabled = false;
-
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
-
   @Parameter(property = "username", defaultValue = "")
   protected String scmUsername = "";
-
   @Parameter(property = "password", defaultValue = "")
   protected String scmPassword = "";
-
   @Parameter(property = "tag")
   protected String preparedReleaseTag;
-
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
   protected MavenSession session;
-
+  private SemverConfiguration configuration;
+  private boolean isRemoteEnabled = false;
   @Parameter(property = "runMode", required = true, defaultValue = "RELEASE")
   private RUNMODE runMode;
 
@@ -103,7 +102,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
    * <p>Create a postfix for the versionTag</p>
    *
    * @param metaData for example "-solr"
@@ -152,13 +150,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * <p>When {@link RUNMODE} = RELEASE_RPM then determine branchVersion from GIT-branch</p>
+   *
+   *
+   * <p>Determine branchVersion from GIT-branch</p>
    *
    * @return branchVersion
    */
   private String determineBranchVersionFromGitBranch() {
     String value = null;
-    if(branchVersion == null || branchVersion.isEmpty()) {
+    if (branchVersion == null || branchVersion.isEmpty()) {
       log.info(MOJO_LINE_BREAK);
       log.info("Determine current branchVersion from GIT-repository");
       try {
@@ -208,14 +208,14 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   /**
    *
+   * <p>Which new version is to be determined from the master-branch.</p>
    *
-   *
-   * @param branch
+   * @param branch branch
    * @return
    */
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
-    log.info("Setup connection to            : " + getConfiguration().getBranchConversionUrl() + branch) ;
+    log.info("Setup connection to            : " + getConfiguration().getBranchConversionUrl() + branch);
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     CloseableHttpResponse response = null;
     try {
@@ -234,10 +234,10 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       log.error("Could not make request to versionizer", err);
     } finally {
       try {
-        if(response != null) {
+        if (response != null) {
           response.close();
         }
-        if(httpClient != null) {
+        if (httpClient != null) {
           httpClient.close();
         }
       } catch (IOException err) {
@@ -248,7 +248,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
    * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
    *
    * @param scmVersion scmVersion
@@ -293,8 +292,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
-   * TODO SH: has to be developed in version 3
+   * TODO SH: has to be developed in version 3.0.0
    *
    * @param developmentVersion
    * @param releaseVersion
@@ -304,9 +302,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
-   * <p></p>
-   *
+   * <p>Create a specific version for production-version of the product.</p>
    *
    * @param developmentVersion
    * @param major              semantic major-version to determine release-version and scm-tag version
@@ -318,17 +314,17 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     log.info("NEW versions on BRANCH base");
 
     String releaseTag = major + "." + minor + "." + patch;
-    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+    if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
       releaseTag = String.format("%03d%03d%03d", major, minor, patch);
     }
 
     String releaseVersion = getConfiguration().getBranchVersion() + "-" + releaseTag;
     String buildMetaData = major + "." + minor + "." + patch;
     String scmVersion = releaseVersion;
-    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+    if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
       scmVersion = releaseVersion + "+" + buildMetaData;
     }
-    if(!getConfiguration().getMetaData().isEmpty()) {
+    if (!getConfiguration().getMetaData().isEmpty()) {
       scmVersion = scmVersion + "+" + getConfiguration().getMetaData();
     }
 
@@ -342,7 +338,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
    * <p>Create the release.properties file</p>
    *
    * @param developmentVersion needed by the pom to determine next development version
@@ -403,6 +398,24 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
+   * <p>Get merged configuration</p>
+   *
+   * @return SemverConfiguration
+   */
+  public SemverConfiguration getConfiguration() {
+    if (configuration == null) {
+      configuration = new SemverConfiguration(session);
+      configuration.setScmUsername(scmUsername);
+      configuration.setScmPassword(scmPassword);
+      configuration.setRunMode(runMode);
+      configuration.setBranchVersion(determineBranchVersionFromGitBranch());
+      configuration.setBranchConversionUrl(branchConversionUrl);
+      configuration.setMetaData(metaData);
+    }
+    return configuration;
+  }
+
+  /**
    * <p>Version-type is mentoined here.</p>
    *
    * @author sido
@@ -432,6 +445,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * <li>release-rpm</li>
    * <li>native</li>
    * <li>native-rpm</li>
+   * </ul>
    *
    * @author sido
    */
@@ -460,25 +474,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       }
       return value;
     }
-  }
-
-  /**
-   *
-   * <p>Get configuration</p>
-   *
-   * @return
-   */
-  public SemverConfiguration getConfiguration() {
-    if(configuration == null) {
-      configuration  = new SemverConfiguration(session);
-      configuration.setScmUsername(scmUsername);
-      configuration.setScmPassword(scmPassword);
-      configuration.setRunMode(runMode);
-      configuration.setBranchVersion(determineBranchVersionFromGitBranch());
-      configuration.setBranchConversionUrl(branchConversionUrl);
-      configuration.setMetaData(metaData);
-    }
-    return configuration;
   }
 
 }

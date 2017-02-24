@@ -14,7 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *
+ *
+ * <p>Determine MAJOR version for MAVEN-project.</p>
+ * <p>Example: move version 1.x.x to 2.x.x.</p>
+ *
  * @author sido
  *
  */
@@ -52,6 +56,16 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
   }
 
+  /**
+   *
+   * <p>Determine MAJOR version from POM-version.</p>
+   *
+   * @param version example: 0.x.x-SNAPSHOT
+   * @return list of development, git and release-version
+   * @throws SemverException
+   * @throws IOException
+   * @throws GitAPIException
+   */
   private List<String> determineVersions(String version) throws SemverException, IOException, GitAPIException {
 
     List<String> versions = new ArrayList<String>();

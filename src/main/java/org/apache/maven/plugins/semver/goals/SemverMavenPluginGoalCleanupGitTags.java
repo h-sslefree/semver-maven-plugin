@@ -13,8 +13,10 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RefSpec;
 
 /**
- * 
- * 
+ *
+ * <p>used to be a goal that was used before a build on a BUILD-server (HUDSON).</p>
+ * <p>Can be phased out when the BUILD-server jobs are obsolete.</p>
+ *
  * @author sido
  * @deprecated
  */
@@ -22,6 +24,11 @@ import org.eclipse.jgit.transport.RefSpec;
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
 
+  /**
+   *
+   * @throws MojoExecutionException
+   * @throws MojoFailureException
+   */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -44,14 +51,23 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
       log.error("Error when determining GIT-repo", e);
     }
   }
-  
+
+  /**
+   *
+   * <p>Cleanup lost GIT-tags before making a release on BUILD-server (for example HUDSON)</p>
+   *
+   * @param scmConnection
+   * @param scmRoot
+   * @throws IOException
+   * @throws GitAPIException
+   */
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
     log.info("Determine local and remote GIT-tags for GIT-repo");
     log.info(MOJO_LINE_BREAK);
     try {
 	  initializeRepository();
 	} catch (Exception e) {
-      log.error("Could not initialize GIT-reposiroty", e);
+      log.error("Could not initialize GIT-repository", e);
 	}
     currentGitRepo.pull().setCredentialsProvider(credProvider).call();
     List<Ref> refs = currentGitRepo.tagList().call();

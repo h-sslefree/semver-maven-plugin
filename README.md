@@ -1,9 +1,6 @@
-
 # semver-maven-plugin
 
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
-
-
 
 Check: [semver.org](https://www.semver.org) for more information
 
@@ -29,7 +26,7 @@ It has be used in combination with the **maven-release-plugin**.
 
 It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
   
-In version 3.0.0 the native-method is developed to get rid of the combination with the  
+In version 3.0.0 the native-method is developed to get rid of the dependency on the *maven-release-plugin*.
 
 ## Goals
 
@@ -45,15 +42,43 @@ Create a non-breaking new feature on your project: 0.x.0.
 
 Create a breaking changes in ygour project: x.0.0.
 
+**not yet implemented (will be avaiable in version 3.0.0)**
+* *rollback*
+
+Create a breaking changes in ygour project: x.0.0.
+
+*@Deprecated*
 * *cleanup-git-tags*
 
-Cleanup remote and local **build-**tags. Those are your to let the buildserver (Jenkins) know if a new build is needed. Not everey tag has a build attached to it.
+Cleanup remote and local **build-**tags. Run before the buildserver makes a release.
 
-**Example:**
+### Run the goals
 
-```mvn semver:patch```
+The goals that use the maven-release-plugin are attached to RUNMODES:
+* RELEASE
+* RELEASE_RPM
+* RELEASE_BRANCH
+* RELEASE_BRANCH_HOSEE
+
+To run the goals please execute the following commands:
+* `mvn semver:patch release:prepare`
+* `mvn semver:minor release:prepare`
+* `mvn semver:major release:prepare`
+
+**Not yet implemented**
+The goals that are native are attached to RUNMODES:
+* NATIVE
+* NATIVE_RPM
+
+To run the goals please execute the following commands:
+* `mvn semver:patch`
+* `mvn semver:minor`
+* `mvn semver:major`
+* `mvn semver:rollback` 
 
 
-## Build semver-maven-plugin
+## Build
 
-mvn install
+To build the semver-maven-plugin, execute the following command:
+
+`mvn clean package`

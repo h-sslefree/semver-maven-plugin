@@ -18,7 +18,7 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
  */
 public class SemverConfiguration {
 
-  private static final String BRANCH_CONVERSION_URL = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/";
+  private static final String BRANCH_CONVERSION_URL = "";
 
   private RUNMODE runMode;
   private String branchVersion;
@@ -107,19 +107,29 @@ public class SemverConfiguration {
 
   /**
    *
-   * <p>Get runmode.</p>
+   * <p>Get RUNMODE.</p>
    *
-   * @return
+   * @return RUNMODE
    */
   public RUNMODE getRunMode() {
     return runMode;
   }
-  
+
+  /**
+   *
+   * <p>Set RUNMODE and merge with configuration.</p>
+   *
+   * @param runMode
+   */
   public void setRunMode(RUNMODE runMode) {
     this.runMode = runMode;
     mergeConfiguration();
   }
-  
+
+  /**
+   *
+   * @return
+   */
   public String getBranchVersion() {
     return branchVersion;
   }
