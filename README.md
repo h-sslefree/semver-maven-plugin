@@ -22,9 +22,22 @@ The latest version of the semver-maven-plugin is:
 <semver.maven.plugin-version>2.2.1</semver.maven.plugin-version>
 ```
 
-It has be used in combination with the **maven-release-plugin**. 
+### Run configurations
+
+The goals that use the **maven-release-plugin** are attached to RUN_MODES:
+
+* RELEASE
+* RELEASE_RPM
+* RELEASE_BRANCH
 
 It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
+
+The goals that are **native** are attached to RUNMODES:
+
+**Not yet implemented**
+
+* NATIVE
+* NATIVE_RPM
   
 The **native**-method is developed in version: *3.0.0* to get rid of the dependency on the **maven-release-plugin**.
 
