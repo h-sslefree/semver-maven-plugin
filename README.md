@@ -62,7 +62,6 @@ The goals that use the **maven-release-plugin** are attached to RUNMODES:
 * RELEASE
 * RELEASE_RPM
 * RELEASE_BRANCH
-* RELEASE_BRANCH_HOSEE
 
 To run the goals please execute the following commands:
 
