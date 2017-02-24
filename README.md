@@ -12,17 +12,24 @@ Include the following depedency in your pom.xml
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
-  <version>${semver.maven.plugin-version}</version>
+  <version>2.2.1</version>
 </plugin>
 ```
 
-The latest version of the semver-maven-plugin is:
-
-```
-<semver.maven.plugin-version>2.2.1</semver.maven.plugin-version>
-```
-
 ### Run configurations
+
+You have to specify the configuration-tag to set the RUN_MODE.
+ 
+```
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>semver-maven-plugin</artifactId>
+  <version>2.2.1</version>
+  <configuration>
+    <runMode>RELEASE</runMode>
+  </configuration>
+</plugin>
+```
 
 The goals that use the **maven-release-plugin** are attached to RUN_MODES:
 
