@@ -3,6 +3,19 @@ package org.apache.maven.plugins.semver.configuration;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 
+/**
+ *
+ *
+ * <p>Semver Configuration is used to merge 3 types of configuration:
+ * <ul>
+ *   <li>MAVEN-plugin configuration</li>
+ *   <li>CLI configuration</li>
+ *   <li>Default configuration</li>
+ * </ul>
+ * </p>
+ *
+ * @author sido
+ */
 public class SemverConfiguration {
 
   private static final String BRANCH_CONVERSION_URL = "http://versionizer.bicat.com/v2/convert/branch_to_milestone/";
@@ -26,6 +39,10 @@ public class SemverConfiguration {
     mergeConfiguration();
   }
 
+  /**
+   *
+   * <p>Merges the 3 kinds of configuration</p>
+   */
   private void mergeConfiguration() {
     String userRunMode = "";
     String userBranchVersion = "";
@@ -88,6 +105,12 @@ public class SemverConfiguration {
 
   }
 
+  /**
+   *
+   * <p>Get runmode.</p>
+   *
+   * @return
+   */
   public RUNMODE getRunMode() {
     return runMode;
   }

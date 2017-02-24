@@ -26,6 +26,12 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.io.*;
 import java.util.List;
 
+/**
+ *
+ * <p>Abstract class to use as template for each goal in the plugin.</p>
+ *
+ * @author sido
+ */
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private SemverConfiguration configuration;
@@ -200,6 +206,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     return value;
   }
 
+  /**
+   *
+   *
+   *
+   * @param branch
+   * @return
+   */
   private String determineVersionFromMasterBranch(String branch) {
     String branchVersion = "";
     log.info("Setup connection to            : " + getConfiguration().getBranchConversionUrl() + branch) ;
@@ -235,7 +248,10 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * @param scmVersion
+   *
+   * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
+   *
+   * @param scmVersion scmVersion
    * @throws IOException
    * @throws GitAPIException
    */
@@ -276,11 +292,22 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     log.info(MOJO_LINE_BREAK);
   }
 
+  /**
+   *
+   * TODO SH: has to be developed in version 3
+   *
+   * @param developmentVersion
+   * @param releaseVersion
+   */
   protected void createReleaseNative(String developmentVersion, String releaseVersion) {
     // TODO:SH Create a native build for test-purposes only. This way we can ditch the release-plugin
   }
 
   /**
+   *
+   * <p></p>
+   *
+   *
    * @param developmentVersion
    * @param major              semantic major-version to determine release-version and scm-tag version
    * @param minor              semantic minor-version to determine release-version and scm-tag version
@@ -315,6 +342,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
+   *
+   * <p>Create the release.properties file</p>
+   *
    * @param developmentVersion needed by the pom to determine next development version
    * @param releaseVersion     releaseVersion is used in the release-pom for the JENKINS-build
    * @param scmVersion         scmVersion is used for tagging the version in GIT
@@ -373,7 +403,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * <p></p>
+   * <p>Version-type is mentoined here.</p>
    *
    * @author sido
    */
@@ -432,6 +462,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
+  /**
+   *
+   * <p>Get configuration</p>
+   *
+   * @return
+   */
   public SemverConfiguration getConfiguration() {
     if(configuration == null) {
       configuration  = new SemverConfiguration(session);

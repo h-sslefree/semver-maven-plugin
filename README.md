@@ -3,10 +3,11 @@
 
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
 
+
+
 Check: [semver.org](https://www.semver.org) for more information
 
 ## Usage
-
 
 Include the following depedency in your pom.xml
 
@@ -23,6 +24,12 @@ The latest version of the semver-maven-plugin is:
 ```
 <semver.maven.plugin-version>0.1.0</semver.maven.plugin-version>
 ```
+
+It has be used in combination with the **maven-release-plugin**. 
+
+It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
+  
+In version 3.0.0 the native-method is developed to get rid of the combination with the  
 
 ## Goals
 
