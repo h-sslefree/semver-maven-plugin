@@ -30,51 +30,51 @@ In version 3.0.0 the native-method is developed to get rid of the dependency on 
 
 ## Goals
 
-    * *patch*
-
+* *patch*
     Create a bug-fix on your project: 0.0.x. 
 
-    * *minor*
-
+* *minor*
     Create a non-breaking new feature on your project: 0.x.0.
 
-    * *major*
-
+* *major*
     Create a breaking changes in your project: x.0.0.
 
+* *rollback*
     **not yet implemented (will be avaiable in version 3.0.0)**
-    * *rollback*
-
     Rollback a patch, minor or major version. Also deletes created GIT-tags on local and remote repository.
 
-    *@Deprecated*
-    * *cleanup-git-tags*
 
-    Cleanup remote and local **build-**tags. Run before the buildserver makes a release.
+* *cleanup-git-tags*
+    *@Deprecated*
+    Cleanup remote and local **build-**tags. Run before the build-server makes a release.
 
 ### Run the goals
 
 The goals that use the maven-release-plugin are attached to RUNMODES:
-    * RELEASE
-    * RELEASE_RPM
-    * RELEASE_BRANCH
-    * RELEASE_BRANCH_HOSEE
+
+* RELEASE
+* RELEASE_RPM
+* RELEASE_BRANCH
+* RELEASE_BRANCH_HOSEE
 
 To run the goals please execute the following commands:
-    * `mvn semver:patch release:prepare`
-    * `mvn semver:minor release:prepare`
-    * `mvn semver:major release:prepare`
+
+* `mvn semver:patch release:prepare`
+* `mvn semver:minor release:prepare`
+* `mvn semver:major release:prepare`
 
 **Not yet implemented**
 The goals that are native are attached to RUNMODES:
-    * NATIVE
-    * NATIVE_RPM
+
+* NATIVE
+* NATIVE_RPM
 
 To run the goals please execute the following commands:
-    * `mvn semver:patch`
-    * `mvn semver:minor`
-    * `mvn semver:major`
-    * `mvn semver:rollback` 
+
+* `mvn semver:patch`
+* `mvn semver:minor`
+* `mvn semver:major`
+* `mvn semver:rollback` 
 
 
 ## Build
