@@ -26,7 +26,7 @@ It has be used in combination with the **maven-release-plugin**.
 
 It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
   
-In version 3.0.0 the native-method is developed to get rid of the dependency on the **maven-release-plugin**.
+The **native**-method is developed in version: *3.0.0* to get rid of the dependency on the **maven-release-plugin**.
 
 ## Goals
 
