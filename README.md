@@ -30,26 +30,26 @@ In version 3.0.0 the native-method is developed to get rid of the dependency on 
 
 ## Goals
 
-* *patch*
+* **patch**
 
     Create a bug-fix on your project: 0.0.x. 
 
-* *minor*
+* **minor**
 
     Create a non-breaking new feature on your project: 0.x.0.
 
-* *major*
+* **major**
 
     Create a breaking changes in your project: x.0.0.
 
-* *rollback*
+* **rollback**
 
-    **not yet implemented (will be avaiable in version 3.0.0)**
+    *not yet implemented (will be avaiable in version 3.0.0)*
     
     Rollback a patch, minor or major version. Also deletes created GIT-tags on local and remote repository.
 
 
-* *cleanup-git-tags*
+* **cleanup-git-tags**
 
     *@Deprecated*
     
@@ -70,9 +70,10 @@ To run the goals please execute the following commands:
 * `mvn semver:minor release:prepare`
 * `mvn semver:major release:prepare`
 
-**Not yet implemented**
 
 The goals that are **native** are attached to RUNMODES:
+
+**Not yet implemented**
 
 * NATIVE
 * NATIVE_RPM
