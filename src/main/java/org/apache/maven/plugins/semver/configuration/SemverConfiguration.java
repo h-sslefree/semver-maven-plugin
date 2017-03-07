@@ -4,13 +4,11 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
 
 /**
- *
- *
  * <p>Semver Configuration is used to merge 3 types of configuration:
  * <ul>
- *   <li>MAVEN-plugin configuration</li>
- *   <li>CLI configuration</li>
- *   <li>Default configuration</li>
+ * <li>MAVEN-plugin configuration</li>
+ * <li>CLI configuration</li>
+ * <li>Default configuration</li>
  * </ul>
  * </p>
  *
@@ -18,163 +16,204 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
  */
 public class SemverConfiguration {
 
-  private static final String BRANCH_CONVERSION_URL = "";
+    private static final String BRANCH_CONVERSION_URL = "";
 
-  private RUNMODE runMode;
-  private String branchVersion;
-  private String scmUsername;
-  private String scmPassword;
-  private String branchConversionUrl;
-  private String metaData;
+    private RUNMODE runMode;
+    private String branchVersion;
+    private String scmUsername;
+    private String scmPassword;
+    private String branchConversionUrl;
+    private String metaData;
 
-  private MavenSession session;
+    private MavenSession session;
 
-  /**
-   * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
-   *
-   * @return {@link SemverConfiguration}
-   */
-  public SemverConfiguration(MavenSession session) {
-    this.session = session;
-    mergeConfiguration();
-  }
-
-  /**
-   *
-   * <p>Merges the 3 kinds of configuration</p>
-   */
-  private void mergeConfiguration() {
-    String userRunMode = "";
-    String userBranchVersion = "";
-    String userScmUsername = "";
-    String userScmPassword = "";
-    String userBranchConversionUrl = "";
-    String userMetaData = "";
-    if(session != null) {
-      userRunMode = session.getUserProperties().getProperty("runMode");
-      userBranchVersion = session.getUserProperties().getProperty("branchVersion");
-      userScmUsername = session.getUserProperties().getProperty("username");
-      userScmPassword = session.getUserProperties().getProperty("password");
-      userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
-      userMetaData = session.getUserProperties().getProperty("userMetaData");
+    /**
+     * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
+     *
+     * @return {@link SemverConfiguration}
+     */
+    public SemverConfiguration(MavenSession session) {
+        this.session = session;
+        mergeConfiguration();
     }
 
-    if (userRunMode != null) {
-      runMode = RUNMODE.convertToEnum(userRunMode);
+    /**
+     * <p>Merges the 3 kinds of configuration</p>
+     */
+    private void mergeConfiguration() {
+        String userRunMode = "";
+        String userBranchVersion = "";
+        String userScmUsername = "";
+        String userScmPassword = "";
+        String userBranchConversionUrl = "";
+        String userMetaData = "";
+        if (session != null) {
+            userRunMode = session.getUserProperties().getProperty("runMode");
+            userBranchVersion = session.getUserProperties().getProperty("branchVersion");
+            userScmUsername = session.getUserProperties().getProperty("username");
+            userScmPassword = session.getUserProperties().getProperty("password");
+            userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
+            userMetaData = session.getUserProperties().getProperty("userMetaData");
+        }
+
+        if (userRunMode != null) {
+            runMode = RUNMODE.convertToEnum(userRunMode);
+        }
+        if (runMode == RUNMODE.RELEASE_BRANCH) {
+            if (userBranchVersion != null) {
+                branchVersion = userBranchVersion;
+            }
+            if (branchVersion == null) {
+                branchVersion = "";
+            }
+        }
+
+        if (scmUsername == null || scmUsername.isEmpty()) {
+            scmUsername = userScmUsername;
+            if (scmUsername == null || scmUsername.isEmpty()) {
+                scmUsername = "";
+                //TODO:SH Get username from settings.xml via plugin config
+            }
+        }
+
+        if (scmPassword == null || scmPassword.isEmpty()) {
+            scmPassword = userScmPassword;
+            if (scmPassword == null || scmPassword.isEmpty()) {
+                scmPassword = "";
+                //TODO:SH Get password from settings.xml via plugin config
+            }
+        }
+
+        if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
+            if (userBranchConversionUrl != null && !userBranchConversionUrl.isEmpty()) {
+                branchConversionUrl = userBranchConversionUrl;
+            } else {
+                branchConversionUrl = BRANCH_CONVERSION_URL;
+            }
+        }
+
+        if (metaData == null || metaData.isEmpty()) {
+            if (userMetaData != null && !userMetaData.isEmpty()) {
+                metaData = userMetaData;
+            } else {
+                metaData = "";
+            }
+        }
+
     }
-    if (runMode == RUNMODE.RELEASE_BRANCH) {
-      if (userBranchVersion != null) {
-        branchVersion = userBranchVersion;
-      }
-      if (branchVersion == null) {
-        branchVersion = "";
-      }
+
+    /**
+     * <p>Get RUNMODE</p>
+     * <ul>Possible runModes are:
+     *   <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
+     *   <li>When {@link RUNMODE} = RELEASE_RPM then determine version from POM-version</li>
+     *   <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
+     *   <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
+     * </ul>
+     *
+     * @return RUNMODE
+     */
+    public RUNMODE getRunMode() {
+        return runMode;
     }
 
-    if (scmUsername == null || scmUsername.isEmpty()) {
-      scmUsername = userScmUsername;
-      if (scmUsername == null || scmUsername.isEmpty()) {
-        scmUsername = "";
-        //TODO:SH Get username from settings.xml via plugin config
-      }
+    /**
+     * <p>Set RUNMODE and merge with configuration.</p>
+     *
+     * @param runMode
+     */
+    public void setRunMode(RUNMODE runMode) {
+        this.runMode = runMode;
+        mergeConfiguration();
     }
 
-    if (scmPassword == null || scmPassword.isEmpty()) {
-      scmPassword = userScmPassword;
-      if (scmPassword == null || scmPassword.isEmpty()) {
-        scmPassword = "";
-        //TODO:SH Get password from settings.xml via plugin config
-      }
+    /**
+     *
+     * <p>Returns the branchVersion of the current branch in which the parent project is in</p>
+     *
+     * @return branchVersion
+     */
+    public String getBranchVersion() {
+        return branchVersion;
     }
 
-    if (branchConversionUrl == null || branchConversionUrl.isEmpty()) {
-      if (userBranchConversionUrl != null && !userBranchConversionUrl.isEmpty()) {
-        branchConversionUrl = userBranchConversionUrl;
-      } else {
-        branchConversionUrl = BRANCH_CONVERSION_URL;
-      }
+    public void setBranchVersion(String branchVersion) {
+        this.branchVersion = branchVersion;
+        mergeConfiguration();
     }
 
-    if (metaData == null || metaData.isEmpty()) {
-      if (userMetaData != null && !userMetaData.isEmpty()) {
-        metaData = userMetaData;
-      } else {
-        metaData = "";
-      }
+    /**
+     *
+     * <p>To commit tags in SCM you have to have the username of the repostory</p>
+     *
+     * @return scmUsername
+     */
+    public String getScmUsername() {
+        return this.scmUsername;
     }
 
-  }
+    public void setScmUsername(String scmUsername) {
+        this.scmUsername = scmUsername;
+        mergeConfiguration();
+    }
 
-  /**
-   *
-   * <p>Get RUNMODE.</p>
-   *
-   * @return RUNMODE
-   */
-  public RUNMODE getRunMode() {
-    return runMode;
-  }
+    /**
+     *
+     * <p>To commit tags in SCM you have to have the password of the repostory</p>
+     *
+     * @return scmPassword
+     */
+    public String getScmPassword() {
+        return this.scmPassword;
+    }
 
-  /**
-   *
-   * <p>Set RUNMODE and merge with configuration.</p>
-   *
-   * @param runMode
-   */
-  public void setRunMode(RUNMODE runMode) {
-    this.runMode = runMode;
-    mergeConfiguration();
-  }
+    public void setScmPassword(String scmPassword) {
+        this.scmPassword = scmPassword;
+        mergeConfiguration();
+    }
 
-  /**
-   *
-   * @return
-   */
-  public String getBranchVersion() {
-    return branchVersion;
-  }
-  
-  public void setBranchVersion(String branchVersion) {
-    this.branchVersion = branchVersion;
-    mergeConfiguration();
-  }
+    /**
+     *
+     * <p>
+     *     THe branchConversionUrl is used to determine which version contains <br>
+     *     is the master-branch. THis is necessary to determine the next version of the <br>
+     *     <b>master</b>-brnach.
+     * </p>
+     *
+     * @return branchConversionUrl
+     */
+    public String getBranchConversionUrl() {
+        return this.branchConversionUrl;
+    }
 
-  public String getScmUsername() {
-    return this.scmUsername;
-  }
+    public void setBranchConversionUrl(String branchConversionUrl) {
+        this.branchConversionUrl = branchConversionUrl;
+        mergeConfiguration();
+    }
 
-  public void setScmUsername(String scmUsername) {
-    this.scmUsername = scmUsername;
-    mergeConfiguration();
-  }
+    public void setMetaData(String metaData) {
+        this.metaData = metaData;
+        mergeConfiguration();
+    }
 
-  public String getScmPassword() {
-    return this.scmPassword;
-  }
-
-  public void setScmPassword(String scmPassword) {
-    this.scmPassword = scmPassword;
-    mergeConfiguration();
-  }
-
-  public String getBranchConversionUrl() {
-    return this.branchConversionUrl;
-  }
-
-  public void setBranchConversionUrl(String branchConversionUrl) {
-    this.branchConversionUrl= branchConversionUrl;
-    mergeConfiguration();
-  }
-
-  public void setMetaData(String metaData) {
-    this.metaData = metaData;
-    mergeConfiguration();
-  }
-
-  public String getMetaData() {
-    return this.metaData;
-  }
-
+    /**
+     *
+     * <p>Version metaData is used to describe the version that is tagged.</p>
+     * <p>
+     *     For example:<br>
+     *     RPM-version: 6.4.0-002001003+2.1.5<br>
+     *     THe +2.1.3 is the metaData from the version<br>
+     *     It is parsed from 002001003.
+     * </p>
+     *
+     * @return metaData
+     */
+    public String getMetaData() {
+        return this.metaData;
+    }
 
 
 }

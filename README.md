@@ -71,7 +71,7 @@ The **native**-method is developed in version: *3.0.0* to get rid of the depende
 
 * **cleanup-git-tags**
 
-    *@Deprecated*
+    `@Deprecated`
     
     Cleanup remote and local **build-**tags. Run before the build-server makes a release.
 
