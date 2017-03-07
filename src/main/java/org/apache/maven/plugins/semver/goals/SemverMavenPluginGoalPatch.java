@@ -10,6 +10,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.factories.VersionFactory;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 
@@ -46,11 +48,11 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     }
     
     if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
-      createReleaseProperties(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
+      FileWriterFactory.createReleaseProperties(getLog(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
-      createReleaseNative(versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
+      VersionFactory.createReleaseNative(getLog(), getConfiguration(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
     } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-      createReleaseBranch(versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
+      VersionFactory.createReleaseBranch(getLog(), getConfiguration(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
     }
     
   }

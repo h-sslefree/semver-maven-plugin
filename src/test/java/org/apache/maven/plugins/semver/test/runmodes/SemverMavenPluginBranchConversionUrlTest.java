@@ -16,7 +16,10 @@ import java.io.IOException;
 import static org.apache.commons.logging.LogFactory.getLog;
 
 /**
- * Created by sido on 27-12-16.
+ *
+ *
+ *
+ * @author sido
  */
 public class SemverMavenPluginBranchConversionUrlTest extends AbstractSemverMavenPluginTest {
 

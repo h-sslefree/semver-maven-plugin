@@ -41,7 +41,10 @@ import java.util.List;
  * <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
  * </ul>
  * <ul>Possible value for the branchConversionUrl is
- * <li>http://localhost/determineBranchVersion</li>
+ * <li>branchConversionUrl = http://localhost/determineBranchVersion</li>
+ * </ul>
+ * <ul>Turn metaData on or off
+ * <li>metaData = true/false</li>
  * </ul>
  *
  * @author sido
@@ -50,7 +53,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
     protected final Log log = getLog();
 
-    protected static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
+    public static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
     private static final String FUNCTION_LINE_BREAK = "************************************************************************";
 
     protected Git currentGitRepo;
@@ -294,112 +297,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         }
         currentGitRepo.close();
         log.info(MOJO_LINE_BREAK);
-    }
-
-    /**
-     * TODO SH: has to be developed in version 3.0.0
-     *
-     * @param developmentVersion
-     * @param releaseVersion
-     */
-    protected void createReleaseNative(String developmentVersion, String releaseVersion) {
-        // TODO:SH Create a native build for test-purposes only. This way we can ditch the release-plugin
-    }
-
-    /**
-     * <p>Create a specific version for production-version of the product.</p>
-     *
-     * @param developmentVersion
-     * @param major              semantic major-version to determine release-version and scm-tag version
-     * @param minor              semantic minor-version to determine release-version and scm-tag version
-     * @param patch              semantic patch-version to determine release-version and scm-tag version
-     */
-    protected void createReleaseBranch(String developmentVersion, int major, int minor, int patch) {
-
-        log.info("NEW versions on BRANCH base");
-
-        String releaseTag = major + "." + minor + "." + patch;
-        if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-            releaseTag = String.format("%03d%03d%03d", major, minor, patch);
-        }
-
-        String releaseVersion = getConfiguration().getBranchVersion() + "-" + releaseTag;
-        String buildMetaData = major + "." + minor + "." + patch;
-        String scmVersion = releaseVersion;
-        if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-            scmVersion = releaseVersion + "+" + buildMetaData;
-        }
-        if (!getConfiguration().getMetaData().isEmpty()) {
-            scmVersion = scmVersion + "+" + getConfiguration().getMetaData();
-        }
-
-        log.info("New DEVELOPMENT-version                  : " + developmentVersion);
-        log.info("New BRANCH GIT build metadata            : " + buildMetaData);
-        log.info("New BRANCH GIT-version                   : " + scmVersion);
-        log.info("New BRANCH RELEASE-version               : " + releaseVersion);
-        log.info(MOJO_LINE_BREAK);
-
-        createReleaseProperties(developmentVersion, releaseVersion, scmVersion);
-    }
-
-    /**
-     * <p>Create the release.properties file</p>
-     *
-     * @param developmentVersion needed by the pom to determine next development version
-     * @param releaseVersion     releaseVersion is used in the release-pom for the JENKINS-build
-     * @param scmVersion         scmVersion is used for tagging the version in GIT
-     */
-    protected void createReleaseProperties(String developmentVersion, String releaseVersion, String scmVersion) {
-        String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + releaseVersion;
-        String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
-        String mavenProjectScm = "scm.tag=" + scmVersion;
-
-        try {
-            File releaseProperties = new File("release.properties");
-            if (releaseProperties.exists()) {
-                log.info("Old release.properties removed    : " + releaseProperties.getAbsolutePath());
-                boolean isDeleted = releaseProperties.delete();
-                if (!isDeleted) {
-                    log.error("File: release.properties.xml is not removed");
-                }
-            }
-            FileWriter fileWriter = new FileWriter(releaseProperties);
-            StringBuilder releaseText = new StringBuilder();
-            releaseText.append(mavenProjectRelease);
-            releaseText.append("\n");
-            releaseText.append(mavenProjectDevelopment);
-            releaseText.append("\n");
-            releaseText.append(mavenProjectScm);
-
-            log.info("New release.properties prepared   : " + releaseProperties.getAbsolutePath());
-
-            writeReleaseProperties(fileWriter, releaseText);
-            fileWriter.close();
-        } catch (IOException err) {
-            log.error("Semver plugin is terminating");
-            log.error("Error when creating new release.properties", err);
-            Runtime.getRuntime().exit(1);
-        }
-
-
-    }
-
-    /**
-     * <p>Write actual file to disk</p>
-     *
-     * @param fileWriter  the fileWriter for release.properties
-     * @param releaseText the full content for the release.properties
-     */
-    private void writeReleaseProperties(FileWriter fileWriter, StringBuilder releaseText) {
-        try {
-            Writer output = new BufferedWriter(fileWriter);
-            output.append(releaseText.toString());
-            output.close();
-        } catch (IOException err) {
-            log.error("Semver plugin is terminating");
-            log.error("Error when creating new release.properties", err);
-            Runtime.getRuntime().exit(1);
-        }
     }
 
     /**
