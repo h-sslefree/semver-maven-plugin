@@ -12,8 +12,8 @@ import org.apache.maven.plugins.semver.exceptions.SemverException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -34,27 +34,21 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
     
-    log.info("Semver-goal                       : MINOR");
-    log.info("Run-mode                          : " + getConfiguration().getRunMode());
-    log.info("Version from POM                  : " + version);
-    log.info("SCM-connection                    : " + scmConnection);
-    log.info("SCM-root                          : " + scmRoot);
-    log.info(MOJO_LINE_BREAK);
+    LOG.info("Semver-goal                       : MINOR");
+    LOG.info("Run-mode                          : " + getConfiguration().getRunMode());
+    LOG.info("Version from POM                  : " + version);
+    LOG.info("SCM-connection                    : " + scmConnection);
+    LOG.info("SCM-root                          : " + scmRoot);
+    LOG.info(MOJO_LINE_BREAK);
 
-    List<String> versions = new ArrayList<String>();
+    Map<RAW_VERSION, String> rawVersions = new HashMap<RAW_VERSION, String>();
     try {
-      versions = determineVersions(version);
+      rawVersions = determineRawVersions(version);
     } catch (Exception e) {
-      log.error(e);
+      LOG.error(e);
     }
-    
-    if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
-      FileWriterFactory.createReleaseProperties(getLog(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
-    } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
-      VersionFactory.createReleaseNative(getLog(), getConfiguration(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), versions.get(VERSION.RELEASE.getIndex()));
-    } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-      VersionFactory.createReleaseBranch(getLog(), getConfiguration(), project, versions.get(VERSION.DEVELOPMENT.getIndex()), Integer.valueOf(versions.get(VERSION.MAJOR.getIndex())), Integer.valueOf(versions.get(VERSION.MINOR.getIndex())), Integer.valueOf(versions.get(VERSION.PATCH.getIndex())));
-    }
+
+    executeRunMode(rawVersions);
     
   }
 
@@ -69,9 +63,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
    * @throws IOException
    * @throws GitAPIException
    */
-  private List<String> determineVersions(String version) throws SemverException, IOException, GitAPIException {
+  private Map<RAW_VERSION, String> determineRawVersions(String version) throws SemverException, IOException, GitAPIException {
 
-    List<String> versions = new ArrayList<String>();
+    Map<RAW_VERSION, String> versions = new HashMap<RAW_VERSION, String>();
 
     int majorVersion = 0;
     int minorVersion = 1;
@@ -79,21 +73,21 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
     String[] rawVersion = version.split("\\.");
     if (rawVersion.length > 0 && rawVersion.length == 3) {
-      log.debug("Set version-variables from POM.xml");
-      log.debug(MOJO_LINE_BREAK);
+      LOG.debug("Set version-variables from POM.xml");
+      LOG.debug(MOJO_LINE_BREAK);
       majorVersion = Integer.valueOf(rawVersion[0]);
       minorVersion = Integer.valueOf(rawVersion[1]);
       patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
     } else {
-      log.error("Unrecognized version-pattern");
-      log.error("Semver plugin is terminating");
+      LOG.error("Unrecognized version-pattern");
+      LOG.error("Semver plugin is terminating");
       throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parseble version-pattern");
     }
 
-    log.debug("MAJOR-version                    : " + majorVersion);
-    log.debug("MINOR-version                    : " + minorVersion);
-    log.debug("PATCH-version                    : " + patchVersion);
-    log.debug(MOJO_LINE_BREAK);
+    LOG.debug("MAJOR-version                    : " + majorVersion);
+    LOG.debug("MINOR-version                    : " + minorVersion);
+    LOG.debug("PATCH-version                    : " + patchVersion);
+    LOG.debug(MOJO_LINE_BREAK);
 
     minorVersion = minorVersion + 1;
     patchVersion = 0;
@@ -102,18 +96,18 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-      log.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
+      LOG.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
     }
-    log.info("New DEVELOPMENT-version           : " + developmentVersion);
-    log.info("New GIT-version                   : " + scmVersion);
-    log.info("New RELEASE-version               : " + releaseVersion);
-    log.info(MOJO_LINE_BREAK);
+    LOG.info("New DEVELOPMENT-version           : " + developmentVersion);
+    LOG.info("New GIT-version                   : " + scmVersion);
+    LOG.info("New RELEASE-version               : " + releaseVersion);
+    LOG.info(MOJO_LINE_BREAK);
 
-    versions.add(VERSION.DEVELOPMENT.getIndex(), developmentVersion);
-    versions.add(VERSION.RELEASE.getIndex(), releaseVersion);
-    versions.add(VERSION.MAJOR.getIndex(), String.valueOf(majorVersion));
-    versions.add(VERSION.MINOR.getIndex(), String.valueOf(minorVersion));
-    versions.add(VERSION.PATCH.getIndex(), String.valueOf(patchVersion));
+    versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
+    versions.put(RAW_VERSION.RELEASE, releaseVersion);
+    versions.put(RAW_VERSION.MAJOR, String.valueOf(majorVersion));
+    versions.put(RAW_VERSION.MINOR, String.valueOf(minorVersion));
+    versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
     cleanupGitLocalAndRemoteTags(scmVersion);
     

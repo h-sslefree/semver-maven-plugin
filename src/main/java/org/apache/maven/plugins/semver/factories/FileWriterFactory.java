@@ -4,6 +4,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * @author sido
@@ -17,14 +18,12 @@ public class FileWriterFactory {
      *
      * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
      * @param project            @see {@link org.apache.maven.project.MavenProject}
-     * @param developmentVersion needed by the pom to determine next development version
-     * @param releaseVersion     releaseVersion is used in the release-pom for the JENKINS-build
-     * @param scmVersion         scmVersion is used for tagging the version in GIT
+     * @param finalVersions      map with development, release and scm version
      */
-    public static void createReleaseProperties(Log LOG, MavenProject project, String developmentVersion, String releaseVersion, String scmVersion) {
-        String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + releaseVersion;
-        String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + developmentVersion;
-        String mavenProjectScm = "scm.tag=" + scmVersion;
+    public static void createReleaseProperties(Log LOG, MavenProject project, Map<VersionFactory.FINAL_VERSION, String> finalVersions) {
+        String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionFactory.FINAL_VERSION.RELEASE);
+        String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionFactory.FINAL_VERSION.DEVELOPMENT);
+        String mavenProjectScm = "scm.tag=" + finalVersions.get(VersionFactory.FINAL_VERSION.SCM);
 
         try {
             File releaseProperties = new File("release.properties");
@@ -49,7 +48,7 @@ public class FileWriterFactory {
             fileWriter.close();
         } catch (IOException err) {
             if(LOG != null) {
-                LOG.error("Semver plugin is terminating");
+                LOG.error("semver-maven-plugin is terminating");
                 LOG.error("Error when creating new release.properties", err);
             }
             Runtime.getRuntime().exit(1);
@@ -87,7 +86,7 @@ public class FileWriterFactory {
 
         } catch (IOException err) {
             if(LOG != null) {
-                LOG.error("Semver plugin is terminating");
+                LOG.error("semver-maven-plugin is terminating");
                 LOG.error("Error when creating new semver backup pom.xml", err);
             }
             Runtime.getRuntime().exit(1);
@@ -108,7 +107,7 @@ public class FileWriterFactory {
             output.close();
         } catch (IOException err) {
             if(LOG != null) {
-                LOG.error("Semver plugin is terminating");
+                LOG.error("semver-maven-plugin is terminating");
                 LOG.error("Error when creating new release.properties", err);
             }
             Runtime.getRuntime().exit(1);

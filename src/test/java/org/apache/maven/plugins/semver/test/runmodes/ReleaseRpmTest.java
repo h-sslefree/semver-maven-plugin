@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author sido
  *
  */
-public class SemverMavenPluginReleaseRpmTest extends AbstractSemverMavenPluginTest{
+public class ReleaseRpmTest extends AbstractSemverMavenPluginTest{
 
 	@Test
 	public void testSemverMavenPluginPatchRpm() throws Exception {

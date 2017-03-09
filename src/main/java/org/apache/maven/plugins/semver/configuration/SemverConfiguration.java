@@ -16,7 +16,7 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
  */
 public class SemverConfiguration {
 
-    private static final String BRANCH_CONVERSION_URL = "";
+    private static final String BRANCH_CONVERSION_URL = "http://localhost/branchconversion";
 
     private RUNMODE runMode;
     private String branchVersion;
@@ -56,11 +56,11 @@ public class SemverConfiguration {
             userMetaData = session.getUserProperties().getProperty("userMetaData");
         }
 
-        if (userRunMode != null) {
+        if (userRunMode != null && !userRunMode.isEmpty()) {
             runMode = RUNMODE.convertToEnum(userRunMode);
         }
         if (runMode == RUNMODE.RELEASE_BRANCH) {
-            if (userBranchVersion != null) {
+            if (userBranchVersion != null && !userBranchVersion.isEmpty()) {
                 branchVersion = userBranchVersion;
             }
             if (branchVersion == null) {

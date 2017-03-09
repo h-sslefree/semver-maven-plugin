@@ -1,19 +1,14 @@
 package org.apache.maven.plugins.semver;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.factories.BranchFactory;
+import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.factories.VersionFactory;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -26,6 +21,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Abstract class to use as template for each goal in the plugin.</p>
@@ -51,7 +47,7 @@ import java.util.List;
  */
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
-    protected final Log log = getLog();
+    protected final Log LOG = getLog();
 
     public static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
     private static final String FUNCTION_LINE_BREAK = "************************************************************************";
@@ -128,9 +124,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      */
     protected void initializeRepository() throws SemverException {
 
-        log.info(FUNCTION_LINE_BREAK);
+        LOG.info(FUNCTION_LINE_BREAK);
         if (currentGitRepo == null && credProvider == null) {
-            log.info("Initializing GIT-repository");
+            LOG.info("Initializing GIT-repository");
             FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
             repoBuilder.addCeilingDirectory(project.getBasedir());
             repoBuilder.findGitDir(project.getBasedir());
@@ -138,121 +134,49 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
             try {
                 repo = repoBuilder.build();
                 currentGitRepo = new Git(repo);
-                log.info(" - GIT-repository is initialized");
+                LOG.info(" - GIT-repository is initialized");
             } catch (Exception err) {
-                log.error(" - This is not a valid GIT-repository.");
-                log.error(" - Please run this goal in a valid GIT-repository");
-                log.error(" - Could not initialize repostory", err);
+                LOG.error(" - This is not a valid GIT-repository.");
+                LOG.error(" - Please run this goal in a valid GIT-repository");
+                LOG.error(" - Could not initialize repostory", err);
                 throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
             }
             if (!(getConfiguration().getScmPassword().isEmpty() || getConfiguration().getScmUsername().isEmpty())) {
                 isRemoteEnabled = true;
                 credProvider = new UsernamePasswordCredentialsProvider(getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
-                log.info(" - GIT-credential provider is initialized");
+                LOG.info(" - GIT-credential provider is initialized");
             } else {
-                log.warn(" - There is no connection to the remote GIT-repository");
-                log.debug(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
+                LOG.warn(" - There is no connection to the remote GIT-repository");
+                LOG.debug(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
             }
         } else {
-            log.debug("GIT repository and the credentialsprovider are already initialized");
+            LOG.debug("GIT repository and the credentialsprovider are already initialized");
         }
-        log.info("GIT-repository initializing finished");
-        log.info(FUNCTION_LINE_BREAK);
+        LOG.info("GIT-repository initializing finished");
+        LOG.info(FUNCTION_LINE_BREAK);
     }
 
-    /**
-     * <p>Determine branchVersion from GIT-branch</p>
-     *
-     * @return branchVersion
-     */
-    private String determineBranchVersionFromGitBranch() {
-        String value = null;
-        if (branchVersion == null || branchVersion.isEmpty()) {
-            log.info(MOJO_LINE_BREAK);
-            log.info("Determine current branchVersion from GIT-repository");
-            try {
-                initializeRepository();
-            } catch (Exception err) {
-                log.error("Could not initialize GIT-repository", err);
-            }
 
-            try {
-                String branch = currentGitRepo.getRepository().getBranch();
-                log.info("Current branch                    : " + branch);
-                if (branch != null && !branch.isEmpty()) {
-                    if (branch.matches("\\d+.\\d+.\\d+.*")) {
-                        log.info("Current branch matches            : \\d+.\\d+.\\d+.*");
-                        value = branch;
-                    } else if (branch.matches("v\\d+_\\d+_\\d+.*")) {
-                        log.info("Current branch matches            : v\\d+_\\d+_\\d+.*");
-                        String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
-                        value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
-                    } else if (branch.equals("master")) {
-                        log.info("Current branch matches            : master");
-                        value = determineVersionFromMasterBranch(branch);
-                    } else if (branch.matches("^[a-z0-9]*")) {
-                        log.warn("Current branch matches md5-hash       : ^[a-z0-9]");
-                        log.warn("Application is running tests");
-                    } else {
-                        log.error("Current branch does not match        : digit.digit.digit");
-                        log.error("And current branch does not match    : v+digit.digit.digit+*");
-                        log.error("And current branch does is not       : master");
-                        log.error("Branch is not set, semantic versioning for RPM is terminated");
-                        Runtime.getRuntime().exit(1);
-                    }
-                } else {
-                    log.error("Current branch is empty or null");
-                    log.error("Branch is not set, semantic versioning for RPM is terminated");
-                    Runtime.getRuntime().exit(1);
-                }
-            } catch (Exception err) {
-                log.error("An error occured while trying to reach GIT-repo: ", err);
-            }
-            log.info("------------------------------------------------------------------------");
-        } else {
-            value = branchVersion;
-        }
-        return value;
-    }
 
     /**
-     * <p>Which new version is to be determined from the master-branch.</p>
      *
-     * @param branch branch
-     * @return
+     *
+     * <p>Executes the configured runMode for each goal.</p>
+     *
+     *
+     * @param rawVersions rawVersions are the versions determined by the goal
      */
-    private String determineVersionFromMasterBranch(String branch) {
-        String branchVersion = "";
-        log.info("Setup connection to            : " + getConfiguration().getBranchConversionUrl() + branch);
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        CloseableHttpResponse response = null;
-        try {
-            HttpGet httpGet = new HttpGet(getConfiguration().getBranchConversionUrl() + branch);
-            httpGet.addHeader("Content-Type", "application/json");
-            response = httpClient.execute(httpGet);
-            log.info("Versionizer returned response-code: " + response.getStatusLine());
-            HttpEntity entity = response.getEntity();
-            branchVersion = EntityUtils.toString(entity);
-            if (branchVersion != null) {
-                log.info("Versionizer returned branchversion: " + branchVersion);
-            } else {
-                log.error("No branch version could be determined");
-            }
-        } catch (IOException err) {
-            log.error("Could not make request to versionizer", err);
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }
-                if (httpClient != null) {
-                    httpClient.close();
-                }
-            } catch (IOException err) {
-                log.error("Could not close request to versionizer", err);
-            }
+    protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
+        if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
+            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseVersions(LOG, getConfiguration(), project, rawVersions);
+            FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+        } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
+            FileWriterFactory.backupSemverPom(LOG, project);
+            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseNativeVersions(getLog(), getConfiguration(), project, rawVersions);
+        } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseBranchVersions(getLog(), getConfiguration(), project, rawVersions);
+            FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
         }
-        return branchVersion;
     }
 
     /**
@@ -263,40 +187,40 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      * @throws GitAPIException
      */
     protected void cleanupGitLocalAndRemoteTags(String scmVersion) throws SemverException, IOException, GitAPIException {
-        log.info("Check for lost-tags");
-        log.info(MOJO_LINE_BREAK);
+        LOG.info("Check for lost-tags");
+        LOG.info(MOJO_LINE_BREAK);
         try {
             initializeRepository();
         } catch (Exception e) {
-            log.error("Could not initialize GIT-repository", e);
+            LOG.error("Could not initialize GIT-repository", e);
         }
         if (isRemoteEnabled) {
             currentGitRepo.pull().setCredentialsProvider(credProvider).call();
             List<Ref> refs = currentGitRepo.tagList().call();
-            log.debug("Remote tags: " + refs.toString());
+            LOG.debug("Remote tags: " + refs.toString());
             if (refs.isEmpty()) {
                 boolean found = false;
                 for (Ref ref : refs) {
                     if (ref.getName().contains(scmVersion)) {
                         found = true;
-                        log.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+                        LOG.info("Delete lost local-tag                 : " + ref.getName().substring(10));
                         currentGitRepo.tagDelete().setTags(ref.getName()).call();
                         RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
-                        log.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+                        LOG.info("Delete lost remote-tag                : " + ref.getName().substring(10));
                         currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
                     }
                 }
                 if (!found) {
-                    log.info("No local or remote lost tags found");
+                    LOG.info("No local or remote lost tags found");
                 }
             } else {
-                log.info("No local or remote lost tags found");
+                LOG.info("No local or remote lost tags found");
             }
         } else {
-            log.warn("Remote is not initialized. Could not delete remote tags");
+            LOG.warn("Remote is not initialized. Could not delete remote tags");
         }
         currentGitRepo.close();
-        log.info(MOJO_LINE_BREAK);
+        LOG.info(MOJO_LINE_BREAK);
     }
 
     /**
@@ -305,13 +229,19 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      * @return SemverConfiguration
      */
     public SemverConfiguration getConfiguration() {
+        try {
+            initializeRepository();
+        } catch (Exception err) {
+            LOG.error("Could not initialize GIT-repository", err);
+        }
+
         if (configuration == null) {
             configuration = new SemverConfiguration(session);
             configuration.setScmUsername(scmUsername);
             configuration.setScmPassword(scmPassword);
             configuration.setRunMode(runMode);
-            configuration.setBranchVersion(determineBranchVersionFromGitBranch());
             configuration.setBranchConversionUrl(branchConversionUrl);
+            configuration.setBranchVersion(BranchFactory.determineBranchVersionFromGitBranch(LOG, currentGitRepo, getConfiguration().getBranchConversionUrl(), branchVersion));
             configuration.setMetaData(metaData);
         }
         return configuration;
@@ -322,23 +252,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      *
      * @author sido
      */
-    public enum VERSION {
-        DEVELOPMENT(0),
-        RELEASE(1),
-        MAJOR(2),
-        MINOR(3),
-        PATCH(4);
-
-        private int index;
-
-        private VERSION(int index) {
-            this.index = index;
-        }
-
-        public int getIndex() {
-            return this.index;
-        }
-
+    public enum RAW_VERSION {
+        DEVELOPMENT,
+        RELEASE,
+        MAJOR,
+        MINOR,
+        PATCH;
     }
 
     /**

@@ -1,14 +1,12 @@
-package org.apache.maven.plugins.semver.test.runmodes;
+package org.apache.maven.plugins.semver.test;
 
 import org.apache.commons.logging.Log;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,9 +19,9 @@ import static org.apache.commons.logging.LogFactory.getLog;
  *
  * @author sido
  */
-public class SemverMavenPluginBranchConversionUrlTest extends AbstractSemverMavenPluginTest {
+public class BranchConversionUrlTest extends AbstractSemverMavenPluginTest {
 
-  private static final Log log = getLog(SemverMavenPluginBranchConversionUrlTest.class);
+  private static final Log log = getLog(BranchConversionUrlTest.class);
 
   @Test
   public void testBranchConversionUrl() {
