@@ -6,13 +6,17 @@ import org.apache.maven.project.MavenProject;
 import java.io.*;
 
 /**
- * Created by sido on 7-3-17.
+ * @author sido
  */
 public class FileWriterFactory {
+
+    private FileWriterFactory() {}
 
     /**
      * <p>Create the release.properties file</p>
      *
+     * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
+     * @param project            @see {@link org.apache.maven.project.MavenProject}
      * @param developmentVersion needed by the pom to determine next development version
      * @param releaseVersion     releaseVersion is used in the release-pom for the JENKINS-build
      * @param scmVersion         scmVersion is used for tagging the version in GIT
@@ -52,6 +56,12 @@ public class FileWriterFactory {
         }
     }
 
+    /**
+     * <p>Backup the old pom to make sure when the build fails it can be set back.</p>
+     *
+     * @param LOG      @see {@link org.apache.maven.plugin.logging.Log}
+     * @param project  @see {@link org.apache.maven.project.MavenProject}
+     */
     public static void backupSemverPom(Log LOG, MavenProject project) {
         try {
             File pomXmlSemverBackup = new File("pom.xml.semverBackup");
@@ -87,6 +97,7 @@ public class FileWriterFactory {
     /**
      * <p>Write actual file to disk</p>
      *
+     * @param LOG         @see {@link org.apache.maven.plugin.logging.Log}
      * @param fileWriter  the fileWriter for release.properties
      * @param releaseText the full content for the release.properties
      */

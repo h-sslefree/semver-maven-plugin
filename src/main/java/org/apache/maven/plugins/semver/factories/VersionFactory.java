@@ -8,7 +8,10 @@ import org.apache.maven.project.MavenProject;
 import java.io.*;
 
 /**
- * <p></p>
+ *
+ * <h1>VersionFactory</h1>
+ *
+ * <p>The versionfactory is used to determine the different symantic-versioning versions to create git tags.</p>
  *
  * @author sido
  */
@@ -20,7 +23,10 @@ public class VersionFactory {
     /**
      * <p>Create a specific version for production-version of the product.</p>
      *
-     * @param developmentVersion
+     * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
+     * @param configuration      @see {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
+     * @param project            @see {@link org.apache.maven.project.MavenProject}
+     * @param developmentVersion next development version for pom.xml
      * @param major              semantic major-version to determine release-version and scm-tag version
      * @param minor              semantic minor-version to determine release-version and scm-tag version
      * @param patch              semantic patch-version to determine release-version and scm-tag version
@@ -59,14 +65,14 @@ public class VersionFactory {
     /**
      * <p>Use the semver-maven-plugin only. Wthout the release-maven-plugin.</p>
      *
-     * @param developmentVersion
-     * @param releaseVersion
+     * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
+     * @param configuration      @see {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
+     * @param project            @see {@link org.apache.maven.project.MavenProject}
+     * @param developmentVersion next development version for pom.xml
+     * @param releaseVersion     current release version and tag
      */
     public static void createReleaseNative(Log LOG, SemverConfiguration configuration, MavenProject project, String developmentVersion, String releaseVersion) {
         FileWriterFactory.backupSemverPom(LOG, project);
-
-
-
 
     }
 
