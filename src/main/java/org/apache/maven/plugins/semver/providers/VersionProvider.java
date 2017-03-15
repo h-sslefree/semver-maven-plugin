@@ -139,11 +139,9 @@ public class VersionProvider {
         if(pomVersion == null || pomVersion.isEmpty()) {
             versionIsOk = false;
             LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
-            System.exit(0);
         } else if(!pomVersion.contains("-SNAPSHOT")) {
             versionIsOk = false;
             LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
-            System.exit(0);
         }
         return versionIsOk;
     }

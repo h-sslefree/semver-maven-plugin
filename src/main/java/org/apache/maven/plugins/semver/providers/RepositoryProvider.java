@@ -152,12 +152,10 @@ public class RepositoryProvider {
             if(status.getUncommittedChanges().size() > 0) {
                 LOG.error("There are uncomitted changes. Please commit and push the open changes.");
                 isChanged = true;
-                System.exit(0);
             }
         } catch (GitAPIException err) {
             LOG.error(err.getMessage());
             isChanged = true;
-            System.exit(0);
         }
         return isChanged;
     }

@@ -46,6 +46,8 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     try {
       if (getVersionProvider().versionCheck(version) && getRepositoryProvider().checkChanges()) {
         rawVersions = determineRawVersions(version);
+      } else {
+        System.exit(0);
       }
     } catch (Exception e) {
       LOG.error(e);
