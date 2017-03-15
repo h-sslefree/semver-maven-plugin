@@ -2,9 +2,7 @@ package org.apache.maven.plugins.semver.goals;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -12,8 +10,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.factories.FileWriterFactory;
-import org.apache.maven.plugins.semver.factories.VersionFactory;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 
@@ -30,7 +27,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    
+
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();

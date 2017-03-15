@@ -8,6 +8,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RefSpec;
@@ -64,23 +66,17 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
     LOG.info("Determine local and remote GIT-tags for GIT-repo");
     LOG.info(MOJO_LINE_BREAK);
-    try {
-	  initializeRepository();
-	} catch (Exception e) {
-      LOG.error("Could not initialize GIT-repository", e);
-	}
-    currentGitRepo.pull().setCredentialsProvider(credProvider).call();
-    List<Ref> refs = currentGitRepo.tagList().call();
+    getRepositoryProvider().pull();
+    List<Ref> refs = getRepositoryProvider().getTags();
     if(refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {
         if(ref.getName().contains(preparedReleaseTag)) {
           found = true;
           LOG.info("Delete local GIT-tag                 : " + ref.getName().substring(10));
-          currentGitRepo.tagDelete().setTags(ref.getName()).call();
-          RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
+          getRepositoryProvider().deleteTag(ref.getName());
           LOG.info("Delete remote GIT-tag                : " + ref.getName().substring(10));
-          currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
+          getRepositoryProvider().pushTag(ref.getName());
         } 
       }
       if (!found) {
@@ -90,7 +86,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
       LOG.info("No local or remote prepared GIT-tags found");
     }
     
-    currentGitRepo.close();
+    getRepositoryProvider().closeRepository();
     LOG.info(MOJO_LINE_BREAK);
     
   }

@@ -1,5 +1,6 @@
 package org.apache.maven.plugins.semver;
 
+import jdk.nashorn.internal.runtime.Version;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
@@ -8,16 +9,12 @@ import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.factories.BranchFactory;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
-import org.apache.maven.plugins.semver.factories.VersionFactory;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
+import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.*;
 import java.util.List;
@@ -50,11 +47,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     protected final Log LOG = getLog();
 
     public static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
-    private static final String FUNCTION_LINE_BREAK = "************************************************************************";
-
-    protected Git currentGitRepo;
-
-    protected CredentialsProvider credProvider;
+    public static final String FUNCTION_LINE_BREAK = "************************************************************************";
 
     @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
     protected MavenProject project;
@@ -76,8 +69,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     private String branchConversionUrl;
 
     private SemverConfiguration configuration;
-
-    private boolean isRemoteEnabled = false;
+    private RepositoryProvider repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
+    private VersionProvider versionProvider = new VersionProvider(LOG, getConfiguration());
 
 
     /**
@@ -118,63 +111,19 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
 
     /**
-     * <p>Initialize GIT-repo for determining branch and tag information.</p>
-     *
-     * @throws SemverException exception for not initializing local and remote repository
-     */
-    protected void initializeRepository() throws SemverException {
-
-        LOG.info(FUNCTION_LINE_BREAK);
-        if (currentGitRepo == null && credProvider == null) {
-            LOG.info("Initializing GIT-repository");
-            FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-            repoBuilder.addCeilingDirectory(project.getBasedir());
-            repoBuilder.findGitDir(project.getBasedir());
-            Repository repo = null;
-            try {
-                repo = repoBuilder.build();
-                currentGitRepo = new Git(repo);
-                LOG.info(" - GIT-repository is initialized");
-            } catch (Exception err) {
-                LOG.error(" - This is not a valid GIT-repository.");
-                LOG.error(" - Please run this goal in a valid GIT-repository");
-                LOG.error(" - Could not initialize repostory", err);
-                throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
-            }
-            if (!(getConfiguration().getScmPassword().isEmpty() || getConfiguration().getScmUsername().isEmpty())) {
-                isRemoteEnabled = true;
-                credProvider = new UsernamePasswordCredentialsProvider(getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
-                LOG.info(" - GIT-credential provider is initialized");
-            } else {
-                LOG.warn(" - There is no connection to the remote GIT-repository");
-                LOG.debug(" - To make a connection to the remote please enter '-Dusername=#username# -Dpassword=#password#' on commandline to initialize the remote repository correctly");
-            }
-        } else {
-            LOG.debug("GIT repository and the credentialsprovider are already initialized");
-        }
-        LOG.info("GIT-repository initializing finished");
-        LOG.info(FUNCTION_LINE_BREAK);
-    }
-
-
-
-    /**
-     *
-     *
      * <p>Executes the configured runMode for each goal.</p>
-     *
      *
      * @param rawVersions rawVersions are the versions determined by the goal
      */
     protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
         if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
-            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseVersions(LOG, getConfiguration(), project, rawVersions);
+            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
             FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
         } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
             FileWriterFactory.backupSemverPom(LOG, project);
-            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseNativeVersions(getLog(), getConfiguration(), project, rawVersions);
-        } else if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-            Map<VersionFactory.FINAL_VERSION, String> finalVersions = VersionFactory.determineReleaseBranchVersions(getLog(), getConfiguration(), project, rawVersions);
+            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseNativeVersions(rawVersions);
+        } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
             FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
         }
     }
@@ -189,37 +138,27 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     protected void cleanupGitLocalAndRemoteTags(String scmVersion) throws SemverException, IOException, GitAPIException {
         LOG.info("Check for lost-tags");
         LOG.info(MOJO_LINE_BREAK);
-        try {
-            initializeRepository();
-        } catch (Exception e) {
-            LOG.error("Could not initialize GIT-repository", e);
-        }
-        if (isRemoteEnabled) {
-            currentGitRepo.pull().setCredentialsProvider(credProvider).call();
-            List<Ref> refs = currentGitRepo.tagList().call();
-            LOG.debug("Remote tags: " + refs.toString());
-            if (refs.isEmpty()) {
-                boolean found = false;
-                for (Ref ref : refs) {
-                    if (ref.getName().contains(scmVersion)) {
-                        found = true;
-                        LOG.info("Delete lost local-tag                 : " + ref.getName().substring(10));
-                        currentGitRepo.tagDelete().setTags(ref.getName()).call();
-                        RefSpec refSpec = new RefSpec().setSource(null).setDestination(ref.getName());
-                        LOG.info("Delete lost remote-tag                : " + ref.getName().substring(10));
-                        currentGitRepo.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(credProvider).call();
-                    }
+        repositoryProvider.pull();
+        List<Ref> refs = repositoryProvider.getTags();
+        LOG.debug("Remote tags: " + refs.toString());
+        if (refs.isEmpty()) {
+            boolean found = false;
+            for (Ref ref : refs) {
+                if (ref.getName().contains(scmVersion)) {
+                    found = true;
+                    LOG.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+                    repositoryProvider.deleteTag(ref.getName());
+                    LOG.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+                    repositoryProvider.pushTag(ref.getName());
                 }
-                if (!found) {
-                    LOG.info("No local or remote lost tags found");
-                }
-            } else {
+            }
+            if (!found) {
                 LOG.info("No local or remote lost tags found");
             }
         } else {
-            LOG.warn("Remote is not initialized. Could not delete remote tags");
+            LOG.info("No local or remote lost tags found");
         }
-        currentGitRepo.close();
+        repositoryProvider.closeRepository();
         LOG.info(MOJO_LINE_BREAK);
     }
 
@@ -229,19 +168,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      * @return SemverConfiguration
      */
     public SemverConfiguration getConfiguration() {
-        try {
-            initializeRepository();
-        } catch (Exception err) {
-            LOG.error("Could not initialize GIT-repository", err);
-        }
-
         if (configuration == null) {
             configuration = new SemverConfiguration(session);
             configuration.setScmUsername(scmUsername);
             configuration.setScmPassword(scmPassword);
             configuration.setRunMode(runMode);
             configuration.setBranchConversionUrl(branchConversionUrl);
-            configuration.setBranchVersion(BranchFactory.determineBranchVersionFromGitBranch(LOG, currentGitRepo, getConfiguration().getBranchConversionUrl(), branchVersion));
+            configuration.setBranchVersion(BranchFactory.determineBranchVersionFromGitBranch(LOG, repositoryProvider, getConfiguration().getBranchConversionUrl(), branchVersion));
             configuration.setMetaData(metaData);
         }
         return configuration;
@@ -261,6 +194,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
 
     /**
+     *
+     *
+     *
      * <ul>
      * <li>release: maak gebruik van normale semantic-versioning en release-plugin</li>
      * <li>release-rpm</li>
@@ -296,5 +232,11 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
             return value;
         }
     }
+
+    public RepositoryProvider getRepositoryProvider() {
+        return repositoryProvider;
+    }
+
+
 
 }

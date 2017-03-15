@@ -9,12 +9,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.Git;
 
 import java.io.IOException;
 
 /**
- * Created by sido on 9-3-17.
+ * @author sido
  */
 public class BranchFactory {
 
@@ -26,18 +27,18 @@ public class BranchFactory {
      * <p>Determine branchVersion from GIT-branch</p>
      *
      * @param LOG
-     * @param gitRepository
+     * @param repositoryProvider
      * @param branchConversionUrl
      * @param branchVersion
      * @return branchVersion
      */
-    public static String determineBranchVersionFromGitBranch(Log LOG, Git gitRepository, String branchConversionUrl, String branchVersion) {
+    public static String determineBranchVersionFromGitBranch(Log LOG, RepositoryProvider repositoryProvider, String branchConversionUrl, String branchVersion) {
         String value = null;
         if (branchVersion == null || branchVersion.isEmpty()) {
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
             LOG.info("Determine current branchVersion from GIT-repository");
             try {
-                String branch = gitRepository.getRepository().getBranch();
+                String branch = repositoryProvider.getCurrentBranch();
                 LOG.info("Current branch                    : " + branch);
                 if (branch != null && !branch.isEmpty()) {
                     if (branch.matches("\\d+.\\d+.\\d+.*")) {

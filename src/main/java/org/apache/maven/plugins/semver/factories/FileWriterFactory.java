@@ -1,6 +1,7 @@
 package org.apache.maven.plugins.semver.factories;
 
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
 
 import java.io.*;
@@ -20,10 +21,10 @@ public class FileWriterFactory {
      * @param project            @see {@link org.apache.maven.project.MavenProject}
      * @param finalVersions      map with development, release and scm version
      */
-    public static void createReleaseProperties(Log LOG, MavenProject project, Map<VersionFactory.FINAL_VERSION, String> finalVersions) {
-        String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionFactory.FINAL_VERSION.RELEASE);
-        String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionFactory.FINAL_VERSION.DEVELOPMENT);
-        String mavenProjectScm = "scm.tag=" + finalVersions.get(VersionFactory.FINAL_VERSION.SCM);
+    public static void createReleaseProperties(Log LOG, MavenProject project, Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
+        String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE);
+        String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT);
+        String mavenProjectScm = "scm.tag=" + finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
 
         try {
             File releaseProperties = new File("release.properties");
@@ -100,7 +101,7 @@ public class FileWriterFactory {
      * @param fileWriter  the fileWriter for release.properties
      * @param releaseText the full content for the release.properties
      */
-    public static void writeFileToDisk(Log LOG, FileWriter fileWriter, String releaseText) {
+    private static void writeFileToDisk(Log LOG, FileWriter fileWriter, String releaseText) {
         try {
             Writer output = new BufferedWriter(fileWriter);
             output.append(releaseText);

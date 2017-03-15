@@ -4,8 +4,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.factories.FileWriterFactory;
-import org.apache.maven.plugins.semver.factories.VersionFactory;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import org.apache.maven.plugins.semver.exceptions.SemverException;
@@ -29,7 +28,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    
+
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
