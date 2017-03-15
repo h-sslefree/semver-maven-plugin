@@ -133,17 +133,17 @@ public class VersionProvider {
      * @param pomVersion
      * @throws SemverException
      */
-    public boolean versionCheck(String pomVersion) throws SemverException {
-        boolean versionIsOk = true;
+    public boolean isVersionCorrupt(String pomVersion) throws SemverException {
+        boolean isVersionCorrupt = false;
         LOG.info("Check on pom-version");
         if(pomVersion == null || pomVersion.isEmpty()) {
-            versionIsOk = false;
+            isVersionCorrupt = true;
             LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
         } else if(!pomVersion.contains("-SNAPSHOT")) {
-            versionIsOk = false;
+            isVersionCorrupt = true;
             LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
         }
-        return versionIsOk;
+        return isVersionCorrupt;
     }
 
     /**

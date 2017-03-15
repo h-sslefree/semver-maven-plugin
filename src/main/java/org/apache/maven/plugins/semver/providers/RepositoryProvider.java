@@ -141,7 +141,7 @@ public class RepositoryProvider {
         repository.close();
     }
 
-    public boolean checkChanges() {
+    public boolean isChanged() {
         boolean isChanged = false;
         LOG.info("Check on local or remote changes");
         LOG.debug("Perform GIT-pull");
