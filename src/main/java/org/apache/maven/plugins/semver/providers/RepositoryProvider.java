@@ -25,12 +25,8 @@ public class RepositoryProvider {
 
     private Log LOG;
 
-    private MavenProject project;
-
     private Git repository;
-
     private CredentialsProvider provider;
-
 
     public RepositoryProvider(Log LOG, MavenProject project, SemverConfiguration configuration) {
         this.LOG = LOG;
@@ -108,7 +104,7 @@ public class RepositoryProvider {
     }
 
     public String getCurrentBranch() {
-        String currentBranch = "master";
+        String currentBranch = "";
         try {
             currentBranch = repository.getRepository().getBranch();
         } catch (IOException err) {

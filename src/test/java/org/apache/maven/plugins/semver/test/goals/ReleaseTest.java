@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.semver.test.runmodes;
+package org.apache.maven.plugins.semver.test.goals;
 
 import org.apache.maven.plugins.semver.goals.SemverMavenPluginGoalMajor;
 import org.apache.maven.plugins.semver.goals.SemverMavenPluginGoalMinor;
@@ -18,25 +18,27 @@ import org.junit.Test;
  * @author sido
  *
  */
-public class ReleaseRpmTest extends AbstractSemverMavenPluginTest{
+public class ReleaseTest extends AbstractSemverMavenPluginTest {
+
+
 
 	@Test
-	public void testSemverMavenPluginPatchRpm() throws Exception {
-		SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "patch");
+	public void testSemverMavenPluginPatchRelease() throws Exception {
+		SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch) mojoRule.lookupConfiguredMojo(loadPom("release/"), "patch");
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 	}
 
 	@Test
-	public void testSemverMavenPluginMinorRpm() throws Exception {
-		SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "minor");
+	public void testSemverMavenPluginMinorRelease() throws Exception {
+		SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor) mojoRule.lookupConfiguredMojo(loadPom("release/"), "minor");
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 	}
 
 	@Test
-	public void testSemverMavenPluginMajorRpm() throws Exception {
-		SemverMavenPluginGoalMajor mojo = (SemverMavenPluginGoalMajor) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "major");
+	public void testSemverMavenPluginMajorRelease() throws Exception {
+		SemverMavenPluginGoalMajor mojo = (SemverMavenPluginGoalMajor) mojoRule.lookupConfiguredMojo(loadPom("release/"), "major");
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 	}

@@ -1,20 +1,18 @@
 package org.apache.maven.plugins.semver;
 
-import jdk.nashorn.internal.runtime.Version;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.factories.BranchFactory;
+import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.transport.RefSpec;
 
 import java.io.*;
 import java.util.List;
@@ -69,8 +67,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     private String branchConversionUrl;
 
     private SemverConfiguration configuration;
-    private RepositoryProvider repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
-    private VersionProvider versionProvider = new VersionProvider(LOG, getConfiguration());
+    private RepositoryProvider repositoryProvider;
+    private VersionProvider versionProvider;
+    private BranchProvider branchProvider;
 
 
     /**
@@ -174,7 +173,11 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
             configuration.setScmPassword(scmPassword);
             configuration.setRunMode(runMode);
             configuration.setBranchConversionUrl(branchConversionUrl);
-            configuration.setBranchVersion(BranchFactory.determineBranchVersionFromGitBranch(LOG, repositoryProvider, getConfiguration().getBranchConversionUrl(), branchVersion));
+            if(branchProvider != null) {
+                configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion));
+            } else {
+                configuration.setBranchVersion(branchVersion);
+            }
             configuration.setMetaData(metaData);
         }
         return configuration;
@@ -237,6 +240,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         return repositoryProvider;
     }
 
+    public VersionProvider getVersionProvider() {
+        return versionProvider;
+    }
+
+    public void initializeProviders() {
+        repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
+        branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
+        versionProvider = new VersionProvider(LOG, getConfiguration());
+    }
 
 
 }

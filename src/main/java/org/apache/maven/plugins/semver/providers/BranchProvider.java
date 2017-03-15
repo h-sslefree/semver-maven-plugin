@@ -1,4 +1,4 @@
-package org.apache.maven.plugins.semver.factories;
+package org.apache.maven.plugins.semver.providers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
@@ -17,22 +17,28 @@ import java.io.IOException;
 /**
  * @author sido
  */
-public class BranchFactory {
+public class BranchProvider {
 
+    private Log LOG;
 
-    private BranchFactory() {}
+    private RepositoryProvider repositoryProvider;
+
+    private String branchConversionUrl;
+
+    public BranchProvider(Log LOG, RepositoryProvider repositoryProvider, String branchConversionUrl) {
+        this.LOG = LOG;
+        this.repositoryProvider = repositoryProvider;
+        this.branchConversionUrl = branchConversionUrl;
+    }
 
 
     /**
      * <p>Determine branchVersion from GIT-branch</p>
      *
-     * @param LOG
-     * @param repositoryProvider
-     * @param branchConversionUrl
      * @param branchVersion
      * @return branchVersion
      */
-    public static String determineBranchVersionFromGitBranch(Log LOG, RepositoryProvider repositoryProvider, String branchConversionUrl, String branchVersion) {
+    public String determineBranchVersionFromGitBranch(String branchVersion) {
         String value = null;
         if (branchVersion == null || branchVersion.isEmpty()) {
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
@@ -50,7 +56,7 @@ public class BranchFactory {
                         value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
                     } else if (branch.equals("master")) {
                         LOG.info("Current branch matches            : master");
-                        value = determineVersionFromMasterBranch(LOG, branchConversionUrl, branch);
+                        value = determineVersionFromMasterBranch(branch);
                     } else if (branch.matches("^[a-z0-9]*")) {
                         LOG.warn("Current branch matches md5-hash       : ^[a-z0-9]");
                         LOG.warn("Application is running tests");
@@ -69,7 +75,7 @@ public class BranchFactory {
             } catch (Exception err) {
                 LOG.error("An error occured while trying to reach GIT-repo: ", err);
             }
-            LOG.info("------------------------------------------------------------------------");
+            LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         } else {
             value = branchVersion;
         }
@@ -79,12 +85,10 @@ public class BranchFactory {
     /**
      * <p>Which new version is to be determined from the master-branch.</p>
      *
-     * @param LOG
-     * @param branchConversionUrl
      * @param branch branch
      * @return
      */
-    private static String determineVersionFromMasterBranch(Log LOG, String branchConversionUrl, String branch) {
+    private String determineVersionFromMasterBranch(String branch) {
         String branchVersion = "";
         LOG.info("Setup connection to            : " + branchConversionUrl + branch);
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();

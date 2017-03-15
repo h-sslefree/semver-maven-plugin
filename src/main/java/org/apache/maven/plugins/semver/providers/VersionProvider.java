@@ -50,13 +50,17 @@ public class VersionProvider {
 
     /**
      *
-     * @param rawVersions
-     * @return
+     * <p>Determine release versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
+     *
+     * @param rawVersions @see   raw version map with development version patch, minor and major<br>
+     *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     * @return finalVersions
      */
     public Map<FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
         Map<FINAL_VERSION, String> finalVersions = new HashMap<FINAL_VERSION, String>();
         finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
         finalVersions.put(FINAL_VERSION.RELEASE, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
+        finalVersions.put(FINAL_VERSION.SCM, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
         return finalVersions;
     }
 
@@ -65,6 +69,9 @@ public class VersionProvider {
      *
      * @param rawVersions        raw version map with development version patch, minor and major<br>
      *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     *
+     * @return finalVersions
+     *
      */
     public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
 

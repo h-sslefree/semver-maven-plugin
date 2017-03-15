@@ -34,6 +34,8 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
+    initializeProviders();
+
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
