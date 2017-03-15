@@ -143,6 +143,7 @@ public class VersionProvider {
             isVersionCorrupt = true;
             LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
         }
+        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         return isVersionCorrupt;
     }
 

@@ -63,7 +63,6 @@ public class RepositoryProvider {
             LOG.error(" - Could not initialize repostory", err);
             throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
         }
-        LOG.info("GIT-repository initializing finished");
         LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
         return repository;
     }
@@ -157,6 +156,7 @@ public class RepositoryProvider {
             LOG.error(err.getMessage());
             isChanged = true;
         }
+        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         return isChanged;
     }
 
