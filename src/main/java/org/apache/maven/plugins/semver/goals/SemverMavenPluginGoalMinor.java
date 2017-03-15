@@ -44,7 +44,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
     Map<RAW_VERSION, String> rawVersions = new HashMap<RAW_VERSION, String>();
     try {
-      rawVersions = determineRawVersions(version);
+      if (getVersionProvider().versionCheck(version) && getRepositoryProvider().checkChanges()) {
+        rawVersions = determineRawVersions(version);
+      }
     } catch (Exception e) {
       LOG.error(e);
     }

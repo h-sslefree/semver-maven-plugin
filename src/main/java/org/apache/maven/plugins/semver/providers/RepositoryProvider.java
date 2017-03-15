@@ -6,6 +6,8 @@ import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -139,6 +141,26 @@ public class RepositoryProvider {
         repository.close();
     }
 
+    public boolean checkChanges() {
+        boolean isChanged = false;
+        LOG.info("Check on local or remote changes");
+        LOG.debug("Perform GIT-pull");
+        pull();
+        try {
+            LOG.info("Check on local changes");
+            Status status = repository.status().call();
+            if(status.getUncommittedChanges().size() > 0) {
+                LOG.error("There are uncomitted changes. Please commit and push the open changes.");
+                isChanged = true;
+                System.exit(0);
+            }
+        } catch (GitAPIException err) {
+            LOG.error(err.getMessage());
+            isChanged = true;
+            System.exit(0);
+        }
+        return isChanged;
+    }
 
 
 }

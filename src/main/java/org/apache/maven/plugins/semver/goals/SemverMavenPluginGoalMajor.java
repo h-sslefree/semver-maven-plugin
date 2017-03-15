@@ -41,7 +41,9 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
         Map<RAW_VERSION, String> rawVersions = new HashMap<RAW_VERSION, String>();
         try {
-            rawVersions = determineRawVersions(version);
+            if (getVersionProvider().versionCheck(version) && getRepositoryProvider().checkChanges()) {
+                rawVersions = determineRawVersions(version);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -66,6 +68,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
         int majorVersion = 1;
         int minorVersion = 0;
         int patchVersion = 0;
+
 
         String[] rawVersion = version.split("\\.");
         if (rawVersion.length > 0 && rawVersion.length == 3) {
@@ -107,7 +110,6 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
         versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
         cleanupGitLocalAndRemoteTags(scmVersion);
-
         return versions;
     }
 

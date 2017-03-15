@@ -9,9 +9,9 @@
 	<name>Test Semver Plugin</name>
 
 	<scm>
-		<url>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin-test.git</url>
-		<connection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin-test.git</connection>
-		<developerConnection>scm:git:http://git.bicat.com/scm/build/semver-maven-plugin-test.git</developerConnection>
+		<url>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</url>
+		<connection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</developerConnection>
 	</scm>
 	
 	<dependencies>

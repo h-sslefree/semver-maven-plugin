@@ -4,6 +4,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
+import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.project.MavenProject;
 
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class VersionProvider {
     public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
 
         if(LOG != null) {
-            LOG.info("NEW rawVersions on BRANCH base");
+            LOG.info("NEW rawVersions on BRANCH: [ " +configuration.getBranchVersion() + " ]");
         }
 
         int patch = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.PATCH));
@@ -123,6 +124,28 @@ public class VersionProvider {
     public Map<FINAL_VERSION, String> determineReleaseNativeVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
 
         return null;
+    }
+
+    /**
+     *
+     *
+     *
+     * @param pomVersion
+     * @throws SemverException
+     */
+    public boolean versionCheck(String pomVersion) throws SemverException {
+        boolean versionIsOk = true;
+        LOG.info("Check on pom-version");
+        if(pomVersion == null || pomVersion.isEmpty()) {
+            versionIsOk = false;
+            LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
+            System.exit(0);
+        } else if(!pomVersion.contains("-SNAPSHOT")) {
+            versionIsOk = false;
+            LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
+            System.exit(0);
+        }
+        return versionIsOk;
     }
 
     /**
