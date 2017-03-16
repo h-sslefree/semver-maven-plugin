@@ -12,9 +12,9 @@ import java.util.Map;
 
 /**
  *
- * <h1>VersionFactory</h1>
+ * <h1>VersionProvider</h1>
  *
- * <p>The versionfactory is used to determine the different symantic-versioning versions to create git tags.</p>
+ * <p>The versionprovider is used to determine the different symantic-versioning versions to create git tags.</p>
  *
  * @author sido
  */
@@ -35,9 +35,10 @@ public class VersionProvider {
 
     /**
      *
-     * <p></p>
-     *
-     *
+     * <p>
+     *     In the constructor the logging and the configuration is given. <br>
+     *     These are elements which continue to return in the different methods.
+     * </p>
      *
      * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
      * @param configuration      @see {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
@@ -114,42 +115,17 @@ public class VersionProvider {
         return finalVersions;
     }
 
-
-    /**
-     * <p>Use the semver-maven-plugin only. Wthout the release-maven-plugin.</p>
-     *
-     * @param rawVersions        raw version map with development version patch, minor and major<br>
-     *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
-     */
-    public Map<FINAL_VERSION, String> determineReleaseNativeVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
-
-        return null;
-    }
-
     /**
      *
-     *
-     *
-     * @param pomVersion
-     * @throws SemverException
-     */
-    public boolean isVersionCorrupt(String pomVersion) throws SemverException {
-        boolean isVersionCorrupt = false;
-        LOG.info("Check on pom-version");
-        if(pomVersion == null || pomVersion.isEmpty()) {
-            isVersionCorrupt = true;
-            LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
-        } else if(!pomVersion.contains("-SNAPSHOT")) {
-            isVersionCorrupt = true;
-            LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
-        }
-        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-        return isVersionCorrupt;
-    }
-
-    /**
-     *
-     * <p></p>
+     * <p>Determine general release-tag.<br>
+     *    Examples:<br>
+     *    <ul><b>NORMAL-release</b>
+     *      <li>1.1.1</li>
+     *    </ul>
+     *    <ul><b>BRANCH-release</b>
+     *    <li>1.1.1-001001001</li>
+     *    </ul>
+     * </p>
      *
      * @param patch         patch is the number to define a bugfix in symantic-versioning
      * @param minor         minor is the number to define a feature in symantic-versioning
@@ -197,6 +173,33 @@ public class VersionProvider {
             buildMetaData.append(configuration.getMetaData());
         }
         return buildMetaData.toString();
+    }
+
+    /**
+     * <p>
+     *     Determine if the version in the pom.xml is corrupt.<br>
+     *     If this is the case then exit the semver-plugin
+     * </p>
+     *
+     *
+     * @param pomVersion get pom version from project
+     * @throws SemverException
+     */
+    public boolean isVersionCorrupt(String pomVersion) throws SemverException {
+        boolean isVersionCorrupt = false;
+        LOG.info("Check on pom-version");
+        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+        if(pomVersion == null || pomVersion.isEmpty()) {
+            isVersionCorrupt = true;
+            LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
+        } else if(!pomVersion.contains("-SNAPSHOT")) {
+            isVersionCorrupt = true;
+            LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
+        } else {
+            LOG.info("Pom-version is correct            : " + pomVersion);
+        }
+        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+        return isVersionCorrupt;
     }
 
 

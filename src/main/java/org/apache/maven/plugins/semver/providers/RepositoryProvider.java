@@ -16,6 +16,7 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class RepositoryProvider {
         try {
             repo = repoBuilder.build();
             repository = new Git(repo);
-            LOG.info(" - GIT-repository is initialized");
+            LOG.info(" * GIT-repository is initialized");
         } catch (Exception err) {
             LOG.error(" - This is not a valid GIT-repository.");
             LOG.error(" - Please run this goal in a valid GIT-repository");
@@ -76,7 +77,7 @@ public class RepositoryProvider {
         CredentialsProvider provider = null;
         if (!(configuration.getScmPassword().isEmpty() || configuration.getScmUsername().isEmpty())) {
             provider = new UsernamePasswordCredentialsProvider(configuration.getScmUsername(), configuration.getScmPassword());
-            LOG.info(" - GIT-credential provider is initialized");
+            LOG.info(" * GIT-credential provider is initialized");
         }
         return provider;
     }
@@ -85,6 +86,17 @@ public class RepositoryProvider {
         boolean isSuccess = true;
         try {
             repository.pull().setCredentialsProvider(provider).call();
+        } catch (GitAPIException err) {
+            isSuccess = false;
+            LOG.error(err.getMessage());
+        }
+        return isSuccess;
+    }
+
+    public boolean push() {
+        boolean isSuccess = true;
+        try {
+            repository.push().setRemote("origin").setCredentialsProvider(provider).call();
         } catch (GitAPIException err) {
             isSuccess = false;
             LOG.error(err.getMessage());
@@ -103,6 +115,8 @@ public class RepositoryProvider {
         }
         return isSuccess;
     }
+
+
 
     public String getCurrentBranch() {
         String currentBranch = "";
@@ -125,6 +139,14 @@ public class RepositoryProvider {
         return tags;
     }
 
+    public boolean createTag(String tag) {
+        boolean isTagCreated = true;
+
+
+
+        return isTagCreated;
+    }
+
     public boolean deleteTag(String tag) {
         boolean isSuccess = true;
         try {
@@ -136,27 +158,42 @@ public class RepositoryProvider {
         return isSuccess;
     }
 
+    public boolean commit(String message) {
+        boolean isCommitSuccess = true;
+        try {
+            repository.commit().setAll(true).setMessage(message).call();
+        } catch (GitAPIException err) {
+            LOG.error(err.getMessage());
+            isCommitSuccess = false;
+        }
+
+        return isCommitSuccess;
+    }
+
     public void closeRepository() {
         repository.close();
     }
 
     public boolean isChanged() {
         boolean isChanged = false;
-        LOG.info("Check on local or remote changes");
-        LOG.debug("Perform GIT-pull");
+        LOG.info("Check for local or remote changes");
+        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         pull();
         try {
-            LOG.info("Check on local changes");
             Status status = repository.status().call();
-            if(status.getUncommittedChanges().size() > 0) {
-                LOG.error("There are uncomitted changes. Please commit and push the open changes.");
+            if(!status.isClean()) {
+                LOG.error("Semver-action has failed");
+                LOG.error("There are uncomitted changes");
+                LOG.error( "Please commit and push the open changes");
                 isChanged = true;
+            } else {
+                LOG.info( "Local changes                     : workingtree is clean");
             }
         } catch (GitAPIException err) {
             LOG.error(err.getMessage());
             isChanged = true;
         }
-        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
         return isChanged;
     }
 

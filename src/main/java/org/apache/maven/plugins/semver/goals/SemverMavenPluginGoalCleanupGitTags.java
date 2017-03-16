@@ -45,7 +45,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     LOG.info("Version from POM                  : " + version);
     LOG.info("SCM-connection                    : " + scmConnection);
     LOG.info("SCM-root                          : " + scmRoot);
-    LOG.info(MOJO_LINE_BREAK);
+    LOG.info(FUNCTION_LINE_BREAK);
     
     try {
       cleanupGitRemoteTags(scmConnection, scmRoot);

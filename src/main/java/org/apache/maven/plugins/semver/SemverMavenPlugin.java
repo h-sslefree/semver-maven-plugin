@@ -8,6 +8,7 @@ import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
@@ -57,7 +58,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     protected String preparedReleaseTag;
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     protected MavenSession session;
-    @Parameter(property = "runMode", required = true, defaultValue = "RELEASE")
+    @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
     private RUNMODE runMode;
     @Parameter(property = "branchVersion")
     private String branchVersion;
@@ -70,6 +71,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     private RepositoryProvider repositoryProvider;
     private VersionProvider versionProvider;
     private BranchProvider branchProvider;
+    private PomProvider pomProvider;
 
 
     /**
@@ -119,8 +121,11 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
             Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
             FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
         } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
-            FileWriterFactory.backupSemverPom(LOG, project);
-            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseNativeVersions(rawVersions);
+            FileWriterFactory.backupSemverPom(LOG);
+            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
+            pomProvider.createReleasePom(finalVersions);
+            pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
+            FileWriterFactory.removeBackupSemverPom(LOG);
         } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
             Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
             FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
@@ -139,7 +144,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         LOG.info(MOJO_LINE_BREAK);
         repositoryProvider.pull();
         List<Ref> refs = repositoryProvider.getTags();
-        LOG.debug("Remote tags: " + refs.toString());
+        LOG.debug("Remote tags                      : " + refs.toString());
         if (refs.isEmpty()) {
             boolean found = false;
             for (Ref ref : refs) {
@@ -152,13 +157,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
                 }
             }
             if (!found) {
-                LOG.info("No local or remote lost tags found");
+                LOG.info("No lost-tags where found          : local or remote");
             }
         } else {
-            LOG.info("No local or remote lost tags found");
+            LOG.info("No lost-tags where found          : local or remote");
         }
         repositoryProvider.closeRepository();
-        LOG.info(MOJO_LINE_BREAK);
+        LOG.info(FUNCTION_LINE_BREAK);
     }
 
     /**
@@ -248,6 +253,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
         branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
         versionProvider = new VersionProvider(LOG, getConfiguration());
+        pomProvider = new PomProvider(LOG, repositoryProvider, project);
     }
 
 

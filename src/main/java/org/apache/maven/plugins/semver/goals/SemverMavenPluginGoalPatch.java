@@ -39,7 +39,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     LOG.info("Version from POM                  : " + version);
     LOG.info("SCM-connection                    : " + scmConnection);
     LOG.info("SCM-root                          : " + scmRoot);
-    LOG.info(MOJO_LINE_BREAK);
+    LOG.info(FUNCTION_LINE_BREAK);
 
     Map<RAW_VERSION, String> rawVersions = new HashMap<RAW_VERSION, String>();
     try {
@@ -104,7 +104,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     LOG.info("New DEVELOPMENT-version           : " + developmentVersion);
     LOG.info("New GIT-version                   : " + scmVersion);
     LOG.info("New RELEASE-version               : " + releaseVersion);
-    LOG.info(MOJO_LINE_BREAK);
+    LOG.info(FUNCTION_LINE_BREAK);
 
     versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
     versions.put(RAW_VERSION.RELEASE, releaseVersion);
