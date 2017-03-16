@@ -103,15 +103,19 @@ public class FileWriterFactory {
             if (fileName != null) {
                 File file = new File(fileName);
                 if (file.exists()) {
-                    LOG.info("Old " + fileName + " removed    : " + file.getAbsolutePath());
+                    if(LOG != null) {
+                        LOG.info("Old file: [ " + fileName + " ]  removed    : " + file.getAbsolutePath());
+                    }
                     boolean isDeleted = file.delete();
                     if (!isDeleted) {
-                        LOG.error("File is not removed               : " + fileName);
+                        if(LOG != null) {
+                            LOG.error("File: [ " + fileName + " ] is not removed             : " + file.getAbsolutePath());
+                        }
                     }
                 }
-
-                LOG.info("New " + fileName + " prepared   : " + file.getAbsolutePath());
-
+                if(LOG != null) {
+                    LOG.info("New " + fileName + " prepared   : " + file.getAbsolutePath());
+                }
                 FileWriter writer = new FileWriter(file);
                 Writer output = new BufferedWriter(writer);
                 output.append(fileContent);
@@ -136,22 +140,23 @@ public class FileWriterFactory {
      */
     public static void writeFileToDisk(Log LOG, File file) {
         try {
+//            if (file.exists()) {
+//                if(LOG != null) {
+//                    LOG.info("Old file: [ " + file.getName() + " ] removed    : " + file.getAbsolutePath());
+//                }
+//                boolean isDeleted = file.delete();
+//                if (!isDeleted) {
+//                    if(LOG != null) {
+//                        LOG.error("File [ " + file.getName() + " ] is not removed         : " + file.getAbsolutePath());
+//                    }
+//                }
+//            }
 
-            if (file.exists()) {
-                LOG.info("Old " + file.getName() + " removed    : " + file.getAbsolutePath());
-                boolean isDeleted = file.delete();
-                if (!isDeleted) {
-                    LOG.error("File is not removed               : " + file.getName());
-                }
+            if(LOG != null) {
+                LOG.info("New file: [ " + file.getName() + " ] is prepared : " + file.getAbsolutePath());
             }
-
-            LOG.info("New " + file.getName() + " prepared   : " + file.getAbsolutePath());
-
-            FileWriter writer = new FileWriter(file);
-            Writer output = new BufferedWriter(writer);
-            output.close();
-            writer.close();
-
+//            LOG.info(file.());
+            file.createNewFile();
         } catch (IOException err) {
             if (LOG != null) {
                 LOG.error("semver-maven-plugin is terminating");
