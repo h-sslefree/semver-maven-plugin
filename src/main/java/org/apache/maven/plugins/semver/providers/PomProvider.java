@@ -29,8 +29,12 @@ public class PomProvider {
         releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
         FileWriterFactory.writeFileToDisk(LOG, releasePom.getModel().getPomFile());
         String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
-        repositoryProvider.commit("[SEMVER] Create new release-pom for tag: [ " + scmTag + " ]");
+        String commitMessage = "[SEMVER] Create new release-pom for tag: [ " + scmTag + " ]";
+        LOG.info("Commit local changes              : " + commitMessage);
+        repositoryProvider.commit(commitMessage);
+        LOG.info("Create local tag                  : " + scmTag);
         repositoryProvider.createTag(scmTag);
+        LOG.info("Push local changes and tag        : " + project.getScm().getUrl());
         repositoryProvider.push();
         return isNewTagCreated;
     }

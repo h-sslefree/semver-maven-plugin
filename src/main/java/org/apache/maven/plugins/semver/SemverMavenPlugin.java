@@ -136,6 +136,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
      * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
      *
      * @param scmVersion scmVersion
+     * @throws SemverException
      * @throws IOException
      * @throws GitAPIException
      */
