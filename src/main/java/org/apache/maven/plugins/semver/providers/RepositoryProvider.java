@@ -26,176 +26,212 @@ import java.util.List;
  */
 public class RepositoryProvider {
 
-    private Log LOG;
+  private Log LOG;
 
-    private Git repository;
-    private CredentialsProvider provider;
+  private Git repository;
+  private CredentialsProvider provider;
 
-    public RepositoryProvider(Log LOG, MavenProject project, SemverConfiguration configuration) {
-        this.LOG = LOG;
-        try {
-            repository = initializeRepository(project);
-            provider = initializeCredentialsProvider(configuration);
-        } catch (SemverException err) {
-            LOG.error(err.getMessage());
-        }
+  public RepositoryProvider(Log LOG, MavenProject project, SemverConfiguration configuration) {
+    this.LOG = LOG;
+    try {
+      repository = initializeRepository(project);
+      provider = initializeCredentialsProvider(configuration);
+    } catch (SemverException err) {
+      LOG.error(err.getMessage());
+      Runtime.getRuntime().exit(1);
+    }
+  }
+
+  /**
+   * <p>Initialize GIT-repo for determining branch and tag information.</p>
+   *
+   * @throws SemverException exception for not initializing local and remote repository
+   */
+  private Git initializeRepository(MavenProject project) throws SemverException {
+    Git repository = null;
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    LOG.info("Initializing GIT-repository");
+    FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+    repoBuilder.addCeilingDirectory(project.getBasedir());
+    repoBuilder.findGitDir(project.getBasedir());
+    Repository repo = null;
+    try {
+      repo = repoBuilder.build();
+      repository = new Git(repo);
+      LOG.info(" * GIT-repository is initialized");
+    } catch (Exception err) {
+      LOG.error(" - This is not a valid GIT-repository.");
+      LOG.error(" - Please run this goal in a valid GIT-repository");
+      LOG.error(" - Could not initialize repostory", err);
+      throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
+    }
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    return repository;
+  }
+
+  /**
+   * <p>Initialize credentialsprovider to acces remote GIT repository.</p>
+   *
+   * @return credentialsProvider initialized credentialsProvider
+   */
+  private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
+    CredentialsProvider provider = null;
+    if (!(configuration.getScmPassword().isEmpty() || configuration.getScmUsername().isEmpty())) {
+      provider = new UsernamePasswordCredentialsProvider(configuration.getScmUsername(), configuration.getScmPassword());
+      LOG.info(" * GIT-credential provider is initialized");
+    }
+    return provider;
+  }
+
+  public boolean pull() {
+    boolean isSuccess = true;
+    try {
+      repository.pull().setCredentialsProvider(provider).call();
+    } catch (GitAPIException err) {
+      isSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isSuccess;
+  }
+
+  public boolean push() {
+    boolean isSuccess = true;
+    try {
+      repository.push().setRemote("origin").setCredentialsProvider(provider).call();
+    } catch (GitAPIException err) {
+      isSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isSuccess;
+  }
+
+  public boolean pushTag(String tag) {
+    boolean isSuccess = true;
+    RefSpec refSpec = new RefSpec().setSource(null).setDestination(tag);
+    try {
+      repository.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(provider).call();
+    } catch (GitAPIException err) {
+      isSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isSuccess;
+  }
+
+
+  public String getCurrentBranch() {
+    String currentBranch = "";
+    try {
+      currentBranch = repository.getRepository().getBranch();
+    } catch (IOException err) {
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return currentBranch;
+
+  }
+
+  public List<Ref> getTags() {
+    List<Ref> tags = new ArrayList<Ref>();
+    try {
+      tags = repository.tagList().call();
+    } catch (GitAPIException err) {
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return tags;
+  }
+
+  public boolean createTag(String tag) {
+    boolean isTagCreated = true;
+    try {
+      deleteTag(tag);
+      repository.tag().setName(tag).call();
+    } catch (GitAPIException err) {
+      isTagCreated = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isTagCreated;
+  }
+
+  public boolean deleteTag(String tag) {
+    boolean isSuccess = true;
+    try {
+      repository.tagDelete().setTags(tag).call();
+    } catch (GitAPIException err) {
+      isSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isSuccess;
+  }
+
+  public boolean commit(String message) {
+    boolean isCommitSuccess = true;
+    try {
+      repository.commit().setAll(true).setMessage(message).call();
+    } catch (GitAPIException err) {
+      isCommitSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please run semver:rollback to fix this issue");
+      Runtime.getRuntime().exit(1);
     }
 
-    /**
-     * <p>Initialize GIT-repo for determining branch and tag information.</p>
-     *
-     * @throws SemverException exception for not initializing local and remote repository
-     */
-    private Git initializeRepository(MavenProject project) throws SemverException {
-        Git repository = null;
-        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-        LOG.info("Initializing GIT-repository");
-        FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-        repoBuilder.addCeilingDirectory(project.getBasedir());
-        repoBuilder.findGitDir(project.getBasedir());
-        Repository repo = null;
-        try {
-            repo = repoBuilder.build();
-            repository = new Git(repo);
-            LOG.info(" * GIT-repository is initialized");
-        } catch (Exception err) {
-            LOG.error(" - This is not a valid GIT-repository.");
-            LOG.error(" - Please run this goal in a valid GIT-repository");
-            LOG.error(" - Could not initialize repostory", err);
-            throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
-        }
-        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-        return repository;
+    return isCommitSuccess;
+  }
+
+  public void closeRepository() {
+    repository.close();
+  }
+
+  public boolean isChanged() {
+    boolean isChanged = false;
+    LOG.info("Check for local or remote changes");
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    pull();
+    try {
+      Status status = repository.status().call();
+      if (!status.isClean()) {
+        LOG.error("Semver-action has failed");
+        LOG.error("There are uncomitted changes");
+        LOG.error("Please commit and push the open changes");
+        isChanged = true;
+      } else {
+        LOG.info("Local changes                     : workingtree is clean");
+      }
+    } catch (GitAPIException err) {
+      LOG.error(err.getMessage());
+      isChanged = true;
     }
-
-    /**
-     * <p>Initialize credentialsprovider to acces remote GIT repository.</p>
-     *
-     * @return credentialsProvider initialized credentialsProvider
-     */
-    private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
-        CredentialsProvider provider = null;
-        if (!(configuration.getScmPassword().isEmpty() || configuration.getScmUsername().isEmpty())) {
-            provider = new UsernamePasswordCredentialsProvider(configuration.getScmUsername(), configuration.getScmPassword());
-            LOG.info(" * GIT-credential provider is initialized");
-        }
-        return provider;
-    }
-
-    public boolean pull() {
-        boolean isSuccess = true;
-        try {
-            repository.pull().setCredentialsProvider(provider).call();
-        } catch (GitAPIException err) {
-            isSuccess = false;
-            LOG.error(err.getMessage());
-        }
-        return isSuccess;
-    }
-
-    public boolean push() {
-        boolean isSuccess = true;
-        try {
-            repository.push().setRemote("origin").setCredentialsProvider(provider).call();
-        } catch (GitAPIException err) {
-            isSuccess = false;
-            LOG.error(err.getMessage());
-        }
-        return isSuccess;
-    }
-
-    public boolean pushTag(String tag) {
-        boolean isSuccess = true;
-        RefSpec refSpec = new RefSpec().setSource(null).setDestination(tag);
-        try {
-            repository.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(provider).call();
-        } catch (GitAPIException err) {
-            isSuccess = false;
-            LOG.error(err.getMessage());
-        }
-        return isSuccess;
-    }
-
-
-
-    public String getCurrentBranch() {
-        String currentBranch = "";
-        try {
-            currentBranch = repository.getRepository().getBranch();
-        } catch (IOException err) {
-            LOG.error(err.getMessage());
-        }
-        return currentBranch;
-
-    }
-
-    public List<Ref> getTags() {
-        List<Ref> tags = new ArrayList<Ref>();
-        try {
-            tags = repository.tagList().call();
-        } catch (GitAPIException err) {
-            LOG.error(err.getMessage());
-        }
-        return tags;
-    }
-
-    public boolean createTag(String tag) {
-        boolean isTagCreated = true;
-
-
-
-        return isTagCreated;
-    }
-
-    public boolean deleteTag(String tag) {
-        boolean isSuccess = true;
-        try {
-            repository.tagDelete().setTags(tag).call();
-        } catch (GitAPIException err) {
-            isSuccess = false;
-            LOG.error(err.getMessage());
-        }
-        return isSuccess;
-    }
-
-    public boolean commit(String message) {
-        boolean isCommitSuccess = true;
-        try {
-            repository.commit().setAll(true).setMessage(message).call();
-        } catch (GitAPIException err) {
-            LOG.error(err.getMessage());
-            isCommitSuccess = false;
-        }
-
-        return isCommitSuccess;
-    }
-
-    public void closeRepository() {
-        repository.close();
-    }
-
-    public boolean isChanged() {
-        boolean isChanged = false;
-        LOG.info("Check for local or remote changes");
-        LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-        pull();
-        try {
-            Status status = repository.status().call();
-            if(!status.isClean()) {
-                LOG.error("Semver-action has failed");
-                LOG.error("There are uncomitted changes");
-                LOG.error( "Please commit and push the open changes");
-                isChanged = true;
-            } else {
-                LOG.info( "Local changes                     : workingtree is clean");
-            }
-        } catch (GitAPIException err) {
-            LOG.error(err.getMessage());
-            isChanged = true;
-        }
-        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-        return isChanged;
-    }
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    return isChanged;
+  }
 
 
 }

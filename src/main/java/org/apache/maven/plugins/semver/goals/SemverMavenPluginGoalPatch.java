@@ -15,12 +15,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 
 /**
- *
  * <p>Determine PATCH version for MAVEN-project.</p>
  * <p>Example: move version x.x.1 to x.x.2.</p>
  *
  * @author sido
- *
  */
 @Mojo(name = "patch")
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
@@ -33,7 +31,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
-    
+
     LOG.info("Semver-goal                       : PATCH");
     LOG.info("Run-mode                          : " + getConfiguration().getRunMode());
     LOG.info("Version from POM                  : " + version);
@@ -46,19 +44,18 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
       if (!getVersionProvider().isVersionCorrupt(version) && !getRepositoryProvider().isChanged()) {
         rawVersions = determineRawVersions(version);
       } else {
-        System.exit(0);
+        Runtime.getRuntime().exit(1);
       }
     } catch (Exception e) {
       LOG.error(e);
     }
-    
+
     executeRunMode(rawVersions);
-    
+
   }
 
 
   /**
-   *
    * <p>Determine PATCHversion from POM-version.</p>
    *
    * @param version example: x.x.0-SNAPSHOT
@@ -98,7 +95,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    if(getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+    if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
       LOG.info("Determine new versions for branch : " + getConfiguration().getBranchVersion());
     }
     LOG.info("New DEVELOPMENT-version           : " + developmentVersion);
@@ -113,9 +110,9 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
     cleanupGitLocalAndRemoteTags(scmVersion);
-    
+
     return versions;
   }
-  
-  
+
+
 }
