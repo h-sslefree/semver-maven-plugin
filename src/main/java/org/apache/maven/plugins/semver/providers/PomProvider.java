@@ -32,12 +32,12 @@ public class PomProvider {
     releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
     FileWriterFactory.writeFileToDisk(LOG, releasePom.getFile());
     String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
-    String commitMessage = "[SEMVER] Create new release-pom for tag: [ " + scmTag + " ]";
-    LOG.info("Commit local changes              : " + commitMessage);
+    String commitMessage = "[SEMVER] Create new release-pom for tag  : [ " + scmTag + " ]";
+    LOG.info("Commit local changes                : " + commitMessage);
     repositoryProvider.commit(commitMessage);
-    LOG.info("Create local tag                  : " + scmTag);
+    LOG.info("Create local tag                    : " + scmTag);
     repositoryProvider.createTag(scmTag);
-    LOG.info("Push local changes and tag        : " + project.getScm().getUrl());
+    LOG.info("Push local changes and tag          : " + project.getScm().getUrl());
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isReleasePomCreated;
@@ -50,7 +50,7 @@ public class PomProvider {
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.setVersion(developmentVersion);
     FileWriterFactory.writeFileToDisk(LOG, nextDevelopementPom.getModel().getPomFile());
-    repositoryProvider.commit("[SEMVER] Create next development-pom with version: [ " + developmentVersion + " ]");
+    repositoryProvider.commit("[SEMVER] Create next development-pom with version  : [ " + developmentVersion + " ]");
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isNextDevelopmentVersionCreated;

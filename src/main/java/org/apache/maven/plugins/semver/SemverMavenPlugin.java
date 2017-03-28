@@ -145,23 +145,26 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     LOG.info(MOJO_LINE_BREAK);
     repositoryProvider.pull();
     List<Ref> refs = repositoryProvider.getTags();
-    LOG.debug("Remote tags                      : " + refs.toString());
+    LOG.debug("Remote tags                        ");
+    for(Ref ref : refs) {
+      LOG.debug("                                   - " + ref.getName());
+    }
     if (refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {
         if (ref.getName().contains(scmVersion)) {
           found = true;
-          LOG.info("Delete lost local-tag                 : " + ref.getName().substring(10));
+          LOG.info("Delete lost local-tag                  : " + ref.getName().substring(10));
           repositoryProvider.deleteTag(ref.getName());
-          LOG.info("Delete lost remote-tag                : " + ref.getName().substring(10));
+          LOG.info("Delete lost remote-tag                 : " + ref.getName().substring(10));
           repositoryProvider.pushTag(ref.getName());
         }
       }
       if (!found) {
-        LOG.info("No lost-tags where found          : local or remote");
+        LOG.info("No lost-tags where found            : local or remote");
       }
     } else {
-      LOG.info("No lost-tags where found          : local or remote");
+      LOG.info("No lost-tags where found            : local or remote");
     }
     repositoryProvider.closeRepository();
     LOG.info(FUNCTION_LINE_BREAK);
@@ -227,6 +230,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public enum RAW_VERSION {
     DEVELOPMENT,
     RELEASE,
+    SCM,
     MAJOR,
     MINOR,
     PATCH;

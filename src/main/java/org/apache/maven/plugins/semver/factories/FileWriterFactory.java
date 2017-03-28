@@ -57,19 +57,19 @@ public class FileWriterFactory {
       File pomXmlSemverBackup = new File("pom.xml.semverBackup");
       if (pomXmlSemverBackup.exists()) {
         if (LOG != null) {
-          LOG.debug("Old pom.xml.semverBackup removed  : " + pomXmlSemverBackup.getAbsolutePath());
+          LOG.debug("Old pom.xml.semverBackup removed    : " + pomXmlSemverBackup.getAbsolutePath());
         }
         boolean isDeleted = pomXmlSemverBackup.delete();
         if (!isDeleted) {
           if (LOG != null) {
-            LOG.error("File is not removed               : pom.xml.semverBackup");
+            LOG.error("File is not removed                 : pom.xml.semverBackup");
           }
         }
       }
       Files.copy(pomXmlOriginal.toPath(), pomXmlSemverBackup.toPath());
 
       if (LOG != null) {
-        LOG.debug("New pom.xml.semverBackup prepared : " + pomXmlSemverBackup.getAbsolutePath());
+        LOG.debug("New pom.xml.semverBackup prepared  : " + pomXmlSemverBackup.getAbsolutePath());
       }
 
     } catch (IOException err) {
@@ -89,7 +89,7 @@ public class FileWriterFactory {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if (pomXmlSemverBackup.exists()) {
-      LOG.info("Backup pom.xml exists remove file             : pom.xml.semverBackup");
+      LOG.info("Backup pom.xml exists remove file              : pom.xml.semverBackup");
       pomXmlSemverBackup.delete();
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
@@ -108,17 +108,17 @@ public class FileWriterFactory {
         File file = new File(fileName);
         if (file.exists()) {
           if (LOG != null) {
-            LOG.info("Old file: [ " + fileName + " ]  removed    : " + file.getAbsolutePath());
+            LOG.info("Old [ " + fileName + " ] removed  : " + file.getAbsolutePath());
           }
           boolean isDeleted = file.delete();
           if (!isDeleted) {
             if (LOG != null) {
-              LOG.error("File: [ " + fileName + " ] is not removed             : " + file.getAbsolutePath());
+              LOG.error("Old: [ " + fileName + " ] is not removed : " + file.getAbsolutePath());
             }
           }
         }
         if (LOG != null) {
-          LOG.info("New " + fileName + " prepared   : " + file.getAbsolutePath());
+          LOG.info("New [ " + fileName + " ] prepared : " + file.getAbsolutePath());
         }
         FileWriter writer = new FileWriter(file);
         Writer output = new BufferedWriter(writer);

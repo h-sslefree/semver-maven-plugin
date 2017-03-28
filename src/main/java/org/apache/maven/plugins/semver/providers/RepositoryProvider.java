@@ -91,7 +91,6 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
     }
@@ -105,7 +104,6 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       isSuccess = false;
       LOG.error(err.getMessage());
-      LOG.error("");
       LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
@@ -121,7 +119,6 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       isSuccess = false;
       LOG.error(err.getMessage());
-      LOG.error("");
       LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
@@ -152,7 +149,6 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
     }
@@ -168,7 +164,6 @@ public class RepositoryProvider {
       isTagCreated = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
     }
@@ -183,7 +178,6 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
     }
@@ -197,7 +191,6 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       isCommitSuccess = false;
       LOG.error(err.getMessage());
-      LOG.error("");
       LOG.error("");
       LOG.error("Please run semver:rollback to fix this issue");
       Runtime.getRuntime().exit(1);
@@ -223,7 +216,7 @@ public class RepositoryProvider {
         LOG.error("Please commit and push the open changes");
         isChanged = true;
       } else {
-        LOG.info("Local changes                     : workingtree is clean");
+        LOG.info("Local changes                       : workingtree is clean");
       }
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
