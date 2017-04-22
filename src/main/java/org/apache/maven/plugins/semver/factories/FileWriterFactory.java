@@ -12,13 +12,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
 /**
- *
- * <h>FileWriter</h>
- * <p>
- *     Is used to write and delete files on disk.<br>
- *     Mostly pom.xml files are managed on disk.
- * </p>
- *
  * @author sido
  */
 public class FileWriterFactory {
@@ -91,25 +84,19 @@ public class FileWriterFactory {
     }
   }
 
-  /**
-   *
-   * @param LOG
-   */
   public static void removeBackupSemverPom(Log LOG) {
     LOG.info("Clean backup pom.xml");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if (pomXmlSemverBackup.exists()) {
       LOG.info("Backup pom.xml exists remove file             : pom.xml.semverBackup");
-      if(pomXmlSemverBackup.delete()) {
-        LOG.info("Backup pom.xml is being removed               : pom.xml.semverBackup");
-      }
+      pomXmlSemverBackup.delete();
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
   /**
-   * <p>Write actual file to disk based on file-name and content</p>
+   * <p>Write actual file to disk</p>
    *
    * @param LOG         @see {@link org.apache.maven.plugin.logging.Log}
    * @param fileName    the name of the file
@@ -149,10 +136,10 @@ public class FileWriterFactory {
   }
 
   /**
-   * <p>Write actual file to disk base on the file-object.</p>
+   * <p>Write actual file to disk</p>
    *
    * @param LOG  @see {@link org.apache.maven.plugin.logging.Log}
-   * @param file the file that has to be written on disk
+   * @param file the file
    */
   public static void writeFileToDisk(Log LOG, File file) {
 
@@ -177,9 +164,7 @@ public class FileWriterFactory {
         LOG.info("New file: [ " + file.getName() + " ] is prepared : " + file.getAbsolutePath());
       }
 
-      if(file.createNewFile()) {
-        LOG.info("THe new file is written on disk");
-      }
+      file.createNewFile();
       Files.write(filePath, resultData, StandardOpenOption.WRITE);
 
     } catch (IOException err) {
