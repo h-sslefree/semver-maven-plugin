@@ -22,6 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * <h>RepositoryProvider</h>
+ * <p>
+ *
+ *
+ * </p>
+ *
  * @author sido
  */
 public class RepositoryProvider {
@@ -45,6 +52,8 @@ public class RepositoryProvider {
   /**
    * <p>Initialize GIT-repo for determining branch and tag information.</p>
    *
+   * @param project {@link MavenProject}
+   * @return {@link Git} GIT-repository
    * @throws SemverException exception for not initializing local and remote repository
    */
   private Git initializeRepository(MavenProject project) throws SemverException {
@@ -72,7 +81,8 @@ public class RepositoryProvider {
   /**
    * <p>Initialize credentialsprovider to acces remote GIT repository.</p>
    *
-   * @return credentialsProvider initialized credentialsProvider
+   * @param configuration {@link SemverConfiguration}
+   * @return {@link CredentialsProvider} initialized credentialsProvider
    */
   private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
     CredentialsProvider provider = null;
@@ -83,6 +93,12 @@ public class RepositoryProvider {
     return provider;
   }
 
+  /**
+   *
+   * <p>Perform a pull from the remote GIT-repository.</p>
+   *
+   * @return is pull completed?
+   */
   public boolean pull() {
     boolean isSuccess = true;
     try {
@@ -98,6 +114,12 @@ public class RepositoryProvider {
     return isSuccess;
   }
 
+  /**
+   *
+   * <p>Perform a push to the remote GIT-repository</p>
+   *
+   * @return is the push completed?
+   */
   public boolean push() {
     boolean isSuccess = true;
     try {
@@ -113,6 +135,13 @@ public class RepositoryProvider {
     return isSuccess;
   }
 
+  /**
+   *
+   * <p>Push a GIT-tag to the remote GIT-repository.</p>
+   *
+   * @param tag GIT-tag
+   * @return is the tag succesfully pushed
+   */
   public boolean pushTag(String tag) {
     boolean isSuccess = true;
     RefSpec refSpec = new RefSpec().setSource(null).setDestination(tag);
@@ -129,7 +158,11 @@ public class RepositoryProvider {
     return isSuccess;
   }
 
-
+  /**
+   *
+   *
+   * @return
+   */
   public String getCurrentBranch() {
     String currentBranch = "";
     try {
@@ -142,9 +175,14 @@ public class RepositoryProvider {
       Runtime.getRuntime().exit(1);
     }
     return currentBranch;
-
   }
 
+  /**
+   *
+   * <p>Return a list of remote GIT-tags.</p>
+   *
+   * @return GIT-tags
+   */
   public List<Ref> getTags() {
     List<Ref> tags = new ArrayList<Ref>();
     try {
@@ -159,6 +197,13 @@ public class RepositoryProvider {
     return tags;
   }
 
+  /**
+   *
+   * <p>Create a local GIT-tag.</p>
+   *
+   * @param tag GIT-tag to create
+   * @return is the GIT-tag succesfully created
+   */
   public boolean createTag(String tag) {
     boolean isTagCreated = true;
     try {
@@ -175,6 +220,13 @@ public class RepositoryProvider {
     return isTagCreated;
   }
 
+  /**
+   *
+   * <p>Delete a local GIT-tag</p>
+   *
+   * @param tag GIT-tag to delete
+   * @return is the tag succesfully deleted?
+   */
   public boolean deleteTag(String tag) {
     boolean isSuccess = true;
     try {
@@ -190,6 +242,13 @@ public class RepositoryProvider {
     return isSuccess;
   }
 
+  /**
+   *
+   * <p>Perform a commit on the local repository</p>
+   *
+   * @param message GIT-commit message
+   * @return is the commit completed?
+   */
   public boolean commit(String message) {
     boolean isCommitSuccess = true;
     try {
@@ -206,10 +265,19 @@ public class RepositoryProvider {
     return isCommitSuccess;
   }
 
+  /**
+   * <p>Close the repository when finished.</p>
+   */
   public void closeRepository() {
     repository.close();
   }
 
+  /**
+   *
+   * <p>Determine if there are any open changes in the GIT-repository.</p>
+   *
+   * @return are there any open changes?
+   */
   public boolean isChanged() {
     boolean isChanged = false;
     LOG.info("Check for local or remote changes");

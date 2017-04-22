@@ -181,7 +181,6 @@ public class VersionProvider {
      *     If this is the case then exit the semver-plugin
      * </p>
      *
-     *
      * @param pomVersion get pom version from project
      * @throws SemverException
      */

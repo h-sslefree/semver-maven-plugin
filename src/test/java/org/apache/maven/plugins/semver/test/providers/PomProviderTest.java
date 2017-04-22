@@ -6,11 +6,11 @@ import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author sido
  */
-public class VersionProviderTest extends AbstractSemverMavenPluginTest {
+public class PomProviderTest extends AbstractSemverMavenPluginTest {
 
     private final Log LOG = null;
 

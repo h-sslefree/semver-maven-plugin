@@ -15,6 +15,13 @@ import org.eclipse.jgit.api.Git;
 import java.io.IOException;
 
 /**
+ *
+ * <h>BranchProvider</h>
+ * <p>
+ *     When a version has a branch in it's GIT-tag, <br>
+ *     the branch-provider can be used to determine the branch for GIT.
+ * </p>
+ *
  * @author sido
  */
 public class BranchProvider {
@@ -31,11 +38,10 @@ public class BranchProvider {
         this.branchConversionUrl = branchConversionUrl;
     }
 
-
     /**
      * <p>Determine branchVersion from GIT-branch</p>
      *
-     * @param branchVersion
+     * @param branchVersion branch version for the GIT-tag
      * @return branchVersion
      */
     public String determineBranchVersionFromGitBranch(String branchVersion) {
@@ -85,8 +91,8 @@ public class BranchProvider {
     /**
      * <p>Which new version is to be determined from the master-branch.</p>
      *
-     * @param branch branch
-     * @return
+     * @param branch branch branch from which a version has te be determined
+     * @return masterBranchVersion
      */
     private String determineVersionFromMasterBranch(String branch) {
         String branchVersion = "";

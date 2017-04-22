@@ -18,24 +18,24 @@ import org.junit.Test;
  * @author sido
  *
  */
-public class ReleaseRpmTest extends AbstractSemverMavenPluginTest{
+public class ReleaseBranchTest extends AbstractSemverMavenPluginTest{
 
 	@Test
-	public void testSemverMavenPluginPatchRpm() throws Exception {
+	public void testSemverMavenPluginPatchBranch() throws Exception {
 		SemverMavenPluginGoalPatch mojo = (SemverMavenPluginGoalPatch) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "patch");
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 	}
 
 	@Test
-	public void testSemverMavenPluginMinorRpm() throws Exception {
+	public void testSemverMavenPluginMinorBranch() throws Exception {
 		SemverMavenPluginGoalMinor mojo = (SemverMavenPluginGoalMinor) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "minor");
 		Assert.assertNotNull(mojo);
 		mojo.execute();
 	}
 
 	@Test
-	public void testSemverMavenPluginMajorRpm() throws Exception {
+	public void testSemverMavenPluginMajorBranch() throws Exception {
 		SemverMavenPluginGoalMajor mojo = (SemverMavenPluginGoalMajor) mojoRule.lookupConfiguredMojo(loadPom("rpm/"), "major");
 		Assert.assertNotNull(mojo);
 		mojo.execute();

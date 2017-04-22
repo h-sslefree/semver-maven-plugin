@@ -8,6 +8,10 @@ import org.apache.maven.project.MavenProject;
 import java.util.Map;
 
 /**
+ *
+ * <h>PomProvider</h>
+ * <p></p>
+ *
  * @author sido
  */
 public class PomProvider {
@@ -24,6 +28,13 @@ public class PomProvider {
     this.project = project;
   }
 
+  /**
+   *
+   *
+   *
+   * @param finalVersions
+   * @return
+   */
   public boolean createReleasePom(Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
     LOG.info("Create release-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
@@ -43,6 +54,13 @@ public class PomProvider {
     return isReleasePomCreated;
   }
 
+  /**
+   *
+   *
+   *
+   * @param developmentVersion developmentVersion
+   * @return is next development pom created?
+   */
   public boolean createNextDevelopmentPom(String developmentVersion) {
     LOG.info("Create next development-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);

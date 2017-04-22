@@ -120,15 +120,22 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
       FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+    } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+      Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
+      FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
       FileWriterFactory.backupSemverPom(LOG);
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
       pomProvider.createReleasePom(finalVersions);
       pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
       FileWriterFactory.removeBackupSemverPom(LOG);
-    } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+    } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
+      FileWriterFactory.backupSemverPom(LOG);
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
-      FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+      pomProvider.createReleasePom(finalVersions);
+      pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
+      FileWriterFactory.removeBackupSemverPom(LOG);
     }
   }
 
@@ -239,8 +246,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * <li>native</li>
    * <li>native-rpm</li>
    * </ul>
-   *
-   * @author sido
    */
   public enum RUNMODE {
     RELEASE,

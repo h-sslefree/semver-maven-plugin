@@ -19,7 +19,7 @@
     <properties>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.sourceCompiler>1.6</project.build.sourceCompiler>
+        <project.build.sourceCompiler>1.8</project.build.sourceCompiler>
 
         <gitlog-pattern>^(?!PATCH \[.*\]|FIX \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING\[.*\]).*</gitlog-pattern>
 

@@ -106,7 +106,6 @@ public class SemverConfiguration {
      * <p>Get RUNMODE</p>
      * <ul>Possible runModes are:
      *   <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
-     *   <li>When {@link RUNMODE} = RELEASE_RPM then determine version from POM-version</li>
      *   <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
      *   <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
      *   <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
