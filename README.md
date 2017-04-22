@@ -12,7 +12,7 @@ Include the following depedency in your pom.xml
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
-  <version>2.2.1</version>
+  <version>3.0.0</version>
 </plugin>
 ```
 
@@ -24,7 +24,7 @@ You have to specify the configuration-tag to set the RUN_MODE.
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
-  <version>2.2.1</version>
+  <version>3.0.0</version>
   <configuration>
     <runMode>RELEASE</runMode>
   </configuration>
@@ -34,7 +34,6 @@ You have to specify the configuration-tag to set the RUN_MODE.
 The goals that use the **maven-release-plugin** are attached to RUN_MODES:
 
 * RELEASE
-* RELEASE_RPM
 * RELEASE_BRANCH
 
 It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
@@ -44,7 +43,7 @@ The goals that are **native** are attached to RUNMODES:
 **Not yet implemented**
 
 * NATIVE
-* NATIVE_RPM
+* NATIVE_BRANCH
   
 The **native**-method is developed in version: *3.0.0* to get rid of the dependency on the **maven-release-plugin**.
 

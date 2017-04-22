@@ -133,7 +133,7 @@ public class VersionProvider {
      *
      * @return
      */
-    private String determineReleaseTag(int patch, int minor, int major) {
+    public String determineReleaseTag(int patch, int minor, int major) {
         StringBuilder releaseTag = new StringBuilder();
         releaseTag.append(major);
         releaseTag.append(".");
@@ -156,7 +156,7 @@ public class VersionProvider {
      * @param major         major is the number to define a breaking change in symantic-versioning
      * @return
      */
-    private String determineBuildMetaData(int patch, int minor, int major) {
+    public String determineBuildMetaData(int patch, int minor, int major) {
         StringBuilder buildMetaData = new StringBuilder();
         if (configuration != null && configuration.getRunMode() == SemverMavenPlugin.RUNMODE.RELEASE_BRANCH_HOSEE) {
             StringBuilder buildMetaDataBranch = new StringBuilder();

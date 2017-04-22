@@ -71,7 +71,6 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     int minorVersion = 0;
     int patchVersion = 0;
 
-
     String[] rawVersion = version.split("\\.");
     if (rawVersion.length > 0 && rawVersion.length == 3) {
       LOG.debug("Set version-variables from POM.xml");
@@ -99,7 +98,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
     LOG.info("New DEVELOPMENT-version           : " + developmentVersion);
-    LOG.info("New GIT-version                   : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(scmVersion));
+    LOG.info("New GIT-version                   : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion) + getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
     LOG.info("New RELEASE-version               : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 

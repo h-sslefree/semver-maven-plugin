@@ -97,7 +97,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
     LOG.info("New DEVELOPMENT-version           : " + developmentVersion);
-    LOG.info("New GIT-version                   : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(scmVersion));
+    LOG.info("New GIT-version                   : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
     LOG.info("New RELEASE-version               : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 

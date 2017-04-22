@@ -25,7 +25,6 @@ import java.util.Map;
  * <p>Possible usages are:</p>
  * <ul>Possible runModes are:
  * <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
- * <li>When {@link RUNMODE} = RELEASE_RPM then determine version from POM-version</li>
  * <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
  * <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
  * <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
@@ -35,8 +34,8 @@ import java.util.Map;
  * <ul>Possible value for the branchConversionUrl is
  * <li>branchConversionUrl = http://localhost/determineBranchVersion</li>
  * </ul>
- * <ul>Turn metaData on or off
- * <li>metaData = true/false</li>
+ * <ul>Add metaData to the version
+ * <li>metaData = #metaData#</li>
  * </ul>
  *
  * @author sido
