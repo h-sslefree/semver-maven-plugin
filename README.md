@@ -64,7 +64,7 @@ The **native**-method is developed in version: *3.0.0* to get rid of the depende
 
 * **rollback**
 
-    *not yet implemented (will be avaiable in version 3.0.0)*
+    *not yet implemented (will be avaiable in version 3.1.0)*
     
     Rollback a patch, minor or major version. Also deletes created GIT-tags on local and remote repository.
 
@@ -80,7 +80,6 @@ The **native**-method is developed in version: *3.0.0* to get rid of the depende
 The goals that use the **maven-release-plugin** are attached to RUNMODES:
 
 * RELEASE
-* RELEASE_RPM
 * RELEASE_BRANCH
 
 To run the goals please execute the following commands:
@@ -95,7 +94,7 @@ The goals that are **native** are attached to RUNMODES:
 **Not yet implemented**
 
 * NATIVE
-* NATIVE_RPM
+* NATIVE_BRANCH
 
 To run the goals please execute the following commands:
 
