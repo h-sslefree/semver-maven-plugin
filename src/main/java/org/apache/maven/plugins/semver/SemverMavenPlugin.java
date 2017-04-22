@@ -31,11 +31,17 @@ import java.util.Map;
  * <li>When {@link RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
  * <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
  * </ul>
+ *  <ul>Add a tag to the GIT-version
+ * <li>tag = 1</li>
+ * </ul>
+ * <ul>Add the branchVersion to the GIT-tag
+ * <li>branchVersion = featureX</li>
+ * </ul>
  * <ul>Possible value for the branchConversionUrl is
  * <li>branchConversionUrl = http://localhost/determineBranchVersion</li>
  * </ul>
- * <ul>Add metaData to the version
- * <li>metaData = #metaData#</li>
+ * <ul>Add metaData to the GIT-version
+ * <li>metaData = beta</li>
  * </ul>
  *
  * @author sido
