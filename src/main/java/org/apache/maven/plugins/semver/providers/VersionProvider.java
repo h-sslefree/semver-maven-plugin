@@ -4,7 +4,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.project.MavenProject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +21,6 @@ public class VersionProvider {
     private Log LOG;
 
     private SemverConfiguration configuration;
-
-    private MavenProject project;
 
     public enum FINAL_VERSION {
         DEVELOPMENT,
@@ -58,7 +55,7 @@ public class VersionProvider {
      * @return finalVersions
      */
     public Map<FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
-        Map<FINAL_VERSION, String> finalVersions = new HashMap<FINAL_VERSION, String>();
+        Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
         finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
         finalVersions.put(FINAL_VERSION.RELEASE, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
         finalVersions.put(FINAL_VERSION.SCM, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
@@ -66,7 +63,10 @@ public class VersionProvider {
     }
 
     /**
-     * <p>Create a specific version for production-version of the product.</p>
+     * <p>
+     *     Determine release-versions from {@link SemverMavenPlugin.RAW_VERSION}.<br>
+     *     This version contains also the buildmeta-data and branch information.
+     * </p>
      *
      * @param rawVersions        raw version map with development version patch, minor and major<br>
      *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
@@ -105,7 +105,7 @@ public class VersionProvider {
             LOG.info("New BRANCH RELEASE-version               : " + releaseVersion);
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         }
-        Map<FINAL_VERSION, String> finalVersions = new HashMap<FINAL_VERSION, String>();
+        Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
         finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
         finalVersions.put(FINAL_VERSION.BUILD_METADATA, buildMetaData);
         finalVersions.put(FINAL_VERSION.SCM, scmVersion.toString());
@@ -130,7 +130,7 @@ public class VersionProvider {
      * @param minor         minor is the number to define a feature in symantic-versioning
      * @param major         major is the number to define a breaking change in symantic-versioning
      *
-     * @return
+     * @return release tag
      */
     public String determineReleaseTag(int patch, int minor, int major) {
         StringBuilder releaseTag = new StringBuilder();
@@ -153,19 +153,15 @@ public class VersionProvider {
      * @param patch         patch is the number to define a bugfix in symantic-versioning
      * @param minor         minor is the number to define a feature in symantic-versioning
      * @param major         major is the number to define a breaking change in symantic-versioning
-     * @return
+     *
+     * @return build metadata
      */
     public String determineBuildMetaData(int patch, int minor, int major) {
         StringBuilder buildMetaData = new StringBuilder();
         if (configuration != null && configuration.getRunMode() == SemverMavenPlugin.RUNMODE.RELEASE_BRANCH_HOSEE) {
-            StringBuilder buildMetaDataBranch = new StringBuilder();
-            buildMetaDataBranch.append(major);
-            buildMetaDataBranch.append(".");
-            buildMetaDataBranch.append(minor);
-            buildMetaDataBranch.append(".");
-            buildMetaDataBranch.append(patch);
+            String buildMetaDataBranch = major + "." + minor + "." + patch;
             buildMetaData.append("+");
-            buildMetaData.append(buildMetaDataBranch.toString());
+            buildMetaData.append(buildMetaDataBranch);
         }
         if (configuration != null && !configuration.getMetaData().isEmpty()) {
             buildMetaData.append("+");
@@ -182,7 +178,8 @@ public class VersionProvider {
      *
      *
      * @param pomVersion get pom version from project
-     * @throws SemverException
+     * @throws SemverException native semver exception
+     * @return is version corrupt?
      */
     public boolean isVersionCorrupt(String pomVersion) throws SemverException {
         boolean isVersionCorrupt = false;
