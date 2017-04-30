@@ -15,8 +15,10 @@ public class SemverException extends Exception {
 
   /**
    *
-   * @param header
-   * @param message
+   * <h>Constructor to initialize SemverException</h>
+   *
+   * @param header header of the error-messages
+   * @param message body of the error-message
    */
   public SemverException(String header, String message) {
     LOG.error(header);

@@ -9,8 +9,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.providers.RepositoryProvider;
-import org.eclipse.jgit.api.Git;
 
 import java.io.IOException;
 

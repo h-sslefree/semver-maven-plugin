@@ -32,13 +32,11 @@ public class PomProvider {
    *
    *
    *
-   * @param finalVersions
-   * @return
+   * @param finalVersions final versions from the plugin-foals
    */
-  public boolean createReleasePom(Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
+  public void createReleasePom(Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
     LOG.info("Create release-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    boolean isReleasePomCreated = false;
     MavenProject releasePom = project;
     releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
     FileWriterFactory.writeFileToDisk(LOG, releasePom.getFile());
@@ -51,7 +49,6 @@ public class PomProvider {
     LOG.info("Push local changes and tag          : " + project.getScm().getUrl());
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-    return isReleasePomCreated;
   }
 
   /**
@@ -59,19 +56,16 @@ public class PomProvider {
    *
    *
    * @param developmentVersion developmentVersion
-   * @return is next development pom created?
    */
-  public boolean createNextDevelopmentPom(String developmentVersion) {
+  public void createNextDevelopmentPom(String developmentVersion) {
     LOG.info("Create next development-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    boolean isNextDevelopmentVersionCreated = false;
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.setVersion(developmentVersion);
     FileWriterFactory.writeFileToDisk(LOG, nextDevelopementPom.getModel().getPomFile());
     repositoryProvider.commit("[SEMVER] Create next development-pom with version  : [ " + developmentVersion + " ]");
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-    return isNextDevelopmentVersionCreated;
   }
 
 }

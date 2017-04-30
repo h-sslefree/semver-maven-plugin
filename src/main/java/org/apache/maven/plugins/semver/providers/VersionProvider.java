@@ -1,6 +1,5 @@
 package org.apache.maven.plugins.semver.providers;
 
-import org.apache.maven.Maven;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;

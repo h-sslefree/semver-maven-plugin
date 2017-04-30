@@ -4,10 +4,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.providers.RepositoryProvider;
-import org.eclipse.jgit.api.errors.GitAPIException;
-
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +38,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     LOG.info("SCM-root                          : " + scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
-    Map<RAW_VERSION, String> rawVersions = new HashMap<RAW_VERSION, String>();
+    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     try {
       if (!getVersionProvider().isVersionCorrupt(version) && !getRepositoryProvider().isChanged()) {
         rawVersions = determineRawVersions(version);
@@ -61,17 +59,17 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
    *
    * @param version example: x.0.x-SNAPSHOT
    * @return list of development, git and release-version
-   * @throws SemverException
-   * @throws IOException
-   * @throws GitAPIException
+   * @throws SemverException plugin naive exception
+   * @throws IOException disk write exception
+   * @throws GitAPIException repository exception
    */
   private Map<RAW_VERSION, String> determineRawVersions(String version) throws SemverException, IOException, GitAPIException {
 
-    Map<RAW_VERSION, String> versions = new HashMap<RAW_VERSION, String>();
+    Map<RAW_VERSION, String> versions = new HashMap<>();
 
-    int majorVersion = 0;
-    int minorVersion = 1;
-    int patchVersion = 0;
+    int majorVersion;
+    int minorVersion;
+    int patchVersion;
 
     String[] rawVersion = version.split("\\.");
     if (rawVersion.length > 0 && rawVersion.length == 3) {

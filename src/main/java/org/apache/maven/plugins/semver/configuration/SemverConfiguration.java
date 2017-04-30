@@ -30,7 +30,7 @@ public class SemverConfiguration {
     /**
      * <p>Combining user properties with configuration properties in {@link SemverConfiguration}</p>
      *
-     * @return {@link SemverConfiguration}
+     * @param  session MavenSession
      */
     public SemverConfiguration(MavenSession session) {
         this.session = session;
@@ -122,7 +122,7 @@ public class SemverConfiguration {
     /**
      * <p>Set RUNMODE and merge with configuration.</p>
      *
-     * @param runMode
+     * @param runMode kind of runMode the plugin is configured with
      */
     public void setRunMode(RUNMODE runMode) {
         this.runMode = runMode;

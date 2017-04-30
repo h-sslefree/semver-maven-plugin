@@ -56,13 +56,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
   @Parameter(property = "username", defaultValue = "")
-  protected String scmUsername = "";
+  private String scmUsername = "";
   @Parameter(property = "password", defaultValue = "")
-  protected String scmPassword = "";
+  private String scmPassword = "";
   @Parameter(property = "tag")
   protected String preparedReleaseTag;
   @Parameter(defaultValue = "${session}", readonly = true, required = true)
-  protected MavenSession session;
+  private MavenSession session;
   @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
   private RUNMODE runMode;
   @Parameter(property = "branchVersion")
@@ -148,9 +148,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
    *
    * @param scmVersion scmVersion
-   * @throws SemverException
-   * @throws IOException
-   * @throws GitAPIException
+   * @throws SemverException native plugin exception
+   * @throws IOException disk write exception
+   * @throws GitAPIException repository exception
    */
   protected void cleanupGitLocalAndRemoteTags(String scmVersion) throws SemverException, IOException, GitAPIException {
     LOG.info("Check for lost-tags");
@@ -209,7 +209,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    *
    * @return {@link RepositoryProvider}
    */
-  public RepositoryProvider getRepositoryProvider() {
+  protected RepositoryProvider getRepositoryProvider() {
     return repositoryProvider;
   }
 
@@ -218,7 +218,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    *
    * @return {@link VersionProvider}
    */
-  public VersionProvider getVersionProvider() {
+  protected VersionProvider getVersionProvider() {
     return versionProvider;
   }
 
@@ -227,7 +227,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * <p>In each goal this method is called to intialize all providers.</p>
    *
    */
-  public void initializeProviders() {
+  protected void initializeProviders() {
     repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
     branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
     versionProvider = new VersionProvider(LOG, getConfiguration());
@@ -245,7 +245,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     SCM,
     MAJOR,
     MINOR,
-    PATCH;
+    PATCH
   }
 
   /**
