@@ -1,10 +1,16 @@
 package org.apache.maven.plugins.semver.providers;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.DefaultModelWriter;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.project.MavenProject;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,15 +44,17 @@ public class PomProvider {
     LOG.info("Create release-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     MavenProject releasePom = project;
-    releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
-    FileWriterFactory.writeFileToDisk(LOG, releasePom.getFile());
     String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
-    String commitMessage = "[SEMVER] Create new release-pom for tag  : [ " + scmTag + " ]";
-    LOG.info("Commit local changes                : " + commitMessage);
+    releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
+    releasePom.getScm().setTag(scmTag);
+    FileWriterFactory.writeFileToDisk(LOG, "pom.xml", modelToStringXml(releasePom.getModel()));
+    String commitMessage = "[SEMVER] Create new release-pom for tag : [ " + scmTag + " ]";
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    LOG.info("Commit new release-pom             : " + commitMessage);
     repositoryProvider.commit(commitMessage);
-    LOG.info("Create local tag                    : " + scmTag);
+    LOG.info("Create local scm-tag               : " + scmTag);
     repositoryProvider.createTag(scmTag);
-    LOG.info("Push local changes and tag          : " + project.getScm().getUrl());
+    LOG.info("Push new release-pom and scm-tag");
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
@@ -62,10 +70,30 @@ public class PomProvider {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.setVersion(developmentVersion);
-    FileWriterFactory.writeFileToDisk(LOG, nextDevelopementPom.getModel().getPomFile());
-    repositoryProvider.commit("[SEMVER] Create next development-pom with version  : [ " + developmentVersion + " ]");
+    nextDevelopementPom.getScm().setTag("");
+    FileWriterFactory.writeFileToDisk(LOG, "pom.xml", modelToStringXml(nextDevelopementPom.getModel()));
+    String commitMessage = "[SEMVER] Create next development-pom with version : [ " + developmentVersion + " ]";
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    LOG.info("Commit next development-pom        : " + commitMessage);
+    repositoryProvider.commit(commitMessage);
+    LOG.info("Push next development-pom");
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+  }
+
+  private String modelToStringXml(Model model) {
+
+    MavenXpp3Writer modelWriter = new MavenXpp3Writer();
+
+    StringWriter output = new StringWriter();
+    String result = "";
+    try {
+      modelWriter.write(output, model);
+      result = output.getBuffer().toString();
+    } catch (IOException e) {
+      LOG.error("Cannot convert model to pom: " + e.getMessage());
+    }
+    return result;
   }
 
 }

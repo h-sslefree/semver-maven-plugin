@@ -67,12 +67,11 @@ public class RepositoryProvider {
       repository = new Git(repo);
       LOG.info(" * GIT-repository is initialized");
     } catch (Exception err) {
-      LOG.error(" - This is not a valid GIT-repository.");
-      LOG.error(" - Please run this goal in a valid GIT-repository");
-      LOG.error(" - Could not initialize repostory", err);
+      LOG.error(" * This is not a valid GIT-repository.");
+      LOG.error(" * Please run this goal in a valid GIT-repository");
+      LOG.error(" * Could not initialize repostory", err);
       throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
     }
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return repository;
   }
 
@@ -105,7 +104,8 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -125,7 +125,8 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -147,7 +148,9 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -165,8 +168,8 @@ public class RepositoryProvider {
     } catch (IOException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return currentBranch;
@@ -185,7 +188,8 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return tags;
@@ -207,7 +211,8 @@ public class RepositoryProvider {
       isTagCreated = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return isTagCreated;
@@ -228,7 +233,8 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -249,7 +255,8 @@ public class RepositoryProvider {
       isCommitSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please run semver:rollback to fix this issue");
+      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
 
@@ -282,7 +289,7 @@ public class RepositoryProvider {
         LOG.error("Please commit and push the open changes");
         isChanged = true;
       } else {
-        LOG.info("Local changes                       : workingtree is clean");
+        LOG.info("Local changes                      : workingtree is clean");
       }
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
@@ -292,5 +299,42 @@ public class RepositoryProvider {
     return isChanged;
   }
 
+  /**
+   * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
+   *
+   * @param scmVersion scmVersion
+   * @throws SemverException native plugin exception
+   * @throws IOException disk write exception
+   * @throws GitAPIException repository exception
+   */
+  public void cleanupGitLocalAndRemoteTags(Log LOG, String scmVersion) throws SemverException, IOException, GitAPIException {
+    LOG.info("Check for lost-tags");
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    pull();
+    List<Ref> refs = getTags();
+    LOG.debug("Remote tags                        ");
+    for(Ref ref : refs) {
+      LOG.debug(" * " + ref.getName());
+    }
+    if (refs.isEmpty()) {
+      boolean found = false;
+      for (Ref ref : refs) {
+        if (ref.getName().contains(scmVersion)) {
+          found = true;
+          LOG.info("Delete lost local-tag                   : " + ref.getName().substring(10));
+          deleteTag(ref.getName());
+          LOG.info("Delete lost remote-tag                  : " + ref.getName().substring(10));
+          pushTag(ref.getName());
+        }
+      }
+      if (!found) {
+        LOG.info("No lost-tags where found           : local or remote");
+      }
+    } else {
+      LOG.info("No lost-tags where found           : local or remote");
+    }
+    closeRepository();
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+  }
 
 }

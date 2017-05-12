@@ -31,11 +31,12 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
 
-    LOG.info("Semver-goal                       : MINOR");
-    LOG.info("Run-mode                          : " + getConfiguration().getRunMode());
-    LOG.info("Version from POM                  : " + version);
-    LOG.info("SCM-connection                    : " + scmConnection);
-    LOG.info("SCM-root                          : " + scmRoot);
+    LOG.info(FUNCTION_LINE_BREAK);
+    LOG.info("Semver-goal                        : MINOR");
+    LOG.info("Run-mode                           : " + getConfiguration().getRunMode());
+    LOG.info("Version from POM                   : " + version);
+    LOG.info("SCM-connection                     : " + scmConnection);
+    LOG.info("SCM-root                           : " + scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
@@ -84,9 +85,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
       throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parseble version-pattern");
     }
 
-    LOG.debug("MAJOR-version                    : " + majorVersion);
-    LOG.debug("MINOR-version                    : " + minorVersion);
-    LOG.debug("PATCH-version                    : " + patchVersion);
+    LOG.debug("MAJOR-version                     : " + majorVersion);
+    LOG.debug("MINOR-version                     : " + minorVersion);
+    LOG.debug("PATCH-version                     : " + patchVersion);
     LOG.debug(MOJO_LINE_BREAK);
 
     minorVersion = minorVersion + 1;
@@ -96,9 +97,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
-    LOG.info("New DEVELOPMENT-version             : " + developmentVersion);
-    LOG.info("New GIT-version                     : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
-    LOG.info("New RELEASE-version                 : " + releaseVersion);
+    LOG.info("New DEVELOPMENT-version              : " + developmentVersion);
+    LOG.info("New GIT-version                      : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
+    LOG.info("New RELEASE-version                  : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 
     versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
@@ -107,7 +108,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     versions.put(RAW_VERSION.MINOR, String.valueOf(minorVersion));
     versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
-    cleanupGitLocalAndRemoteTags(scmVersion);
+    getRepositoryProvider().cleanupGitLocalAndRemoteTags(LOG, scmVersion);
 
     return versions;
   }

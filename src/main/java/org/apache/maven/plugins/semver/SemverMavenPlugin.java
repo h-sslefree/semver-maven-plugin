@@ -134,7 +134,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
       pomProvider.createReleasePom(finalVersions);
       pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-      FileWriterFactory.removeBackupSemverPom(LOG);
+//      FileWriterFactory.removeBackupSemverPom(LOG);
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
       FileWriterFactory.backupSemverPom(LOG);
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
@@ -144,43 +144,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
-  /**
-   * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
-   *
-   * @param scmVersion scmVersion
-   * @throws SemverException native plugin exception
-   * @throws IOException disk write exception
-   * @throws GitAPIException repository exception
-   */
-  protected void cleanupGitLocalAndRemoteTags(String scmVersion) throws SemverException, IOException, GitAPIException {
-    LOG.info("Check for lost-tags");
-    LOG.info(MOJO_LINE_BREAK);
-    repositoryProvider.pull();
-    List<Ref> refs = repositoryProvider.getTags();
-    LOG.debug("Remote tags                        ");
-    for(Ref ref : refs) {
-      LOG.debug("                                   - " + ref.getName());
-    }
-    if (refs.isEmpty()) {
-      boolean found = false;
-      for (Ref ref : refs) {
-        if (ref.getName().contains(scmVersion)) {
-          found = true;
-          LOG.info("Delete lost local-tag                  : " + ref.getName().substring(10));
-          repositoryProvider.deleteTag(ref.getName());
-          LOG.info("Delete lost remote-tag                 : " + ref.getName().substring(10));
-          repositoryProvider.pushTag(ref.getName());
-        }
-      }
-      if (!found) {
-        LOG.info("No lost-tags where found            : local or remote");
-      }
-    } else {
-      LOG.info("No lost-tags where found            : local or remote");
-    }
-    repositoryProvider.closeRepository();
-    LOG.info(FUNCTION_LINE_BREAK);
-  }
+
 
   /**
    * <p>Get merged configuration</p>

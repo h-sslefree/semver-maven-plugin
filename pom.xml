@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.sourceCompiler>1.8</project.build.sourceCompiler>
 
-        <gitlog-pattern>^(?!PATCH \[.*\]|FIX \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING\[.*\]).*</gitlog-pattern>
+        <gitlog-pattern>^(?!PATCH \[.*\]|ADD \[.*\]|FIX \[.*\]|FEATURE \[.*\]|CHORE \[.*\]|BREAKING\[.*\]).*</gitlog-pattern>
 
         <maven.plugin.plugin-version>3.5</maven.plugin.plugin-version>
         <maven.compiler.plugin-version>3.1</maven.compiler.plugin-version>
@@ -41,7 +41,6 @@
         <maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
 
         <org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
-        <!--<org.apache.httpcomponents.httpclient-version>4.5.2</org.apache.httpcomponents.httpclient-version>-->
 
         <maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
         <junit-version>4.12</junit-version>

@@ -99,10 +99,10 @@ public class VersionProvider {
         scmVersion.append(buildMetaData);
 
         if(LOG != null) {
-            LOG.info("New DEVELOPMENT-version                  : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
-            LOG.info("New BRANCH GIT build metadata            : " + buildMetaData);
-            LOG.info("New BRANCH GIT-version                   : " + scmVersion);
-            LOG.info("New BRANCH RELEASE-version               : " + releaseVersion);
+            LOG.info("New DEVELOPMENT-version                   : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
+            LOG.info("New BRANCH GIT build metadata             : " + buildMetaData);
+            LOG.info("New BRANCH GIT-version                    : " + scmVersion);
+            LOG.info("New BRANCH RELEASE-version                : " + releaseVersion);
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         }
         Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
@@ -187,12 +187,16 @@ public class VersionProvider {
         LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         if(pomVersion == null || pomVersion.isEmpty()) {
             isVersionCorrupt = true;
+            LOG.error("");
             LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
+            LOG.error("");
         } else if(!pomVersion.contains("-SNAPSHOT")) {
             isVersionCorrupt = true;
-            LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string.");
+            LOG.error("");
+            LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string");
+            LOG.error("");
         } else {
-            LOG.info("Pom-version is correct            : " + pomVersion);
+            LOG.info("Pom-version is correct             : " + pomVersion);
         }
         LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
         return isVersionCorrupt;

@@ -2,7 +2,7 @@
 
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
 
-Check: [semver.org](https://www.semver.org) for more information
+Check:[semver.org](https://www.semver.org) for more information
 
 ## Usage
 
@@ -87,7 +87,6 @@ To run the goals please execute the following commands:
 * `mvn semver:minor release:prepare`
 * `mvn semver:major release:prepare`
 
-
 The goals that are **native** are attached to RUNMODES:
 
 **Not yet implemented**
@@ -101,7 +100,6 @@ To run the goals please execute the following commands:
 * `mvn semver:minor`
 * `mvn semver:major`
 * `mvn semver:rollback` 
-
 
 ## Build
 

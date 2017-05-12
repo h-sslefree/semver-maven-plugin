@@ -135,7 +135,7 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProvider(LOG, getConfigurationNativeBranch());
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<s>();
+        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
