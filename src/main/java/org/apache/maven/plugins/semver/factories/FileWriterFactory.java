@@ -6,9 +6,7 @@ import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.Map;
 
 /**
@@ -84,12 +82,29 @@ public class FileWriterFactory {
     }
   }
 
+  public static void rollbackPom(Log LOG) {
+    LOG.info("");
+    LOG.info("Rollback pom.xml");
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    File pomXml= new File("pom.xml");
+    File pomXmlSemverBackup = new File("pom.xml.semverBackup");
+    LOG.info(" * Replace pom.xml with           : pom.xml.semverBackup");
+    try {
+      Files.copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException err) {
+      LOG.error(err);
+    }
+
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+  }
+
   public static void removeBackupSemverPom(Log LOG) {
+    LOG.info("");
     LOG.info("Clean backup pom.xml");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if (pomXmlSemverBackup.exists()) {
-      LOG.info("Backup pom.xml exists remove file  : pom.xml.semverBackup");
+      LOG.info(" * Backup pom.xml exists remove file  : pom.xml.semverBackup");
       pomXmlSemverBackup.delete();
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);

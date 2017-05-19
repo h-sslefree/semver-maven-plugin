@@ -5,6 +5,8 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,10 +24,7 @@ import java.util.List;
 /**
  *
  * <h>RepositoryProvider</h>
- * <p>
- *
- *
- * </p>
+ * <p>Provider that is used to make connection to SCM repository and handle all request to and from that repository.</p>
  *
  * @author sido
  */
@@ -35,9 +34,20 @@ public class RepositoryProvider {
 
   private Git repository;
   private CredentialsProvider provider;
+  private Prompter prompter;
 
-  public RepositoryProvider(Log LOG, MavenProject project, SemverConfiguration configuration) {
+  /**
+   *
+   * <p>Initialize the RepositoryProvider.</p>
+   *
+   * @param LOG get logging from the mojo
+   * @param project get the {@link MavenProject} from the mojo
+   * @param configuration get the {@link SemverConfiguration} from the mojo
+   * @param prompter get the {@link Prompter} from the mojo
+   */
+  public RepositoryProvider(Log LOG, MavenProject project, SemverConfiguration configuration, Prompter prompter) {
     this.LOG = LOG;
+    this.prompter = prompter;
     try {
       repository = initializeRepository(project);
       provider = initializeCredentialsProvider(configuration);
@@ -82,11 +92,24 @@ public class RepositoryProvider {
    * @return {@link CredentialsProvider} initialized credentialsProvider
    */
   private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
+    LOG.info("Initializing GIT-credentialsprovider");
     CredentialsProvider provider = null;
-    if (!(configuration.getScmPassword().isEmpty() || configuration.getScmUsername().isEmpty())) {
+    String scmUserName = configuration.getScmUsername();
+    String scmPassword = configuration.getScmPassword();
+    if(scmUserName.isEmpty() || scmPassword.isEmpty()) {
+      try {
+        scmUserName = prompter.prompt("[info]  * Please enter your (SCM) username");
+        scmPassword = prompter.promptForPassword("[info]  * Please enter your (SCM) password");
+      } catch (PrompterException err) {
+        LOG.error(err);
+      }
+    }
+    if (!(scmUserName.isEmpty() || scmPassword.isEmpty())) {
       provider = new UsernamePasswordCredentialsProvider(configuration.getScmUsername(), configuration.getScmPassword());
       LOG.info(" * GIT-credential provider is initialized");
+      LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     }
+
     return provider;
   }
 

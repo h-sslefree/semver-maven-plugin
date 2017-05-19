@@ -42,6 +42,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
       LOG.info("Rollbacked version: [" + version + "]");
 
+      FileWriterFactory.rollbackPom(LOG);
       FileWriterFactory.removeBackupSemverPom(LOG);
     } else {
       LOG.error("Ÿou have configured a wrong RUN_MODE ( " + getConfiguration().getRunMode() + " )");

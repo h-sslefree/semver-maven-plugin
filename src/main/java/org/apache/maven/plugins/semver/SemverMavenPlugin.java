@@ -3,6 +3,7 @@ package org.apache.maven.plugins.semver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
@@ -12,6 +13,7 @@ import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.components.interactivity.Prompter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
@@ -52,6 +54,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public static final String FUNCTION_LINE_BREAK = "************************************************************************";
 
   protected final Log LOG = getLog();
+
+  @Component
+  private Prompter prompter;
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
@@ -192,7 +197,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    *
    */
   protected void initializeProviders() {
-    repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration());
+    repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration(), prompter);
     branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
     versionProvider = new VersionProvider(LOG, getConfiguration());
     pomProvider = new PomProvider(LOG, repositoryProvider, project);
