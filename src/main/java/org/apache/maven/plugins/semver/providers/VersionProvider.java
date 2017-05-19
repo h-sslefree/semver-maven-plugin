@@ -31,13 +31,11 @@ public class VersionProvider {
 
     /**
      *
-     * <p>
-     *     In the constructor the logging and the configuration is given. <br>
-     *     These are elements which continue to return in the different methods.
-     * </p>
+     * <p>In the constructor the logging and the configuration is given.</p>
+     * <p>These are elements which continue to return in the different methods.</p>
      *
-     * @param LOG                @see {@link org.apache.maven.plugin.logging.Log}
-     * @param configuration      @see {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
+     * @param LOG                {@link org.apache.maven.plugin.logging.Log}
+     * @param configuration      {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
      *
      */
     public VersionProvider(Log LOG, SemverConfiguration configuration) {
@@ -50,8 +48,8 @@ public class VersionProvider {
      *
      * <p>Determine release versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
      *
-     * @param rawVersions @see   raw version map with development version patch, minor and major<br>
-     *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     * @param rawVersions        raw version map with development version patch, minor and major
+     *                           the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
      * @return finalVersions
      */
     public Map<FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
@@ -63,13 +61,11 @@ public class VersionProvider {
     }
 
     /**
-     * <p>
-     *     Determine release-versions from {@link SemverMavenPlugin.RAW_VERSION}.<br>
-     *     This version contains also the buildmeta-data and branch information.
-     * </p>
+     * <p>Determine release-versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
+     * <p>This version contains also the buildmeta-data and branch information.</p>
      *
-     * @param rawVersions        raw version map with development version patch, minor and major<br>
-     *                           the @see {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     * @param rawVersions        raw version map with development version patch, minor and major
+     *                           the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
      *
      * @return finalVersions
      *
@@ -116,15 +112,14 @@ public class VersionProvider {
 
     /**
      *
-     * <p>Determine general release-tag.<br>
-     *    Examples:<br>
-     *    <ul><b>NORMAL-release</b>
-     *      <li>1.1.1</li>
-     *    </ul>
-     *    <ul><b>BRANCH-release</b>
-     *    <li>1.1.1-001001001</li>
-     *    </ul>
-     * </p>
+     * <p>Determine general release-tag.</p>
+     * <p>Examples:</p>
+     * <ul><b>NORMAL-release</b>
+     *   <li>1.1.1</li>
+     * </ul>
+     * <ul><b>BRANCH-release</b>
+     *   <li>1.1.1-001001001</li>
+     * </ul>
      *
      * @param patch         patch is the number to define a bugfix in symantic-versioning
      * @param minor         minor is the number to define a feature in symantic-versioning
@@ -171,10 +166,8 @@ public class VersionProvider {
     }
 
     /**
-     * <p>
-     *     Determine if the version in the pom.xml is corrupt.<br>
-     *     If this is the case then exit the semver-plugin
-     * </p>
+     * <p>Determine if the version in the pom.xml is corrupt.</p>
+     * <p>If this is the case then exit the semver-plugin.</p>
      *
      *
      * @param pomVersion get pom version from project

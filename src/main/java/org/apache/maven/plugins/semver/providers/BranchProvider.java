@@ -15,10 +15,7 @@ import java.io.IOException;
 /**
  *
  * <h>BranchProvider</h>
- * <p>
- *     When a version has a branch in it's GIT-tag, <br>
- *     the branch-provider can be used to determine the branch for GIT.
- * </p>
+ * <p>When a version has a branch in it's GIT-tag, the branch-provider can be used to determine the branch for GIT.</p>
  *
  * @author sido
  */
