@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class RepositoryProvider {
 
+  private static final String URL_GITHUB = "github.com";
+
   private Log LOG;
 
   private Git repository;
@@ -52,7 +54,7 @@ public class RepositoryProvider {
     this.prompter = prompter;
     try {
       repository = initializeRepository(project);
-      provider = initializeCredentialsProvider(configuration);
+      provider = initializeCredentialsProvider(project, configuration);
     } catch (SemverException err) {
       LOG.error(err.getMessage());
       Runtime.getRuntime().exit(1);
@@ -93,22 +95,28 @@ public class RepositoryProvider {
    * @param configuration {@link SemverConfiguration}
    * @return {@link CredentialsProvider} initialized credentialsProvider
    */
-  private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
+  private CredentialsProvider initializeCredentialsProvider(MavenProject project, SemverConfiguration configuration) {
     LOG.info("Initializing SCM-credentialsprovider");
     CredentialsProvider provider = null;
     String scmUserName = configuration.getScmUsername();
     String scmPassword = configuration.getScmPassword();
     if(scmUserName.isEmpty() || scmPassword.isEmpty()) {
+      String messageUsername = "[info]  * Please enter your (SCM) username";
+      String messagePassword = "[info]  * Please enter your (SCM) password";
+      if(project.getScm().getUrl().contains(URL_GITHUB)) {
+        messageUsername = "[info]  * Please enter your (SCM) token";
+        messagePassword = "[info]  * Please enter your (SCM) secret";
+      }
       try {
-        scmUserName = prompter.prompt("[info]  * Please enter your (SCM) username");
-        scmPassword = prompter.promptForPassword("[info]  * Please enter your (SCM) password");
+        scmUserName = prompter.prompt(messageUsername);
+        scmPassword = prompter.promptForPassword(messagePassword);
       } catch (PrompterException err) {
         LOG.error(err);
       }
     }
     if (!(scmUserName.isEmpty() || scmPassword.isEmpty())) {
       provider = new UsernamePasswordCredentialsProvider(scmPassword, scmPassword);
-      LOG.info(" * SCM-credential provider is initialized");
+      LOG.info(" * SCM-credentialsprovider is initialized");
       LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     }
 
@@ -211,10 +219,6 @@ public class RepositoryProvider {
     try {
       deleteTag(tag);
       repository.tag().setName(tag).call();
-      if(provider.isInteractive()) {
-        LOG.info("Repository is interactive");
-      }
-      repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isTagCreated = false;
       LOG.error(err.getMessage());
@@ -269,6 +273,25 @@ public class RepositoryProvider {
     }
 
     return isCommitSuccess;
+  }
+
+  /**
+   *
+   * @return
+   */
+  public boolean push(){
+    boolean isPushSuccess = true;
+    try {
+      repository.push().setRemote("origin").setCredentialsProvider(provider).call();
+    } catch (GitAPIException err) {
+      isPushSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
+      Runtime.getRuntime().exit(1);
+    }
+    return isPushSuccess;
   }
 
   /**

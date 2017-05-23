@@ -88,7 +88,7 @@ public class FileWriterFactory {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXml= new File("pom.xml");
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
-    LOG.info(" * Replace pom.xml with          : pom.xml.semverBackup");
+    LOG.info(" * Replace pom.xml with           : pom.xml.semverBackup");
     try {
       Files.copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException err) {

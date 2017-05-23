@@ -44,12 +44,12 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
 
     if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
 
-      LOG.info("Perform a rollback for version      : [ " + version + " ]");
+      LOG.info("Perform a rollback for version    : [ " + version + " ]");
       if(FileWriterFactory.canRollBack(LOG)) {
         if(!getVersionProvider().isRemoteVersionCorrupt()) {
 
           getRepositoryProvider().commit("[semver-maven-plugin] rollback version : [ " + version + " ]");
-          LOG.info("Delete SCM-tag                     : [ " + version + " ]");
+          LOG.info("Delete SCM-tag                    : [ " + version + " ]");
           getRepositoryProvider().deleteTag(version);
 //          getRepositoryProvider().push();
           LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);

@@ -1,19 +1,14 @@
 package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.project.MavenProject;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
-import java.io.*;
 import java.util.Map;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  *
@@ -69,8 +64,12 @@ public class PomProvider {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit new release-pom             : " + commitMessage);
     repositoryProvider.commit(commitMessage);
+    LOG.info("Push new release-pom to remote     : " + commitMessage);
+    repositoryProvider.push();
     LOG.info("Create local scm-tag               : " + scmTag);
     repositoryProvider.createTag(scmTag);
+    LOG.info("Create remote scm-tag              : " + scmTag);
+    //repositoryProvider.pushTag(scmTag);
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
@@ -88,13 +87,14 @@ public class PomProvider {
     nextDevelopementPom.setVersion(developmentVersion);
     nextDevelopementPom.getScm().setTag("");
     updateVersion(nextDevelopementPom, developmentVersion);
-    String commitMessage = "[semver-maven-plugin] Create next development-pom with version : [ " + developmentVersion + " ]";
+    String commitMessage = "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    LOG.info("Commit next development-pom        : " + commitMessage);
+    LOG.info("Commit next dev-pom                : " + commitMessage);
     repositoryProvider.commit(commitMessage);
+    LOG.info("Push next dev-pom to remote        : " + commitMessage);
+    repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
-
 
   private void checkSnapshotVersions(MavenProject project, String version) {
     try {
