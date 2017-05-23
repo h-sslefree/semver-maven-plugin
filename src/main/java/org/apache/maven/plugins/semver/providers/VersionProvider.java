@@ -195,6 +195,13 @@ public class VersionProvider {
         return isVersionCorrupt;
     }
 
+    public boolean isRemoteVersionCorrupt() {
+        boolean isRemoteVersionCorrupt  = false;
+
+
+        return isRemoteVersionCorrupt;
+    }
+
 
 
 

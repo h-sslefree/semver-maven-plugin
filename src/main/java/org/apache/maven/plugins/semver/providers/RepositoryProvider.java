@@ -36,6 +36,8 @@ public class RepositoryProvider {
   private CredentialsProvider provider;
   private Prompter prompter;
 
+  private String branch = "master";
+
   /**
    *
    * <p>Initialize the RepositoryProvider.</p>
@@ -58,16 +60,16 @@ public class RepositoryProvider {
   }
 
   /**
-   * <p>Initialize GIT-repo for determining branch and tag information.</p>
+   * <p>Initialize SCM-repo for determining branch and tag information.</p>
    *
    * @param project {@link MavenProject}
-   * @return {@link Git} GIT-repository
+   * @return {@link Git} SCM-repository
    * @throws SemverException exception for not initializing local and remote repository
    */
   private Git initializeRepository(MavenProject project) throws SemverException {
     Git repository = null;
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-    LOG.info("Initializing GIT-repository");
+    LOG.info("Initializing SCM-repository");
     FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
     repoBuilder.addCeilingDirectory(project.getBasedir());
     repoBuilder.findGitDir(project.getBasedir());
@@ -75,24 +77,24 @@ public class RepositoryProvider {
     try {
       repo = repoBuilder.build();
       repository = new Git(repo);
-      LOG.info(" * GIT-repository is initialized");
+      LOG.info(" * SCM-repository is initialized");
     } catch (Exception err) {
-      LOG.error(" * This is not a valid GIT-repository.");
-      LOG.error(" * Please run this goal in a valid GIT-repository");
+      LOG.error(" * This is not a valid SCM-repository.");
+      LOG.error(" * Please run this goal in a valid SCM-repository");
       LOG.error(" * Could not initialize repostory", err);
-      throw new SemverException("This is not a valid GIT-repository", "Please run this goal in a valid GIT-repository");
+      throw new SemverException("This is not a valid SCM-repository", "Please run this goal in a valid SCM-repository");
     }
     return repository;
   }
 
   /**
-   * <p>Initialize credentialsprovider to acces remote GIT repository.</p>
+   * <p>Initialize credentialsprovider to acces remote SCM repository.</p>
    *
    * @param configuration {@link SemverConfiguration}
    * @return {@link CredentialsProvider} initialized credentialsProvider
    */
   private CredentialsProvider initializeCredentialsProvider(SemverConfiguration configuration) {
-    LOG.info("Initializing GIT-credentialsprovider");
+    LOG.info("Initializing SCM-credentialsprovider");
     CredentialsProvider provider = null;
     String scmUserName = configuration.getScmUsername();
     String scmPassword = configuration.getScmPassword();
@@ -105,8 +107,8 @@ public class RepositoryProvider {
       }
     }
     if (!(scmUserName.isEmpty() || scmPassword.isEmpty())) {
-      provider = new UsernamePasswordCredentialsProvider(configuration.getScmUsername(), configuration.getScmPassword());
-      LOG.info(" * GIT-credential provider is initialized");
+      provider = new UsernamePasswordCredentialsProvider(scmPassword, scmPassword);
+      LOG.info(" * SCM-credential provider is initialized");
       LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     }
 
@@ -127,7 +129,7 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -136,30 +138,9 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Perform a push to the remote GIT-repository</p>
+   * <p>Push a SCM-tag to the remote SCM-repository.</p>
    *
-   * @return is the push completed?
-   */
-  public boolean push() {
-    boolean isSuccess = true;
-    try {
-      repository.push().setRemote("origin").setCredentialsProvider(provider).call();
-    } catch (GitAPIException err) {
-      isSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
-      Runtime.getRuntime().exit(1);
-    }
-    return isSuccess;
-  }
-
-  /**
-   *
-   * <p>Push a GIT-tag to the remote GIT-repository.</p>
-   *
-   * @param tag GIT-tag
+   * @param tag SCM-tag
    * @return is the tag succesfully pushed
    */
   public boolean pushTag(String tag) {
@@ -172,7 +153,7 @@ public class RepositoryProvider {
       LOG.error(err.getMessage());
       LOG.error("");
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -191,7 +172,7 @@ public class RepositoryProvider {
     } catch (IOException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -200,9 +181,9 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Return a list of remote GIT-tags.</p>
+   * <p>Return a list of remote SCM-tags.</p>
    *
-   * @return GIT-tags
+   * @return SCM-tags
    */
   public List<Ref> getTags() {
     List<Ref> tags = new ArrayList<Ref>();
@@ -211,7 +192,7 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -220,21 +201,25 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Create a local GIT-tag.</p>
+   * <p>Create a local SCM-tag.</p>
    *
-   * @param tag GIT-tag to create
-   * @return is the GIT-tag succesfully created
+   * @param tag SCM-tag to create
+   * @return is the SCM-tag succesfully created
    */
   public boolean createTag(String tag) {
     boolean isTagCreated = true;
     try {
       deleteTag(tag);
       repository.tag().setName(tag).call();
+      if(provider.isInteractive()) {
+        LOG.info("Repository is interactive");
+      }
+      repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isTagCreated = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -243,9 +228,9 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Delete a local GIT-tag</p>
+   * <p>Delete a local SCM-tag</p>
    *
-   * @param tag GIT-tag to delete
+   * @param tag SCM-tag to delete
    * @return is the tag succesfully deleted?
    */
   public boolean deleteTag(String tag) {
@@ -256,7 +241,7 @@ public class RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -267,7 +252,7 @@ public class RepositoryProvider {
    *
    * <p>Perform a commit on the local repository</p>
    *
-   * @param message GIT-commit message
+   * @param message SCM-commit message
    * @return is the commit completed?
    */
   public boolean commit(String message) {
@@ -278,7 +263,7 @@ public class RepositoryProvider {
       isCommitSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your GIT-credentials to fix this issue");
+      LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
       Runtime.getRuntime().exit(1);
     }
@@ -295,7 +280,7 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Determine if there are any open changes in the GIT-repository.</p>
+   * <p>Determine if there are any open changes in the SCM-repository.</p>
    *
    * @return are there any open changes?
    */
@@ -323,7 +308,7 @@ public class RepositoryProvider {
   }
 
   /**
-   * <p>When a <i>release:rollback</i> is performed local git-tags have to be cleaned to perform the next release.</p>
+   * <p>When a <i>release:rollback</i> is performed local SCM-tags have to be cleaned to perform the next release.</p>
    *
    * @param scmVersion scmVersion
    * @throws SemverException native plugin exception

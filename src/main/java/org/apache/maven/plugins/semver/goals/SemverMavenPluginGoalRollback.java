@@ -1,11 +1,14 @@
 package org.apache.maven.plugins.semver.goals;
 
+import jdk.nashorn.internal.runtime.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.providers.PomProvider;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
@@ -40,10 +43,21 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     LOG.info(FUNCTION_LINE_BREAK);
 
     if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
-      LOG.info("Rollbacked version: [" + version + "]");
 
-      FileWriterFactory.rollbackPom(LOG);
-      FileWriterFactory.removeBackupSemverPom(LOG);
+      LOG.info("Perform a rollback for version      : [ " + version + " ]");
+      if(FileWriterFactory.canRollBack(LOG)) {
+        if(!getVersionProvider().isRemoteVersionCorrupt()) {
+
+          getRepositoryProvider().commit("[semver-maven-plugin] rollback version : [ " + version + " ]");
+          LOG.info("Delete SCM-tag                     : [ " + version + " ]");
+          getRepositoryProvider().deleteTag(version);
+//          getRepositoryProvider().push();
+          LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+          FileWriterFactory.rollbackPom(LOG);
+          FileWriterFactory.removeBackupSemverPom(LOG);
+        }
+      }
+
     } else {
       LOG.error("Ÿou have configured a wrong RUN_MODE ( " + getConfiguration().getRunMode() + " )");
       LOG.error("Ÿou have to use release:rollback to revert the version update");

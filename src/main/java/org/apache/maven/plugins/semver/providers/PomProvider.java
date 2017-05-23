@@ -1,14 +1,18 @@
 package org.apache.maven.plugins.semver.providers;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.project.MavenProject;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Map;
 
 /**
@@ -26,6 +30,10 @@ public class PomProvider {
 
   private MavenProject project;
 
+  private MavenSession session;
+
+  private BuildPluginManager pluginManager;
+
   /**
    *
    * <h>POM-provider</h>
@@ -35,10 +43,12 @@ public class PomProvider {
    * @param repositoryProvider
    * @param project
    */
-  public PomProvider(Log LOG, RepositoryProvider repositoryProvider, MavenProject project) {
+  public PomProvider(Log LOG, RepositoryProvider repositoryProvider, MavenProject project, MavenSession session, BuildPluginManager pluginManager) {
     this.LOG = LOG;
     this.repositoryProvider = repositoryProvider;
     this.project = project;
+    this.session = session;
+    this.pluginManager = pluginManager;
   }
 
   /**
@@ -53,17 +63,14 @@ public class PomProvider {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     MavenProject releasePom = project;
     String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
-    releasePom.setVersion(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
     releasePom.getScm().setTag(scmTag);
-    FileWriterFactory.writeFileToDisk(LOG, "pom.xml", modelToStringXml(releasePom.getModel()));
-    String commitMessage = "[semver-maven-plugin] Create new release-pom for tag : [ " + scmTag + " ]";
+    updateVersion(releasePom, finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
+    String commitMessage = "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit new release-pom             : " + commitMessage);
     repositoryProvider.commit(commitMessage);
     LOG.info("Create local scm-tag               : " + scmTag);
     repositoryProvider.createTag(scmTag);
-    LOG.info("Push new release-pom and scm-tag");
-    repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
@@ -80,29 +87,66 @@ public class PomProvider {
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.setVersion(developmentVersion);
     nextDevelopementPom.getScm().setTag("");
-    FileWriterFactory.writeFileToDisk(LOG, "pom.xml", modelToStringXml(nextDevelopementPom.getModel()));
+    updateVersion(nextDevelopementPom, developmentVersion);
     String commitMessage = "[semver-maven-plugin] Create next development-pom with version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit next development-pom        : " + commitMessage);
     repositoryProvider.commit(commitMessage);
-    LOG.info("Push next development-pom");
-    repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
-  private String modelToStringXml(Model model) {
 
-    MavenXpp3Writer modelWriter = new MavenXpp3Writer();
-
-    StringWriter output = new StringWriter();
-    String result = "";
+  private void checkSnapshotVersions(MavenProject project, String version) {
     try {
-      modelWriter.write(output, model);
-      result = output.getBuffer().toString();
-    } catch (IOException e) {
-      LOG.error("Cannot convert model to pom: " + e.getMessage());
+      executeMojo(
+              plugin(
+                      groupId("org.codehaus.mojo"),
+                      artifactId("versions-maven-plugin"),
+                      version("2.3")
+              ),
+              goal("set"),
+              configuration(
+                      element(name("generateBackupPoms"), "false"),
+                      element(name("newVersion"), version)
+              ),
+              executionEnvironment(
+                      project,
+                      session,
+                      pluginManager
+              ));
+    } catch (Exception err) {
+      LOG.error(err);
     }
-    return result;
+  }
+
+  /**
+   *
+   * <p>Use the versions plugin to advance the pom.xml's.</p>
+   *
+   * @param project
+   * @param version
+   */
+  private void updateVersion(MavenProject project, String version) {
+    try {
+      executeMojo(
+              plugin(
+                      groupId("org.codehaus.mojo"),
+                      artifactId("versions-maven-plugin"),
+                      version("2.3")
+              ),
+              goal("set"),
+              configuration(
+                      element(name("generateBackupPoms"), "false"),
+                      element(name("newVersion"), version)
+              ),
+              executionEnvironment(
+                      project,
+                      session,
+                      pluginManager
+              ));
+    } catch (Exception err) {
+      LOG.error(err);
+    }
   }
 
 }

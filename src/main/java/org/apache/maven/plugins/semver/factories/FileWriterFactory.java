@@ -88,7 +88,7 @@ public class FileWriterFactory {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXml= new File("pom.xml");
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
-    LOG.info(" * Replace pom.xml with           : pom.xml.semverBackup");
+    LOG.info(" * Replace pom.xml with          : pom.xml.semverBackup");
     try {
       Files.copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException err) {
@@ -104,10 +104,31 @@ public class FileWriterFactory {
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if (pomXmlSemverBackup.exists()) {
-      LOG.info(" * Backup pom.xml exists remove file  : pom.xml.semverBackup");
+      LOG.info(" * Backup pom.xml exists!");
+      LOG.info(" * Remove file                    : pom.xml.semverBackup");
       pomXmlSemverBackup.delete();
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+  }
+
+  /**
+   *
+   * <p>Can we perform a rollback?</p>
+   *
+   * @param LOG logging for maven plugin
+   * @return canRollback
+   */
+  public static boolean canRollBack(Log LOG) {
+    boolean canRollback = false;
+    File pomXmlSemverBackup = new File("pom.xml.semverBackup");
+    if(pomXmlSemverBackup.exists()) {
+      canRollback = true;
+    } else {
+      LOG.error("");
+      LOG.error("There is no pom.xml.semverBackup present");
+      LOG.error("The rollback can not be performed");
+    }
+    return canRollback;
   }
 
   /**
@@ -145,53 +166,6 @@ public class FileWriterFactory {
       if (LOG != null) {
         LOG.error("semver-maven-plugin is terminating");
         LOG.error("Error when creating file [ " + fileName + " ]", err);
-        Runtime.getRuntime().exit(1);
-      }
-    }
-  }
-
-  /**
-   * <p>Write actual file to disk</p>
-   *
-   * @param LOG  @see {@link org.apache.maven.plugin.logging.Log}
-   * @param file the file
-   */
-  public static void writeFileToDisk(Log LOG, File file) {
-
-    try {
-      LOG.warn("File path: " + file.toPath().toString());
-      LOG.warn("Absolute file path: " + file.getAbsoluteFile());
-      if(!file.exists()) {
-        LOG.warn("Create new file: " + file.toPath().toString());
-        file.createNewFile();
-      }
-      Path filePath = file.toPath();
-      byte[] resultData = Files.readAllBytes(filePath);
-      LOG.info(String.valueOf(resultData));
-      File oldFile = new File(file.getAbsolutePath());
-      if (oldFile.exists()) {
-        if (LOG != null) {
-          LOG.info("Old file: [ " + oldFile.getName() + " ] removed      : " + oldFile.getAbsolutePath());
-        }
-        boolean isDeleted = oldFile.delete();
-        if (!isDeleted) {
-          if (LOG != null) {
-            LOG.error("File [ " + oldFile.getName() + " ] is not removed        : " + oldFile.getAbsolutePath());
-          }
-        }
-      }
-
-      if (LOG != null) {
-        LOG.info("New file: [ " + file.getName() + " ] is prepared   : " + file.getAbsolutePath());
-      }
-
-      file.createNewFile();
-      Files.write(filePath, resultData, StandardOpenOption.WRITE);
-
-    } catch (IOException err) {
-      if (LOG != null) {
-        LOG.error("semver-maven-plugin is terminating");
-        LOG.error("Error when creating new file [ " + file.getName() + " ]", err);
         Runtime.getRuntime().exit(1);
       }
     }

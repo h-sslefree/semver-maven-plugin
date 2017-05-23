@@ -2,11 +2,11 @@ package org.apache.maven.plugins.semver;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.plugins.semver.providers.PomProvider;
@@ -14,11 +14,7 @@ import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.components.interactivity.Prompter;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 
-import java.io.*;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,6 +53,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   @Component
   private Prompter prompter;
+
+  @Component
+  private BuildPluginManager buildPluginManager;
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
@@ -139,7 +138,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
       pomProvider.createReleasePom(finalVersions);
       pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-//      FileWriterFactory.removeBackupSemverPom(LOG);
+      FileWriterFactory.removeBackupSemverPom(LOG);
     } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
       FileWriterFactory.backupSemverPom(LOG);
       Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
@@ -200,7 +199,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration(), prompter);
     branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
     versionProvider = new VersionProvider(LOG, getConfiguration());
-    pomProvider = new PomProvider(LOG, repositoryProvider, project);
+    pomProvider = new PomProvider(LOG, repositoryProvider, project, session, buildPluginManager);
   }
 
   /**
