@@ -277,10 +277,9 @@ public class RepositoryProvider {
    *
    * <p>Push a SCM-tag to the remote SCM-repository.</p>
    *
-   * @param tag SCM-tag
    * @return is the tag succesfully pushed
    */
-  public boolean pushTag(String tag) {
+  public boolean pushTag() {
     boolean isSuccess = true;
     try {
       repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
@@ -357,7 +356,7 @@ public class RepositoryProvider {
           LOG.info("Delete lost local-tag                   : " + ref.getName().substring(10));
           deleteTag(ref.getName());
           LOG.info("Delete lost remote-tag                  : " + ref.getName().substring(10));
-          pushTag(ref.getName());
+          pushTag();
         }
       }
       if (!found) {

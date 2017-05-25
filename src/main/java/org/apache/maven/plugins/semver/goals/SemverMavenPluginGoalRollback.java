@@ -45,19 +45,22 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
 
       LOG.info("Perform a rollback for version    : [ " + version + " ]");
+      LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
       if(FileWriterFactory.canRollBack(LOG)) {
-        if(!getVersionProvider().isRemoteVersionCorrupt()) {
-
-          getRepositoryProvider().commit("[semver-maven-plugin] rollback version : [ " + version + " ]");
-          LOG.info("Delete SCM-tag                    : [ " + version + " ]");
-          getRepositoryProvider().deleteTag(version);
-//          getRepositoryProvider().push();
-          LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+        if(!getVersionProvider().isRemoteVersionCorrupt(version)) {
           FileWriterFactory.rollbackPom(LOG);
+          LOG.info(" * Commit old pom.xml");
+          getRepositoryProvider().commit("[semver-maven-plugin] rollback version : [ " + version + " ]");
+          LOG.info(" * Push old pom.xml");
+          getRepositoryProvider().push();
+          LOG.info(" * Delete SCM-tag                 : [ " + version + " ]");
+          getRepositoryProvider().deleteTag(version);
+          LOG.info(" * Delete remote SCM-tag          : [ " + version + " ]");
+          getRepositoryProvider().pushTag();
+          LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
           FileWriterFactory.removeBackupSemverPom(LOG);
         }
       }
-
     } else {
       LOG.error("Ÿou have configured a wrong RUN_MODE ( " + getConfiguration().getRunMode() + " )");
       LOG.error("Ÿou have to use release:rollback to revert the version update");

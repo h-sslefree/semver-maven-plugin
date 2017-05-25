@@ -66,7 +66,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
    * @throws GitAPIException
    */
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot) throws IOException, GitAPIException {
-    LOG.info("Determine local and remote GIT-tags for GIT-repo");
+    LOG.info("Determine local and remote SCM-tags for SCM-repo");
     LOG.info(MOJO_LINE_BREAK);
     getRepositoryProvider().pull();
     List<Ref> refs = getRepositoryProvider().getTags();
@@ -75,17 +75,17 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
       for (Ref ref : refs) {
         if(ref.getName().contains(preparedReleaseTag)) {
           found = true;
-          LOG.info("Delete local GIT-tag                 : " + ref.getName().substring(10));
+          LOG.info("Delete local SCM-tag                 : " + ref.getName().substring(10));
           getRepositoryProvider().deleteTag(ref.getName());
-          LOG.info("Delete remote GIT-tag                : " + ref.getName().substring(10));
-          getRepositoryProvider().pushTag(ref.getName());
+          LOG.info("Delete remote SCM-tag                : " + ref.getName().substring(10));
+          getRepositoryProvider().pushTag();
         } 
       }
       if (!found) {
-        LOG.info("No local or remote prepared GIT-tags found");
+        LOG.info("No local or remote prepared SCM-tags found");
       }
     } else {
-      LOG.info("No local or remote prepared GIT-tags found");
+      LOG.info("No local or remote prepared SCM-tags found");
     }
     
     getRepositoryProvider().closeRepository();

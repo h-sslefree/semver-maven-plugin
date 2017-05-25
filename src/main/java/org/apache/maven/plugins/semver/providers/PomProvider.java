@@ -35,8 +35,8 @@ public class PomProvider {
    * <p>This class provides pom.xml.</p>
    *
    * @param LOG logging is only toplevel initialized so has to be passed as parameter
-   * @param repositoryProvider
-   * @param project
+   * @param repositoryProvider initialized {@link RepositoryProvider}
+   * @param project {@link MavenProject} from Mojo
    */
   public PomProvider(Log LOG, RepositoryProvider repositoryProvider, MavenProject project, MavenSession session, BuildPluginManager pluginManager) {
     this.LOG = LOG;
@@ -70,7 +70,7 @@ public class PomProvider {
     LOG.info("Create local scm-tag               : " + scmTag);
     repositoryProvider.createTag(scmTag);
     LOG.info("Create remote scm-tag              : " + scmTag);
-    repositoryProvider.pushTag(scmTag);
+    repositoryProvider.pushTag();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 

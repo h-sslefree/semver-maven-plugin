@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  *
  * <h1>VersionProvider</h1>
- *
  * <p>The versionprovider is used to determine the different symantic-versioning versions to create git tags.</p>
  *
  * @author sido
@@ -195,9 +194,8 @@ public class VersionProvider {
         return isVersionCorrupt;
     }
 
-    public boolean isRemoteVersionCorrupt() {
+    public boolean isRemoteVersionCorrupt(String pomVersion) {
         boolean isRemoteVersionCorrupt  = false;
-
 
         return isRemoteVersionCorrupt;
     }
