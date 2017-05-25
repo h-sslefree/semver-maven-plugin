@@ -34,7 +34,7 @@ public class PomProvider {
    * <h>POM-provider</h>
    * <p>This class provides pom.xml.</p>
    *
-   * @param LOG
+   * @param LOG logging is only toplevel initialized so has to be passed as parameter
    * @param repositoryProvider
    * @param project
    */
@@ -69,7 +69,7 @@ public class PomProvider {
     LOG.info("Create local scm-tag               : " + scmTag);
     repositoryProvider.createTag(scmTag);
     LOG.info("Create remote scm-tag              : " + scmTag);
-    //repositoryProvider.pushTag(scmTag);
+    repositoryProvider.pushTag(scmTag);
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
@@ -86,7 +86,7 @@ public class PomProvider {
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.setVersion(developmentVersion);
     nextDevelopementPom.getScm().setTag("");
-    updateVersion(nextDevelopementPom, developmentVersion);
+//    updateVersion(nextDevelopementPom, developmentVersion);
     String commitMessage = "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit next dev-pom                : " + commitMessage);

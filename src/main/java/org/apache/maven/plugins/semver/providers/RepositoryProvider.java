@@ -100,15 +100,17 @@ public class RepositoryProvider {
     CredentialsProvider provider = null;
     String scmUserName = configuration.getScmUsername();
     String scmPassword = configuration.getScmPassword();
+    String scmDefaultUsername = "";
     if(scmUserName.isEmpty() || scmPassword.isEmpty()) {
       String messageUsername = "[info]  * Please enter your (SCM) username";
       String messagePassword = "[info]  * Please enter your (SCM) password";
       if(project.getScm().getUrl().contains(URL_GITHUB)) {
+        scmDefaultUsername = "token";
         messageUsername = "[info]  * Please enter your (SCM) token";
         messagePassword = "[info]  * Please enter your (SCM) secret";
       }
       try {
-        scmUserName = prompter.prompt(messageUsername);
+        scmUserName = prompter.prompt(messageUsername, scmDefaultUsername);
         scmPassword = prompter.promptForPassword(messagePassword);
       } catch (PrompterException err) {
         LOG.error(err);
@@ -136,30 +138,6 @@ public class RepositoryProvider {
     } catch (GitAPIException err) {
       isSuccess = false;
       LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
-      Runtime.getRuntime().exit(1);
-    }
-    return isSuccess;
-  }
-
-  /**
-   *
-   * <p>Push a SCM-tag to the remote SCM-repository.</p>
-   *
-   * @param tag SCM-tag
-   * @return is the tag succesfully pushed
-   */
-  public boolean pushTag(String tag) {
-    boolean isSuccess = true;
-    RefSpec refSpec = new RefSpec().setSource(null).setDestination(tag);
-    try {
-      repository.push().setRemote("origin").setRefSpecs(refSpec).setCredentialsProvider(provider).call();
-    } catch (GitAPIException err) {
-      isSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
       LOG.error("");
       LOG.error("Please check your SCM-credentials to fix this issue");
       LOG.error("Please run semver:rollback to return to initial state");
@@ -277,12 +255,14 @@ public class RepositoryProvider {
 
   /**
    *
-   * @return
+   * <p>Push all changes to remote.</p>
+   *
+   * @return is push successfull
    */
   public boolean push(){
     boolean isPushSuccess = true;
     try {
-      repository.push().setRemote("origin").setCredentialsProvider(provider).call();
+      repository.push().setPushAll().setRemote("origin").setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isPushSuccess = false;
       LOG.error(err.getMessage());
@@ -292,6 +272,29 @@ public class RepositoryProvider {
       Runtime.getRuntime().exit(1);
     }
     return isPushSuccess;
+  }
+
+  /**
+   *
+   * <p>Push a SCM-tag to the remote SCM-repository.</p>
+   *
+   * @param tag SCM-tag
+   * @return is the tag succesfully pushed
+   */
+  public boolean pushTag(String tag) {
+    boolean isSuccess = true;
+    try {
+      repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
+    } catch (GitAPIException err) {
+      isSuccess = false;
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("");
+      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
+      Runtime.getRuntime().exit(1);
+    }
+    return isSuccess;
   }
 
   /**

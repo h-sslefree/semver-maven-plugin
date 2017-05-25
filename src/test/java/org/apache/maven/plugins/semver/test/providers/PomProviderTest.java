@@ -7,6 +7,7 @@ import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
+import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -34,10 +35,9 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
     @Test
     public void createReleaseTest() {
 
-        RepositoryProvider repositoryProvider = new RepositoryProvider(LOG, null, getConfigurationRelease());
-        PomProvider pomProvider = new PomProvider(LOG, repositoryProvider, null);
+        RepositoryProvider repositoryProvider = new RepositoryProvider(LOG, null, getConfigurationRelease(), new DefaultPrompter());
+        PomProvider pomProvider = new PomProvider(LOG, repositoryProvider, null, null, null);
         VersionProvider versionProvider = new VersionProvider(LOG, getConfigurationRelease());
-//        pomProvider.createReleasePom(versionProvider.determineReleaseVersions());
 
         Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
@@ -45,6 +45,8 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+
+        pomProvider.createReleasePom(versionProvider.determineReleaseVersions(rawVersions));
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "1.0.0");
