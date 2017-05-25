@@ -95,10 +95,10 @@ public class VersionProvider {
         scmVersion.append(buildMetaData);
 
         if(LOG != null) {
-            LOG.info("New DEVELOPMENT-version                   : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
-            LOG.info("New BRANCH GIT build metadata             : " + buildMetaData);
-            LOG.info("New BRANCH GIT-version                    : " + scmVersion);
-            LOG.info("New BRANCH RELEASE-version                : " + releaseVersion);
+            LOG.info("New DEVELOPMENT-version                 : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
+            LOG.info("New BRANCH GIT build metadata           : " + buildMetaData);
+            LOG.info("New BRANCH GIT-version                  : " + scmVersion);
+            LOG.info("New BRANCH RELEASE-version              : " + releaseVersion);
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         }
         Map<FINAL_VERSION, String> finalVersions = new HashMap<>();

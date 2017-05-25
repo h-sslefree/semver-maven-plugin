@@ -105,7 +105,7 @@ public class FileWriterFactory {
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if (pomXmlSemverBackup.exists()) {
       LOG.info(" * Backup pom.xml exists!");
-      LOG.info(" * Remove file                    : pom.xml.semverBackup");
+      LOG.info(" * Remove file                     : pom.xml.semverBackup");
       pomXmlSemverBackup.delete();
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);

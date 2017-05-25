@@ -60,6 +60,7 @@ public class PomProvider {
     String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
     releasePom.getScm().setTag(scmTag);
     updateVersion(releasePom, finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
+    releasePom.setVersion(scmTag);
     String commitMessage = "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit new release-pom             : " + commitMessage);
@@ -84,9 +85,8 @@ public class PomProvider {
     LOG.info("Create next development-pom");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     MavenProject nextDevelopementPom = project;
-    nextDevelopementPom.setVersion(developmentVersion);
     nextDevelopementPom.getScm().setTag("");
-//    updateVersion(nextDevelopementPom, developmentVersion);
+    updateVersion(nextDevelopementPom, developmentVersion);
     String commitMessage = "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit next dev-pom                : " + commitMessage);
