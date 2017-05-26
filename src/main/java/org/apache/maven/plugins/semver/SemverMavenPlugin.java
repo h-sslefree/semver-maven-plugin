@@ -125,25 +125,32 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param rawVersions rawVersions are the versions determined by the goal
    */
   protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
-    if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
-      Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-      FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
-    } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-      Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
-      FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+    if(!versionProvider.isRemoteVersionCorrupt(project.getVersion())) {
+      if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
+        FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+      } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
+        FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
 
-    } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
-      FileWriterFactory.backupSemverPom(LOG);
-      Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-      pomProvider.createReleasePom(finalVersions);
-      pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-      FileWriterFactory.removeBackupSemverPom(LOG);
-    } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
-      FileWriterFactory.backupSemverPom(LOG);
-      Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
-      pomProvider.createReleasePom(finalVersions);
-      pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-      FileWriterFactory.removeBackupSemverPom(LOG);
+      } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
+        FileWriterFactory.backupSemverPom(LOG);
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
+        pomProvider.createReleasePom(finalVersions);
+        pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
+        FileWriterFactory.removeBackupSemverPom(LOG);
+      } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
+        FileWriterFactory.backupSemverPom(LOG);
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
+        pomProvider.createReleasePom(finalVersions);
+        pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
+        FileWriterFactory.removeBackupSemverPom(LOG);
+      }
+    } else {
+      LOG.error("");
+      LOG.error("Remote version is higher then local version in your repository");
+      LOG.error("Please check your repository state");
+      Runtime.getRuntime().exit(1);
     }
   }
 
@@ -197,7 +204,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   protected void initializeProviders() {
     repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration(), prompter);
     branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
-    versionProvider = new VersionProvider(LOG, getConfiguration());
+    versionProvider = new VersionProvider(LOG, repositoryProvider, getConfiguration());
     pomProvider = new PomProvider(LOG, repositoryProvider, project, session, buildPluginManager);
   }
 

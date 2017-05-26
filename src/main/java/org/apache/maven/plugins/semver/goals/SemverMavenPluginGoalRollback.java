@@ -59,9 +59,15 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
           getRepositoryProvider().pushTag();
           LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
           FileWriterFactory.removeBackupSemverPom(LOG);
+        } else {
+          LOG.error("");
+          LOG.error("Remote version is higher then local version in your repository");
+          LOG.error("Please check your repository state");
+          Runtime.getRuntime().exit(1);
         }
       }
     } else {
+      LOG.error("");
       LOG.error("Ÿou have configured a wrong RUN_MODE ( " + getConfiguration().getRunMode() + " )");
       LOG.error("Ÿou have to use release:rollback to revert the version update");
     }

@@ -1,12 +1,15 @@
 package org.apache.maven.plugins.semver.providers;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.eclipse.jgit.lib.Ref;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -20,6 +23,8 @@ public class VersionProvider {
     private Log LOG;
 
     private SemverConfiguration configuration;
+
+    private RepositoryProvider repositoryProvider;
 
     public enum FINAL_VERSION {
         DEVELOPMENT,
@@ -37,8 +42,9 @@ public class VersionProvider {
      * @param configuration      {@link org.apache.maven.plugins.semver.configuration.SemverConfiguration}
      *
      */
-    public VersionProvider(Log LOG, SemverConfiguration configuration) {
+    public VersionProvider(Log LOG, RepositoryProvider repositoryProvider, SemverConfiguration configuration) {
         this.LOG = LOG;
+        this.repositoryProvider = repositoryProvider;
         this.configuration = configuration;
     }
 
@@ -194,9 +200,31 @@ public class VersionProvider {
         return isVersionCorrupt;
     }
 
-    public boolean isRemoteVersionCorrupt(String pomVersion) {
+    /**
+     *
+     * <p>Determine if remote version is corrupt.</p>
+     *
+     * @param rawLocalVersion the pomVersion which has to be evaluated
+     * @return is corrupt or not
+     */
+    public boolean isRemoteVersionCorrupt(String rawLocalVersion) {
         boolean isRemoteVersionCorrupt  = false;
-
+        DefaultArtifactVersion localVersion;
+        LOG.info("Check remote-tag with local-tag    : [ " + rawLocalVersion + " ]");
+        if(rawLocalVersion.contains("-SNAPSHOT")) {
+            localVersion = new DefaultArtifactVersion(rawLocalVersion.replaceFirst("-SNAPSHOT", ""));
+        } else {
+            localVersion = new DefaultArtifactVersion(rawLocalVersion);
+        }
+        Map<String, Ref> remoteTags = repositoryProvider.getRemoteTags();
+        for(Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
+            DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
+            LOG.debug(" * Compare remote-tag [ " + remoteVersion + " ] with local-tag [ " + localVersion + " ]");
+            if(remoteVersion.compareTo(localVersion) > 0) {
+                LOG.error("Local version is corrupt          : [ local: " + localVersion + " ] [ remote: " + remoteVersion + " ] ");
+                isRemoteVersionCorrupt = true;
+            }
+        }
         return isRemoteVersionCorrupt;
     }
 

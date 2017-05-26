@@ -18,7 +18,9 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -186,6 +188,26 @@ public class RepositoryProvider {
 
   /**
    *
+   * <p>Return a list of remote SCM-tags.</p>
+   *
+   * @return SCM-tags
+   */
+  public Map<String, Ref> getRemoteTags() {
+    Map<String, Ref> tags = new HashMap<>();
+    try {
+      tags = repository.pull().setCredentialsProvider(provider).getRepository().getTags();
+    } catch (Exception err) {
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error("Please run semver:rollback to return to initial state");
+      Runtime.getRuntime().exit(1);
+    }
+    return tags;
+  }
+
+  /**
+   *
    * <p>Create a local SCM-tag.</p>
    *
    * @param tag SCM-tag to create
@@ -340,7 +362,7 @@ public class RepositoryProvider {
    * @throws GitAPIException repository exception
    */
   public void cleanupGitLocalAndRemoteTags(Log LOG, String scmVersion) throws SemverException, IOException, GitAPIException {
-    LOG.info("Check for lost-tags");
+    LOG.info("Check for matching tags            :  [ " + scmVersion + " ]");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     pull();
     List<Ref> refs = getTags();
