@@ -35,27 +35,27 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
 
-    LOG.info("Semver-goal                       : ROLLBACK");
-    LOG.info("Run-mode                          : " + getConfiguration().getRunMode());
-    LOG.info("Version from POM                  : " + version);
-    LOG.info("SCM-connection                    : " + scmConnection);
-    LOG.info("SCM-root                          : " + scmRoot);
+    LOG.info("Semver-goal                        : ROLLBACK");
+    LOG.info("Run-mode                           : " + getConfiguration().getRunMode());
+    LOG.info("Version from POM                   : " + version);
+    LOG.info("SCM-connection                     : " + scmConnection);
+    LOG.info("SCM-root                           : " + scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
     if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
 
-      LOG.info("Perform a rollback for version    : [ " + version + " ]");
+      LOG.info("Perform a rollback for version     : [ " + version + " ]");
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
       if(FileWriterFactory.canRollBack(LOG)) {
         if(!getVersionProvider().isRemoteVersionCorrupt(version)) {
           FileWriterFactory.rollbackPom(LOG);
           LOG.info(" * Commit old pom.xml");
-          getRepositoryProvider().commit("[semver-maven-plugin] rollback version : [ " + version + " ]");
+          getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
           LOG.info(" * Push old pom.xml");
           getRepositoryProvider().push();
-          LOG.info(" * Delete SCM-tag                 : [ " + version + " ]");
+          LOG.info(" * Delete SCM-tag                  : [ " + version + " ]");
           getRepositoryProvider().deleteTag(version);
-          LOG.info(" * Delete remote SCM-tag          : [ " + version + " ]");
+          LOG.info(" * Delete remote SCM-tag           : [ " + version + " ]");
           getRepositoryProvider().pushTag();
           LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
           FileWriterFactory.removeBackupSemverPom(LOG);

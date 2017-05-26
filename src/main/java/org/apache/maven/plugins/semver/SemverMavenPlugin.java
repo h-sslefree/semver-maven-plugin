@@ -7,8 +7,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
@@ -81,7 +81,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private VersionProvider versionProvider;
   private BranchProvider branchProvider;
   private PomProvider pomProvider;
-
 
   /**
    * <p>Override runMode through configuration properties</p>

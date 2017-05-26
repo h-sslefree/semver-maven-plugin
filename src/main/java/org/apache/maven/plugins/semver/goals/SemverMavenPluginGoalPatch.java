@@ -1,7 +1,9 @@
 package org.apache.maven.plugins.semver.goals;
 
+import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
@@ -20,7 +22,8 @@ import java.util.Map;
  *
  * @author sido
  */
-@Mojo(name = "patch", defaultPhase = LifecyclePhase.TEST)
+@Mojo(name = "patch")
+@Execute(phase = LifecyclePhase.TEST)
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
   @Override

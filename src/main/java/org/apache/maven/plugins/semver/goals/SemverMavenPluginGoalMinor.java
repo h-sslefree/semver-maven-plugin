@@ -2,6 +2,8 @@ package org.apache.maven.plugins.semver.goals;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
@@ -20,6 +22,7 @@ import java.util.Map;
  * @author sido
  */
 @Mojo(name = "minor")
+@Execute(phase = LifecyclePhase.TEST)
 public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
   @Override
@@ -97,9 +100,9 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
-    LOG.info("New DEVELOPMENT-version              : " + developmentVersion);
-    LOG.info("New GIT-version                      : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
-    LOG.info("New RELEASE-version                  : " + releaseVersion);
+    LOG.info("New DEVELOPMENT-version            : " + developmentVersion);
+    LOG.info("New GIT-version                    : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
+    LOG.info("New RELEASE-version                : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 
     versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
