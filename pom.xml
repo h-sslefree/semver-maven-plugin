@@ -11,9 +11,9 @@
     <url>http://maven.apache.org</url>
 
     <scm>
-        <url>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin.git</url>
-        <connection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin.git</connection>
-        <developerConnection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin.git</developerConnection>
+        <url>scm:git:https://github.com/sidohaakma/semver-maven-plugin.git</url>
+        <connection>scm:git:https://github.com/sidohaakma/semver-maven-plugin.git</connection>
+        <developerConnection>scm:git:https://github.com/sidohaakma/semver-maven-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
