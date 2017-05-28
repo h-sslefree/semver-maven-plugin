@@ -15,8 +15,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>Determine MAJOR version for MAVEN-project.</p>
- * <p>Example: move version 1.x.x to 2.x.x.</p>
+ * <h>Determine MAJOR version for MAVEN-project.</h>
+ * <p>This advances the tag of the project and the pom.xml version.</p>
+ * <p>Example:</p>
+ * <pre>
+ *     <code>
+ *          <version>1.x.x</version>
+ *          to
+ *          <version>2.x.x</version>
+ *     </code>
+ * </pre>
+ * <p>Run the test-phase when this goal is executed.</p>
  *
  * @author sido
  */

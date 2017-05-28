@@ -27,6 +27,16 @@ public class BranchProvider {
 
     private String branchConversionUrl;
 
+    /**
+     *
+     * <h>BranchProvider constructor</h>
+     * <p>Initializes the BranchProvider.</p>
+     *
+     *
+     * @param LOG logging from parent Mojo
+     * @param repositoryProvider {@link RepositoryProvider} from parent Mojo
+     * @param branchConversionUrl branch conversion url
+     */
     public BranchProvider(Log LOG, RepositoryProvider repositoryProvider, String branchConversionUrl) {
         this.LOG = LOG;
         this.repositoryProvider = repositoryProvider;
@@ -84,9 +94,19 @@ public class BranchProvider {
     }
 
     /**
-     * <p>Which new version is to be determined from the master-branch.</p>
      *
-     * @param branch branch branch from which a version has te be determined
+     * <h>Master branch version detemination</h>
+     * <p>Which new version is to be determined from the master-branch. This is done by an external service defined in the configuration of the plugin</p>
+     * <p>Example:</p>
+     * <pre>
+     *     <code>
+     *          <configuration>
+     *              <branchConversionUrl>http://branchvconversion.com/</branchConversionUrl>
+     *          </configuration>
+     *     </code>
+     * </pre>
+     *
+     * @param branch branch from which a version has te be determined
      * @return masterBranchVersion
      */
     private String determineVersionFromMasterBranch(String branch) {

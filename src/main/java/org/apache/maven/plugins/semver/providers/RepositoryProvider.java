@@ -149,8 +149,9 @@ public class RepositoryProvider {
 
   /**
    *
+   * <p>Get the currentbranch to determine the current branch version.</p>
    *
-   * @return
+   * @return current branch
    */
   public String getCurrentBranch() {
     String currentBranch = "";
@@ -168,11 +169,11 @@ public class RepositoryProvider {
 
   /**
    *
-   * <p>Return a list of remote SCM-tags.</p>
+   * <p>Return a list of local SCM-tags.</p>
    *
-   * @return SCM-tags
+   * @return local SCM-tags
    */
-  public List<Ref> getTags() {
+  public List<Ref> getLocalTags() {
     List<Ref> tags = new ArrayList<Ref>();
     try {
       tags = repository.tagList().call();
@@ -190,7 +191,7 @@ public class RepositoryProvider {
    *
    * <p>Return a list of remote SCM-tags.</p>
    *
-   * @return SCM-tags
+   * @return remote SCM-tags
    */
   public Map<String, Ref> getRemoteTags() {
     Map<String, Ref> tags = new HashMap<>();
@@ -365,7 +366,7 @@ public class RepositoryProvider {
     LOG.info("Check for matching tags            :  [ " + scmVersion + " ]");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     pull();
-    List<Ref> refs = getTags();
+    List<Ref> refs = getLocalTags();
     LOG.debug("Remote tags                        ");
     for(Ref ref : refs) {
       LOG.debug(" * " + ref.getName());

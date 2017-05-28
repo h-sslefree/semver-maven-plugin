@@ -10,6 +10,11 @@ import java.nio.file.*;
 import java.util.Map;
 
 /**
+ *
+ * <h>FileWriterFactory</h>
+ *
+ * <p>This class performs all disk related actions.</p>
+ *
  * @author sido
  */
 public class FileWriterFactory {
@@ -20,8 +25,8 @@ public class FileWriterFactory {
   /**
    * <p>Create the release.properties file</p>
    *
-   * @param LOG           @see {@link org.apache.maven.plugin.logging.Log}
-   * @param project       @see {@link org.apache.maven.project.MavenProject}
+   * @param LOG {@link org.apache.maven.plugin.logging.Log}
+   * @param project {@link org.apache.maven.project.MavenProject}
    * @param finalVersions map with development, release and scm version
    */
   public static void createReleaseProperties(Log LOG, MavenProject project, Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
@@ -82,6 +87,13 @@ public class FileWriterFactory {
     }
   }
 
+  /**
+   *
+   * <h>Rollback pom.xml</h>
+   * <p>Replace the current pom.xml with the pom.xml.semverBackup.</p>
+   *
+   * @param LOG logging from the parent Mojo
+   */
   public static void rollbackPom(Log LOG) {
     File pomXml= new File("pom.xml");
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
@@ -93,6 +105,12 @@ public class FileWriterFactory {
     }
   }
 
+  /**
+   * <h>Cleanup the backup pom.xml</h>
+   * <p>Remove the pom.xml.semverBackup is exists.</p>
+   *
+   * @param LOG logging from the parent Mojo
+   */
   public static void removeBackupSemverPom(Log LOG) {
     LOG.info("Cleanup pom.xml.semverBackup");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);

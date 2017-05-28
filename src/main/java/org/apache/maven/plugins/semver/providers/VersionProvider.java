@@ -9,7 +9,6 @@ import org.eclipse.jgit.lib.Ref;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -53,8 +52,7 @@ public class VersionProvider {
      *
      * <p>Determine release versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
      *
-     * @param rawVersions        raw version map with development version patch, minor and major
-     *                           the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
      * @return finalVersions
      */
     public Map<FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
@@ -69,8 +67,7 @@ public class VersionProvider {
      * <p>Determine release-versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
      * <p>This version contains also the buildmeta-data and branch information.</p>
      *
-     * @param rawVersions        raw version map with development version patch, minor and major
-     *                           the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+     * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
      *
      * @return finalVersions
      *
@@ -126,9 +123,9 @@ public class VersionProvider {
      *   <li>1.1.1-001001001</li>
      * </ul>
      *
-     * @param patch         patch is the number to define a bugfix in symantic-versioning
-     * @param minor         minor is the number to define a feature in symantic-versioning
-     * @param major         major is the number to define a breaking change in symantic-versioning
+     * @param patch patch is the number to define a bugfix in symantic-versioning
+     * @param minor minor is the number to define a feature in symantic-versioning
+     * @param major major is the number to define a breaking change in symantic-versioning
      *
      * @return release tag
      */
@@ -150,9 +147,9 @@ public class VersionProvider {
      *
      * <p>Determine wether or not buildMetaData had to be added to the scmversion for GIT</p>
      *
-     * @param patch         patch is the number to define a bugfix in symantic-versioning
-     * @param minor         minor is the number to define a feature in symantic-versioning
-     * @param major         major is the number to define a breaking change in symantic-versioning
+     * @param patch patch is the number to define a bugfix in symantic-versioning
+     * @param minor minor is the number to define a feature in symantic-versioning
+     * @param major major is the number to define a breaking change in symantic-versioning
      *
      * @return build metadata
      */

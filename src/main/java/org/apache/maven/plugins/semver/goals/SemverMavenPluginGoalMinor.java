@@ -16,8 +16,17 @@ import java.util.Map;
 
 
 /**
- * <p>Determine MINOR version for MAVEN-project.</p>
- * <p>Example: move version x.1.x to x.2.x.</p>
+ * <h>Determine MINOR version for MAVEN-project.</h>
+ * <p>This advances the tag of the project and the pom.xml version.</p>
+ * <p>Example:</p>
+ * <pre>
+ *     <code>
+ *          <version>x.1.x</version>
+ *          to
+ *          <version>x.2.x</version>
+ *     </code>
+ * </pre>
+ * <p>Run the test-phase when this goal is executed.</p>
  *
  * @author sido
  */

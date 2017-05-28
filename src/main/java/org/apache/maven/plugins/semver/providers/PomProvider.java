@@ -1,10 +1,12 @@
 package org.apache.maven.plugins.semver.providers;
 
+import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.Map;
 
@@ -13,7 +15,7 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 /**
  *
  * <h>PomProvider</h>
- * <p></p>
+ * <p>The PomProvider handles all request converning pom-changes.</p>
  *
  * @author sido
  */
@@ -36,7 +38,10 @@ public class PomProvider {
    *
    * @param LOG logging is only toplevel initialized so has to be passed as parameter
    * @param repositoryProvider initialized {@link RepositoryProvider}
-   * @param project {@link MavenProject} from Mojo
+   * @param project {@link MavenProject} from parent Mojo
+   * @param session {@link MavenSession} from parent Mojo
+   * @param pluginManager {@link BuildPluginManager} from parent Mojo
+   *
    */
   public PomProvider(Log LOG, RepositoryProvider repositoryProvider, MavenProject project, MavenSession session, BuildPluginManager pluginManager) {
     this.LOG = LOG;
@@ -121,10 +126,11 @@ public class PomProvider {
 
   /**
    *
-   * <p>Use the versions plugin to advance the pom.xml's.</p>
+   * <h>Update pom-versions</h>
+   * <p>Makes use the versions-plugin to advance the pom.xml's.</p>
    *
-   * @param project
-   * @param version
+   * @param project {@link MavenProject} from parent Mojo
+   * @param version the updated version
    */
   private void updateVersion(MavenProject project, String version) {
     try {

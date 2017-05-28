@@ -8,11 +8,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.transport.RefSpec;
 
 /**
  *
@@ -69,7 +66,7 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
     LOG.info("Determine local and remote SCM-tags for SCM-repo");
     LOG.info(MOJO_LINE_BREAK);
     getRepositoryProvider().pull();
-    List<Ref> refs = getRepositoryProvider().getTags();
+    List<Ref> refs = getRepositoryProvider().getLocalTags();
     if(refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {

@@ -17,8 +17,17 @@ import java.util.Map;
 
 
 /**
- * <p>Determine PATCH version for MAVEN-project.</p>
- * <p>Example: move version x.x.1 to x.x.2.</p>
+ * <h>Determine PATCH version for MAVEN-project.</h>
+ * <p>This advances the tag of the project and the pom.xml version.</p>
+ * <p>Example:</p>
+ * <pre>
+ *     <code>
+ *          <version>x.x.1</version>
+ *          to
+ *          <version>x.x.2</version>
+ *     </code>
+ * </pre>
+ * <p>Run the test-phase when this goal is executed.</p>
  *
  * @author sido
  */
