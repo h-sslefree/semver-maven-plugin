@@ -2,7 +2,7 @@
 
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
 
-Check:[semver.org](https://www.semver.org) for more information
+Check: [semver.org](https://www.semver.org) for more information
 
 ## Usage
 
@@ -40,8 +40,6 @@ It generates the `release.properties` and then the *release:prepare*-goal can be
 
 The goals that are **native** are attached to RUNMODES:
 
-**Not yet implemented**
-
 * NATIVE
 * NATIVE_BRANCH
   
@@ -63,8 +61,6 @@ The **native**-method is developed in version: *3.0.0* to get rid of the depende
 
 * **rollback**
 
-    *not yet implemented (will be avaiable in version 3.1.0)*
-    
     Rollback a patch, minor or major version. Also deletes created GIT-tags on local and remote repository.
 
 
@@ -105,4 +101,4 @@ To run the goals please execute the following commands:
 
 To build the semver-maven-plugin, execute the following command:
 
-`mvn clean package`
+`mvn clean package gpg:sign -Dgpg.passphrase=#passphrase#`
