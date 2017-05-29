@@ -40,7 +40,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
-    getRepositoryProvider().initialize(project.getBasedir(), project.getScm().getUrl(), getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
+    getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
     LOG.info(FUNCTION_LINE_BREAK);
     LOG.info("Semver-goal                        : PATCH");
@@ -105,15 +105,16 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
     String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
+    String scmVersion = getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion) + getVersionProvider().determineBuildMetaData(getConfiguration().getRunMode(), getConfiguration().getMetaData(), patchVersion, minorVersion, majorVersion);
 
     LOG.info("New DEVELOPMENT-version            : " + developmentVersion);
-    LOG.info("New GIT-version                    : " + getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(getConfiguration().getRunMode(), getConfiguration().getMetaData(), patchVersion, minorVersion, majorVersion));
+    LOG.info("New GIT-version                    : " + scmVersion);
     LOG.info("New RELEASE-version                : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 
     versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
     versions.put(RAW_VERSION.RELEASE, releaseVersion);
+    versions.put(RAW_VERSION.SCM, scmVersion);
     versions.put(RAW_VERSION.MAJOR, String.valueOf(majorVersion));
     versions.put(RAW_VERSION.MINOR, String.valueOf(minorVersion));
     versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));

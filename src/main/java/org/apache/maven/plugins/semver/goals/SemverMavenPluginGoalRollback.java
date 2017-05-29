@@ -24,6 +24,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
+    getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
     LOG.info("Semver-goal                        : ROLLBACK");
     LOG.info("Run-mode                           : " + getConfiguration().getRunMode());

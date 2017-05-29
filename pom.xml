@@ -61,6 +61,7 @@
         <org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
         <plexus.interactivity.api-version>1.0-alpha-6</plexus.interactivity.api-version>
         <plexus.components-version>1.7.1</plexus.components-version>
+        <mojo.executer-version>2.3.0</mojo.executer-version>
 
         <maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
         <junit-version>4.12</junit-version>
@@ -220,7 +221,7 @@
         <dependency>
             <groupId>org.twdata.maven</groupId>
             <artifactId>mojo-executor</artifactId>
-            <version>2.3.0</version>
+            <version>${mojo.executer-version}</version>
         </dependency>
 
         <dependency>

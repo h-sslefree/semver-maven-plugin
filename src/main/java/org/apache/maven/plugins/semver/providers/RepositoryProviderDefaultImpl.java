@@ -383,8 +383,7 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
    */
   @Override
   public void isLocalVersionCorrupt(String scmVersion) throws SemverException, IOException, GitAPIException {
-    LOG.info("Check for corrupt local tags : [ " + scmVersion + " ]");
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    LOG.info("Check for corrupt local tags       : [ " + scmVersion + " ]");
     pull();
     List<Ref> refs = getLocalTags();
     LOG.debug("Local tags                        ");
@@ -408,6 +407,7 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
     } else {
       LOG.info(" * No corrupt local tags where found");
     }
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     closeRepository();
   }
 
@@ -415,17 +415,18 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
    *
    * <p>Determine if remote version is corrupt.</p>
    *
-   * @param rawLocalVersion the pomVersion which has to be evaluated
+   * @param scmVersion the pomVersion which has to be evaluated
    * @return is corrupt or not
    */
   @Override
-  public boolean isRemoteVersionCorrupt(String rawLocalVersion) {
+  public boolean isRemoteVersionCorrupt(String scmVersion) {
     boolean isRemoteVersionCorrupt  = false;
+    LOG.info("Check for corrupt remote tags      : [ " + scmVersion + " ]");
     DefaultArtifactVersion localVersion;
-    if(rawLocalVersion.contains("-SNAPSHOT")) {
-      localVersion = new DefaultArtifactVersion(rawLocalVersion.replaceFirst("-SNAPSHOT", ""));
+    if(scmVersion.contains("-SNAPSHOT")) {
+      localVersion = new DefaultArtifactVersion(scmVersion.replaceFirst("-SNAPSHOT", ""));
     } else {
-      localVersion = new DefaultArtifactVersion(rawLocalVersion);
+      localVersion = new DefaultArtifactVersion(scmVersion);
     }
     Map<String, Ref> remoteTags = getRemoteTags();
     for(Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
@@ -437,7 +438,7 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
       }
     }
     if(!isRemoteVersionCorrupt) {
-      LOG.info(" * Remote tag is not ahead of local tag : [ "+ rawLocalVersion +" ]");
+      LOG.info(" * Remote is not ahead of local   : [ "+ scmVersion +" ]");
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isRemoteVersionCorrupt;

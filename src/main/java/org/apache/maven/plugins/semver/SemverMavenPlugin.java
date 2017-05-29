@@ -122,7 +122,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param rawVersions rawVersions are the versions determined by the goal
    */
   protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
-    if(!repositoryProvider.isRemoteVersionCorrupt(project.getVersion())) {
+    if(!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(RAW_VERSION.SCM))) {
       if (configuration.getRunMode() == RUNMODE.RELEASE) {
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         FileWriterFactory.createReleaseProperties(project, finalVersions);
