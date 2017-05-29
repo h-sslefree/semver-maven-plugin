@@ -1,20 +1,12 @@
 package org.apache.maven.plugins.semver.goals;
 
-import jdk.nashorn.internal.runtime.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
-import org.apache.maven.plugins.semver.providers.PomProvider;
-import org.apache.maven.plugins.semver.providers.RepositoryProvider;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -28,8 +20,6 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-
-    initializeProviders();
 
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
@@ -46,9 +36,9 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
 
       LOG.info("Perform a rollback for version     : [ " + version + " ]");
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-      if(FileWriterFactory.canRollBack(LOG)) {
-        if(!getVersionProvider().isRemoteVersionCorrupt(version)) {
-          FileWriterFactory.rollbackPom(LOG);
+      if(FileWriterFactory.canRollBack()) {
+        if(!getRepositoryProvider().isRemoteVersionCorrupt(version)) {
+          FileWriterFactory.rollbackPom();
           LOG.info(" * Commit old pom.xml");
           getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
           LOG.info(" * Push old pom.xml");
@@ -58,7 +48,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
           LOG.info(" * Delete remote SCM-tag           : [ " + version + " ]");
           getRepositoryProvider().pushTag();
           LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-          FileWriterFactory.removeBackupSemverPom(LOG);
+          FileWriterFactory.removeBackupSemverPom();
         } else {
           LOG.error("");
           LOG.error("Remote version is higher then local version in your repository");

@@ -1,6 +1,5 @@
 package org.apache.maven.plugins.semver.goals;
 
-import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
@@ -38,11 +37,10 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
-    initializeProviders();
-
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
+    getRepositoryProvider().initialize(project.getBasedir(), project.getScm().getUrl(), getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
     LOG.info(FUNCTION_LINE_BREAK);
     LOG.info("Semver-goal                        : PATCH");
@@ -60,7 +58,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
         Runtime.getRuntime().exit(1);
       }
     } catch (Exception e) {
-      LOG.error(e);
+      LOG.error(e.getMessage());
     }
 
     executeRunMode(rawVersions);
@@ -110,7 +108,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     String scmVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
     LOG.info("New DEVELOPMENT-version            : " + developmentVersion);
-    LOG.info("New GIT-version                    : " + getVersionProvider().determineReleaseTag(patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(patchVersion, minorVersion, majorVersion));
+    LOG.info("New GIT-version                    : " + getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion)+ getVersionProvider().determineBuildMetaData(getConfiguration().getRunMode(), getConfiguration().getMetaData(), patchVersion, minorVersion, majorVersion));
     LOG.info("New RELEASE-version                : " + releaseVersion);
     LOG.info(FUNCTION_LINE_BREAK);
 
@@ -120,7 +118,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     versions.put(RAW_VERSION.MINOR, String.valueOf(minorVersion));
     versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
-    getRepositoryProvider().cleanupGitLocalAndRemoteTags(LOG, scmVersion);
+    getRepositoryProvider().isLocalVersionCorrupt(scmVersion);
 
     return versions;
   }
