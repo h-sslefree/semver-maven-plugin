@@ -3,11 +3,8 @@ package org.apache.maven.plugins.semver.test.providers;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.providers.PomProvider;
-import org.apache.maven.plugins.semver.providers.RepositoryProvider;
-import org.apache.maven.plugins.semver.providers.VersionProvider;
+import org.apache.maven.plugins.semver.providers.*;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
-import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -35,9 +32,9 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
     @Test
     public void createReleaseTest() {
 
-        RepositoryProvider repositoryProvider = new RepositoryProvider(LOG, null, getConfigurationRelease(), new DefaultPrompter());
-        PomProvider pomProvider = new PomProvider(LOG, repositoryProvider, null, null, null);
-        VersionProvider versionProvider = new VersionProvider(LOG, getConfigurationRelease());
+        RepositoryProvider repositoryProvider = new RepositoryProviderDefaultImpl();
+        PomProvider pomProvider = new PomProviderDefaultImpl();
+        VersionProvider versionProvider = new VersionProviderDefaultImpl();
 
         Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
