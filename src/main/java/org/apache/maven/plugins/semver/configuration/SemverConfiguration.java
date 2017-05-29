@@ -1,7 +1,7 @@
 package org.apache.maven.plugins.semver.configuration;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 
 /**
  * <p>Semver Configuration is used to merge 3 types of configuration:
@@ -18,7 +18,7 @@ public class SemverConfiguration {
 
     private static final String BRANCH_CONVERSION_URL = "";
 
-    private RUNMODE runMode;
+    private RunMode.RUNMODE runMode;
     private String branchVersion;
     private String scmUsername;
     private String scmPassword;
@@ -57,9 +57,9 @@ public class SemverConfiguration {
         }
 
         if (userRunMode != null && !userRunMode.isEmpty()) {
-            runMode = RUNMODE.convertToEnum(userRunMode);
+            runMode = RunMode.RUNMODE.convertToEnum(userRunMode);
         }
-        if (runMode == RUNMODE.RELEASE_BRANCH) {
+        if (runMode == RunMode.RUNMODE.RELEASE_BRANCH) {
             if (userBranchVersion != null && !userBranchVersion.isEmpty()) {
                 branchVersion = userBranchVersion;
             }
@@ -105,17 +105,17 @@ public class SemverConfiguration {
     /**
      * <p>Get RUNMODE</p>
      * <ul>Possible runModes are:
-     *   <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
-     *   <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
-     *   <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
-     *   <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
-     *   <li>When {@link RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
-     *   <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
+     *   <li>When {@link RunMode.RUNMODE} = RELEASE then determine version from POM-version</li>
+     *   <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
+     *   <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RunMode.RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+     *   <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
      * </ul>
      *
      * @return RUNMODE
      */
-    public RUNMODE getRunMode() {
+    public RunMode.RUNMODE getRunMode() {
         return runMode;
     }
 
@@ -124,7 +124,7 @@ public class SemverConfiguration {
      *
      * @param runMode kind of runMode the plugin is configured with
      */
-    public void setRunMode(RUNMODE runMode) {
+    public void setRunMode(RunMode.RUNMODE runMode) {
         this.runMode = runMode;
         mergeConfiguration();
     }

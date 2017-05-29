@@ -4,6 +4,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.providers.*;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
 
     private SemverConfiguration getConfigurationRelease() {
         SemverConfiguration configuration = new SemverConfiguration(null);
-        configuration.setRunMode(SemverMavenPlugin.RUNMODE.RELEASE);
+        configuration.setRunMode(RunMode.RUNMODE.RELEASE);
         return configuration;
     }
 

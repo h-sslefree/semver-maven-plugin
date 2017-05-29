@@ -1,12 +1,10 @@
 package org.apache.maven.plugins.semver.providers;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.eclipse.jgit.lib.Ref;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -57,9 +55,7 @@ public class VersionProviderDefaultImpl implements VersionProvider {
      *
      */
     @Override
-    public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, SemverMavenPlugin.RUNMODE runMode, String metaData, String branchVersion) {
-
-        LOG.info("NEW rawVersions on BRANCH: [ " +branchVersion + " ]");
+    public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion) {
 
         int patch = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.PATCH));
         int minor = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.MINOR));
@@ -80,10 +76,10 @@ public class VersionProviderDefaultImpl implements VersionProvider {
         scmVersion.append(buildMetaData);
 
         if(LOG != null) {
-            LOG.info("New DEVELOPMENT-version                 : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
-            LOG.info("New BRANCH GIT build metadata           : " + buildMetaData);
-            LOG.info("New BRANCH GIT-version                  : " + scmVersion);
-            LOG.info("New BRANCH RELEASE-version              : " + releaseVersion);
+            LOG.info("New DEVELOPMENT-version            : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
+            LOG.info("New BRANCH GIT build metadata      : " + buildMetaData);
+            LOG.info("New BRANCH GIT-version             : " + scmVersion);
+            LOG.info("New BRANCH RELEASE-version         : " + releaseVersion);
             LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
         }
         Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
@@ -113,14 +109,14 @@ public class VersionProviderDefaultImpl implements VersionProvider {
      * @return release tag
      */
     @Override
-    public String determineReleaseTag(SemverMavenPlugin.RUNMODE runMode, int patch, int minor, int major) {
+    public String determineReleaseTag(RunMode.RUNMODE runMode, int patch, int minor, int major) {
         StringBuilder releaseTag = new StringBuilder();
         releaseTag.append(major);
         releaseTag.append(".");
         releaseTag.append(minor);
         releaseTag.append(".");
         releaseTag.append(patch);
-        if (runMode == SemverMavenPlugin.RUNMODE.RELEASE_BRANCH_HOSEE) {
+        if (runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
             releaseTag = new StringBuilder();
             releaseTag.append(String.format("%03d%03d%03d", major, minor, patch));
         }
@@ -138,9 +134,10 @@ public class VersionProviderDefaultImpl implements VersionProvider {
      * @return build metadata
      */
     @Override
-    public String determineBuildMetaData(SemverMavenPlugin.RUNMODE runmode, String metaData, int patch, int minor, int major) {
+    public String determineBuildMetaData(RunMode.RUNMODE runmode, String metaData, int patch, int minor, int major) {
         StringBuilder buildMetaData = new StringBuilder();
-        if (runmode == SemverMavenPlugin.RUNMODE.RELEASE_BRANCH_HOSEE) {
+        if (runmode == RunMode.RUNMODE.RELEASE_BRANCH_RPM  ||
+                runmode == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
             String buildMetaDataBranch = major + "." + minor + "." + patch;
             buildMetaData.append("+");
             buildMetaData.append(buildMetaDataBranch);

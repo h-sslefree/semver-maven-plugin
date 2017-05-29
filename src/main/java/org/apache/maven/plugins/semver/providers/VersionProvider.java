@@ -2,6 +2,7 @@ package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 
 import java.util.Map;
 
@@ -23,11 +24,11 @@ public interface VersionProvider {
 
     Map<VersionProviderDefaultImpl.FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions);
 
-    Map<VersionProviderDefaultImpl.FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, SemverMavenPlugin.RUNMODE runMode, String metaData, String branchVersion);
+    Map<VersionProviderDefaultImpl.FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion);
 
-    String determineReleaseTag(SemverMavenPlugin.RUNMODE runMode, int patch, int minor, int major);
+    String determineReleaseTag(RunMode.RUNMODE runMode, int patch, int minor, int major);
 
-    String determineBuildMetaData(SemverMavenPlugin.RUNMODE runMode, String metaData, int patch, int minor, int major);
+    String determineBuildMetaData(RunMode.RUNMODE runMode, String metaData, int patch, int minor, int major);
 
     boolean isVersionCorrupt(String pomVersion) throws SemverException;
 

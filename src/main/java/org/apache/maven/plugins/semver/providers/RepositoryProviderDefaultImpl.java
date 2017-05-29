@@ -433,7 +433,7 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
       DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
       LOG.debug(" * Compare remote-tag [ " + remoteVersion + " ] with local-tag [ " + localVersion + " ]");
       if(remoteVersion.compareTo(localVersion) > 0) {
-        LOG.error(" * Local version is corrupt          : [ local: " + localVersion + " ] [ remote: " + remoteVersion + " ] ");
+        LOG.error(" * Local version is corrupt       : [ local: " + localVersion + " ] [ remote: " + remoteVersion + " ] ");
         isRemoteVersionCorrupt = true;
       }
     }

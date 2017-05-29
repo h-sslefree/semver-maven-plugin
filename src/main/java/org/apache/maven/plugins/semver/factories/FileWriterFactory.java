@@ -69,7 +69,7 @@ public class FileWriterFactory {
       }
       Files.copy(pomXmlOriginal.toPath(), pomXmlSemverBackup.toPath());
 
-      LOG.info("New pom.xml.semverBackup prepared : " + pomXmlSemverBackup.getAbsolutePath());
+      LOG.info("New pom.xml.semverBackup prepared  : " + pomXmlSemverBackup.getAbsolutePath());
 
     } catch (IOException err) {
       LOG.error("semver-maven-plugin is terminating");

@@ -5,6 +5,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     LOG.info("SCM-root                           : " + scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
-    if(getConfiguration().getRunMode() == RUNMODE.NATIVE || getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
+    if(getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH) {
 
       LOG.info("Perform a rollback for version     : [ " + version + " ]");
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);

@@ -5,11 +5,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
+import org.apache.maven.plugins.semver.runmodes.*;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +21,12 @@ import java.util.Map;
  * <p>
  * <p>Possible usages are:</p>
  * <ul>Possible runModes are:
- * <li>When {@link RUNMODE} = RELEASE then determine version from POM-version</li>
- * <li>When {@link RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
- * <li>When {@link RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
- * <li>When {@link RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
- * <li>When {@link RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
- * <li>When {@link RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
+ * <li>When {@link RunMode.RUNMODE} = RELEASE then determine version from POM-version</li>
+ * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
+ * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_RPM then determine version from POM-version (without maven-release-plugin)</li>
+ * <li>When {@link RunMode.RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
+ * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+ * <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
  * </ul>
  *  <ul>Add a tag to the GIT-version
  * <li>tag = 1</li>
@@ -57,7 +57,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "tag")
   protected String preparedReleaseTag;
   @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
-  private RUNMODE runMode;
+  private RunMode.RUNMODE runMode;
   @Parameter(property = "username", defaultValue = "")
   private String scmUsername = "";
   @Parameter(property = "password", defaultValue = "")
@@ -80,12 +80,21 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Component
   private BranchProvider branchProvider;
 
+  @Component(role = RunModeNative.class)
+  private RunMode runModeNative;
+  @Component(role = RunModeNativeBranch.class)
+  private RunMode runModeNativeBranch;
+  @Component(role = RunModeRelease.class)
+  private RunMode runModeRelease;
+  @Component(role = RunModeReleaseBranch.class)
+  private RunMode runModeReleaseBranch;
+
   /**
    * <p>Override runMode through configuration properties</p>
    *
    * @param runMode get runMode from plugin configuration
    */
-  public void setRunMode(RUNMODE runMode) {
+  public void setRunMode(RunMode.RUNMODE runMode) {
     this.runMode = runMode;
   }
 
@@ -122,33 +131,23 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param rawVersions rawVersions are the versions determined by the goal
    */
   protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
-    if(!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(RAW_VERSION.SCM))) {
-      if (configuration.getRunMode() == RUNMODE.RELEASE) {
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-        FileWriterFactory.createReleaseProperties(project, finalVersions);
-      } else if (configuration.getRunMode() == RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfiguration().getRunMode(), getConfiguration().getMetaData(), getConfiguration().getBranchVersion());
-        FileWriterFactory.createReleaseProperties(project, finalVersions);
-
-      } else if (configuration.getRunMode() == RUNMODE.NATIVE) {
-        FileWriterFactory.backupSemverPom();
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-        pomProvider.createReleasePom(finalVersions);
-        pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-        FileWriterFactory.removeBackupSemverPom();
-      } else if (configuration.getRunMode() == RUNMODE.NATIVE_BRANCH) {
-        FileWriterFactory.backupSemverPom();
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfiguration().getRunMode(), getConfiguration().getMetaData(), getConfiguration().getBranchVersion());
-        pomProvider.createReleasePom(finalVersions);
-        pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-        FileWriterFactory.removeBackupSemverPom();
+//    if(!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(RAW_VERSION.SCM))) {
+      if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE) {
+        runModeRelease.execute(getConfiguration(), rawVersions);
+      } else if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
+        runModeReleaseBranch.execute(getConfiguration(), rawVersions);
+      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE) {
+        runModeNative.execute(getConfiguration(), rawVersions);
+      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH) {
+        runModeNativeBranch.execute(getConfiguration(), rawVersions);
       }
-    } else {
-      LOG.error("");
-      LOG.error("Remote version is higher then local version in your repository");
-      LOG.error("Please check your repository state");
-      Runtime.getRuntime().exit(1);
-    }
+//    }
+//    else {
+//      LOG.error("");
+//      LOG.error("Remote version is higher then local version in your repository");
+//      LOG.error("Please check your repository state");
+//      Runtime.getRuntime().exit(1);
+//    }
   }
 
   protected VersionProvider getVersionProvider() {
@@ -166,7 +165,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setScmPassword(scmPassword);
       configuration.setRunMode(runMode);
       configuration.setBranchConversionUrl(branchConversionUrl);
-      if(runMode == RUNMODE.NATIVE_BRANCH || runMode == RUNMODE.RELEASE_BRANCH) {
+      if(runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH) {
         if (branchProvider != null) {
           configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
         } else {
@@ -192,40 +191,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     PATCH
   }
 
-  /**
-   * <ul>
-   * <li>release: maak gebruik van normale semantic-versioning en release-plugin</li>
-   * <li>release-rpm</li>
-   * <li>native</li>
-   * <li>native-rpm</li>
-   * </ul>
-   */
-  public enum RUNMODE {
-    RELEASE,
-    RELEASE_BRANCH,
-    RELEASE_BRANCH_HOSEE,
-    NATIVE,
-    NATIVE_BRANCH,
-    RUNMODE_NOT_SPECIFIED;
 
-    public static RUNMODE convertToEnum(String runMode) {
-      RUNMODE value = RUNMODE_NOT_SPECIFIED;
-      if (runMode != null) {
-        if ("RELEASE".equals(runMode)) {
-          value = RELEASE;
-        } else if ("RELEASE_BRANCH".equals(runMode)) {
-          value = RELEASE_BRANCH;
-        } else if ("RELEASE_BRANCH_HOSEE".equals(runMode)) {
-          value = RELEASE_BRANCH_HOSEE;
-        } else if ("NATIVE".equals(runMode)) {
-          value = NATIVE;
-        } else if ("NATIVE_BRANCH".equals(runMode)) {
-          value = NATIVE_BRANCH;
-        }
-      }
-      return value;
-    }
-  }
 
 
 }
