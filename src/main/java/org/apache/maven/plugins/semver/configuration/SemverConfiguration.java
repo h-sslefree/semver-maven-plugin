@@ -16,7 +16,7 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin.RUNMODE;
  */
 public class SemverConfiguration {
 
-    private static final String BRANCH_CONVERSION_URL = "http://localhost/branchconversion";
+    private static final String BRANCH_CONVERSION_URL = "";
 
     private RUNMODE runMode;
     private String branchVersion;
