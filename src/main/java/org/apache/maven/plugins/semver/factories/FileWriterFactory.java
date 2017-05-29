@@ -4,6 +4,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.*;
@@ -11,7 +13,7 @@ import java.util.Map;
 
 /**
  *
- * <h>FileWriterFactory</h>
+ * <h1>FileWriterFactory</h1>
  *
  * <p>This class performs all disk related actions.</p>
  *
@@ -19,17 +21,18 @@ import java.util.Map;
  */
 public class FileWriterFactory {
 
+  private static final Logger LOG = LoggerFactory.getLogger(FileWriterFactory.class);
+
   private FileWriterFactory() {
   }
 
   /**
    * <p>Create the release.properties file</p>
    *
-   * @param LOG {@link org.apache.maven.plugin.logging.Log}
    * @param project {@link org.apache.maven.project.MavenProject}
    * @param finalVersions map with development, release and scm version
    */
-  public static void createReleaseProperties(Log LOG, MavenProject project, Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
+  public static void createReleaseProperties(MavenProject project, Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
     String mavenProjectRelease = "project.rel." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE);
     String mavenProjectDevelopment = "project.dev." + project.getGroupId() + "\\\u003A" + project.getArtifactId() + "\u003D" + finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT);
     String mavenProjectScm = "scm.tag=" + finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
@@ -41,67 +44,55 @@ public class FileWriterFactory {
     releaseText.append("\n");
     releaseText.append(mavenProjectScm);
 
-    writeFileToDisk(LOG, "release.properties", releaseText.toString());
+    writeFileToDisk("release.properties", releaseText.toString());
 
   }
 
   /**
+   *
+   *
    * <p>Backup the old pom to make sure when the build fails it can be set back.</p>
    *
-   * @param LOG @see {@link org.apache.maven.plugin.logging.Log}
    */
-  public static void backupSemverPom(Log LOG) {
-    if (LOG != null) {
-      LOG.debug("Backup pom.xml");
-      LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
-    }
+  public static void backupSemverPom() {
+    LOG.info("Backup pom.xml");
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     try {
       File pomXmlOriginal = new File("pom.xml");
       File pomXmlSemverBackup = new File("pom.xml.semverBackup");
       if (pomXmlSemverBackup.exists()) {
-        if (LOG != null) {
-          LOG.debug("Old pom.xml.semverBackup removed  : " + pomXmlSemverBackup.getAbsolutePath());
-        }
+        LOG.warn("Old pom.xml.semverBackup removed  : " + pomXmlSemverBackup.getAbsolutePath());
         boolean isDeleted = pomXmlSemverBackup.delete();
         if (!isDeleted) {
-          if (LOG != null) {
-            LOG.error("File is not removed               : pom.xml.semverBackup");
-          }
+          LOG.error("File is not removed               : pom.xml.semverBackup");
         }
       }
       Files.copy(pomXmlOriginal.toPath(), pomXmlSemverBackup.toPath());
 
-      if (LOG != null) {
-        LOG.debug("New pom.xml.semverBackup prepared : " + pomXmlSemverBackup.getAbsolutePath());
-      }
+      LOG.info("New pom.xml.semverBackup prepared : " + pomXmlSemverBackup.getAbsolutePath());
 
     } catch (IOException err) {
-      if (LOG != null) {
-        LOG.error("semver-maven-plugin is terminating");
-        LOG.error("Error when creating new pom.xml.semverBackup", err);
-      }
+      LOG.error("semver-maven-plugin is terminating");
+      LOG.error("Error when creating new pom.xml.semverBackup", err);
       Runtime.getRuntime().exit(1);
     }
-    if (LOG != null) {
-      LOG.debug(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-    }
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
   /**
    *
-   * <h>Rollback pom.xml</h>
+   * <h1>Rollback pom.xml</h1>
    * <p>Replace the current pom.xml with the pom.xml.semverBackup.</p>
    *
-   * @param LOG logging from the parent Mojo
    */
-  public static void rollbackPom(Log LOG) {
+  public static void rollbackPom() {
     File pomXml= new File("pom.xml");
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     LOG.info(" * Replace pom.xml with            : pom.xml.semverBackup");
     try {
       Files.copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException err) {
-      LOG.error(err);
+      LOG.error(err.getMessage());
     }
   }
 
@@ -109,9 +100,8 @@ public class FileWriterFactory {
    * <h>Cleanup the backup pom.xml</h>
    * <p>Remove the pom.xml.semverBackup is exists.</p>
    *
-   * @param LOG logging from the parent Mojo
    */
-  public static void removeBackupSemverPom(Log LOG) {
+  public static void removeBackupSemverPom() {
     LOG.info("Cleanup pom.xml.semverBackup");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
@@ -126,10 +116,9 @@ public class FileWriterFactory {
    *
    * <p>Can we perform a rollback?</p>
    *
-   * @param LOG logging for maven plugin
    * @return canRollback
    */
-  public static boolean canRollBack(Log LOG) {
+  public static boolean canRollBack() {
     boolean canRollback = false;
     File pomXmlSemverBackup = new File("pom.xml.semverBackup");
     if(pomXmlSemverBackup.exists()) {
@@ -145,28 +134,21 @@ public class FileWriterFactory {
   /**
    * <p>Write actual file to disk</p>
    *
-   * @param LOG         @see {@link org.apache.maven.plugin.logging.Log}
    * @param fileName    the name of the file
    * @param fileContent the full content for the pom.xml
    */
-  public static void writeFileToDisk(Log LOG, String fileName, String fileContent) {
+  public static void writeFileToDisk(String fileName, String fileContent) {
     try {
       if (fileName != null) {
         File file = new File(fileName);
         if (file.exists()) {
-          if (LOG != null) {
-            LOG.info("Old file: [ " + fileName + " ] removed      : " + file.getAbsolutePath());
-          }
+          LOG.info("Old file: [ " + fileName + " ] removed      : " + file.getAbsolutePath());
           boolean isDeleted = file.delete();
           if (!isDeleted) {
-            if (LOG != null) {
-              LOG.error("File: [ " + fileName + " ] is not removed            : " + file.getAbsolutePath());
-            }
+            LOG.error("File: [ " + fileName + " ] is not removed            : " + file.getAbsolutePath());
           }
         }
-        if (LOG != null) {
-          LOG.info("New [ " + fileName + " ] is prepared        : " + file.getAbsolutePath());
-        }
+        LOG.info("New [ " + fileName + " ] is prepared        : " + file.getAbsolutePath());
         FileWriter writer = new FileWriter(file);
         Writer output = new BufferedWriter(writer);
         output.append(fileContent);
@@ -174,11 +156,9 @@ public class FileWriterFactory {
         writer.close();
       }
     } catch (IOException err) {
-      if (LOG != null) {
-        LOG.error("semver-maven-plugin is terminating");
-        LOG.error("Error when creating file [ " + fileName + " ]", err);
-        Runtime.getRuntime().exit(1);
-      }
+      LOG.error("semver-maven-plugin is terminating");
+      LOG.error("Error when creating file [ " + fileName + " ]", err);
+      Runtime.getRuntime().exit(1);
     }
   }
 
