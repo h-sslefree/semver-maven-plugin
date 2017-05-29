@@ -2,8 +2,6 @@ package org.apache.maven.plugins.semver;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
@@ -13,7 +11,8 @@ import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.components.interactivity.Prompter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -49,38 +48,37 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
   public static final String FUNCTION_LINE_BREAK = "************************************************************************";
 
-  protected final Log LOG = getLog();
-
-  @Component
-  private Prompter prompter;
-
-  @Component
-  private BuildPluginManager buildPluginManager;
+  protected final Logger LOG = LoggerFactory.getLogger(SemverMavenPlugin.class);
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
+  @Parameter(property = "session", defaultValue = "${session}", readonly = true, required = true)
+  protected MavenSession session;
+  @Parameter(property = "tag")
+  protected String preparedReleaseTag;
+  @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
+  private RUNMODE runMode;
   @Parameter(property = "username", defaultValue = "")
   private String scmUsername = "";
   @Parameter(property = "password", defaultValue = "")
   private String scmPassword = "";
-  @Parameter(property = "tag")
-  protected String preparedReleaseTag;
-  @Parameter(defaultValue = "${session}", readonly = true, required = true)
-  private MavenSession session;
-  @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
-  private RUNMODE runMode;
   @Parameter(property = "branchVersion")
   private String branchVersion;
-  @Parameter(property = "metaData")
-  private String metaData;
   @Parameter(property = "branchConversionUrl")
   private String branchConversionUrl;
+  @Parameter(property = "metaData")
+  private String metaData;
 
   private SemverConfiguration configuration;
-  private RepositoryProvider repositoryProvider;
+
+  @Component
   private VersionProvider versionProvider;
-  private BranchProvider branchProvider;
+  @Component
   private PomProvider pomProvider;
+  @Component
+  private RepositoryProvider repositoryProvider;
+  @Component
+  private BranchProvider branchProvider;
 
   /**
    * <p>Override runMode through configuration properties</p>
@@ -97,9 +95,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param branchVersion get branchVersion from plugin configuration
    */
   public void setBranchVersion(String branchVersion) {
-    this.branchVersion = branchVersion;
+    configuration.setBranchVersion(branchVersion);
   }
-
 
   /**
    * <p>Override branchConversionUrl through configuration properties</p>
@@ -125,26 +122,26 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param rawVersions rawVersions are the versions determined by the goal
    */
   protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
-    if(!versionProvider.isRemoteVersionCorrupt(project.getVersion())) {
-      if (getConfiguration().getRunMode() == RUNMODE.RELEASE) {
+    if(!repositoryProvider.isRemoteVersionCorrupt(project.getVersion())) {
+      if (configuration.getRunMode() == RUNMODE.RELEASE) {
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-        FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
-      } else if (getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH || getConfiguration().getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
-        FileWriterFactory.createReleaseProperties(LOG, project, finalVersions);
+        FileWriterFactory.createReleaseProperties(project, finalVersions);
+      } else if (configuration.getRunMode() == RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RUNMODE.RELEASE_BRANCH_HOSEE) {
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfiguration().getRunMode(), getConfiguration().getMetaData(), getConfiguration().getBranchVersion());
+        FileWriterFactory.createReleaseProperties(project, finalVersions);
 
-      } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE) {
-        FileWriterFactory.backupSemverPom(LOG);
+      } else if (configuration.getRunMode() == RUNMODE.NATIVE) {
+        FileWriterFactory.backupSemverPom();
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         pomProvider.createReleasePom(finalVersions);
         pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-        FileWriterFactory.removeBackupSemverPom(LOG);
-      } else if (getConfiguration().getRunMode() == RUNMODE.NATIVE_BRANCH) {
-        FileWriterFactory.backupSemverPom(LOG);
-        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions);
+        FileWriterFactory.removeBackupSemverPom();
+      } else if (configuration.getRunMode() == RUNMODE.NATIVE_BRANCH) {
+        FileWriterFactory.backupSemverPom();
+        Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfiguration().getRunMode(), getConfiguration().getMetaData(), getConfiguration().getBranchVersion());
         pomProvider.createReleasePom(finalVersions);
         pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-        FileWriterFactory.removeBackupSemverPom(LOG);
+        FileWriterFactory.removeBackupSemverPom();
       }
     } else {
       LOG.error("");
@@ -154,13 +151,14 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
+  protected VersionProvider getVersionProvider() {
+    return this.versionProvider;
+  }
 
+  protected RepositoryProvider getRepositoryProvider() {
+    return this.repositoryProvider;
+  }
 
-  /**
-   * <p>Get merged configuration</p>
-   *
-   * @return SemverConfiguration
-   */
   public SemverConfiguration getConfiguration() {
     if (configuration == null) {
       configuration = new SemverConfiguration(session);
@@ -168,44 +166,16 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setScmPassword(scmPassword);
       configuration.setRunMode(runMode);
       configuration.setBranchConversionUrl(branchConversionUrl);
-      if (branchProvider != null) {
-        configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion));
-      } else {
-        configuration.setBranchVersion(branchVersion);
+      if(runMode == RUNMODE.NATIVE_BRANCH || runMode == RUNMODE.RELEASE_BRANCH) {
+        if (branchProvider != null) {
+          configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
+        } else {
+          configuration.setBranchVersion(branchVersion);
+        }
       }
       configuration.setMetaData(metaData);
     }
     return configuration;
-  }
-
-  /**
-   * <p>To use the {@link RepositoryProvider} this method is needed to get access.</p>
-   *
-   * @return {@link RepositoryProvider}
-   */
-  protected RepositoryProvider getRepositoryProvider() {
-    return repositoryProvider;
-  }
-
-  /**
-   * <p>To use the {@link VersionProvider} this method is needed to get access.</p>
-   *
-   * @return {@link VersionProvider}
-   */
-  protected VersionProvider getVersionProvider() {
-    return versionProvider;
-  }
-
-  /**
-   *
-   * <p>In each goal this method is called to intialize all providers.</p>
-   *
-   */
-  protected void initializeProviders() {
-    repositoryProvider = new RepositoryProvider(LOG, project, getConfiguration(), prompter);
-    branchProvider = new BranchProvider(LOG, repositoryProvider, branchConversionUrl);
-    versionProvider = new VersionProvider(LOG, repositoryProvider, getConfiguration());
-    pomProvider = new PomProvider(LOG, repositoryProvider, project, session, buildPluginManager);
   }
 
   /**
