@@ -35,6 +35,7 @@ The goals that use the **maven-release-plugin** are attached to RUN_MODES:
 
 * RELEASE
 * RELEASE_BRANCH
+* RELEASE_BRANCH_RPM
 
 It generates the `release.properties` and then the *release:prepare*-goal can be used to make the maven release-artifact.
 
@@ -42,6 +43,7 @@ The goals that are **native** are attached to RUNMODES:
 
 * NATIVE
 * NATIVE_BRANCH
+* NATIVE_BRANCH_RPM
   
 The **native**-method is developed in version: *3.0.0* to get rid of the dependency on the **maven-release-plugin**.
 
@@ -76,6 +78,7 @@ The goals that use the **maven-release-plugin** are attached to RUNMODES:
 
 * RELEASE
 * RELEASE_BRANCH
+* RELEASE_BRANCH_RPM
 
 To run the goals please execute the following commands:
 
@@ -85,10 +88,9 @@ To run the goals please execute the following commands:
 
 The goals that are **native** are attached to RUNMODES:
 
-**Not yet implemented**
-
 * NATIVE
 * NATIVE_BRANCH
+* NATIVE_BRANCH_RPM
 
 To run the goals please execute the following commands:
 
