@@ -7,6 +7,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
@@ -105,8 +106,18 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     patchVersion = 0;
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
-    String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
-    String scmVersion = getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion);
+
+    //TODO:SH move this part to a RunModeNative and RunModeNativeRpm implementation
+    String releaseVersion;
+    String scmVersion;
+    if(getConfiguration().getRunMode().equals(RunMode.RUNMODE.NATIVE_BRANCH) || getConfiguration().getRunMode().equals(RunMode.RUNMODE.NATIVE_BRANCH_RPM)) {
+      scmVersion = getVersionProvider().determineReleaseBranchTag(getConfiguration().getRunMode(), getConfiguration().getBranchVersion(), patchVersion, minorVersion, majorVersion);
+      releaseVersion = scmVersion;
+    } else {
+      scmVersion = getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion);
+      releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
+    }
+
     String metaData = getVersionProvider().determineBuildMetaData(getConfiguration().getRunMode(), getConfiguration().getMetaData(), patchVersion, minorVersion, majorVersion);
 
     LOG.info("New DEVELOPMENT-version            : " + developmentVersion);

@@ -105,14 +105,16 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     patchVersion = patchVersion + 1;
 
     String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
-    String releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
 
     //TODO:SH move this part to a RunModeNative and RunModeNativeRpm implementation
+    String releaseVersion;
     String scmVersion;
     if(getConfiguration().getRunMode().equals(RunMode.RUNMODE.NATIVE_BRANCH) || getConfiguration().getRunMode().equals(RunMode.RUNMODE.NATIVE_BRANCH_RPM)) {
       scmVersion = getVersionProvider().determineReleaseBranchTag(getConfiguration().getRunMode(), getConfiguration().getBranchVersion(), patchVersion, minorVersion, majorVersion);
+      releaseVersion = scmVersion;
     } else {
       scmVersion = getVersionProvider().determineReleaseTag(getConfiguration().getRunMode(), patchVersion, minorVersion, majorVersion);
+      releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
     }
 
     String metaData = getVersionProvider().determineBuildMetaData(getConfiguration().getRunMode(), getConfiguration().getMetaData(), patchVersion, minorVersion, majorVersion);
