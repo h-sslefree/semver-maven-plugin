@@ -17,14 +17,14 @@ import java.util.Map;
 
 
 /**
- * <h>Determine MINOR version for MAVEN-project.</h>
+ * <h1>Determine MINOR version for MAVEN-project.</h1>
  * <p>This advances the tag of the project and the pom.xml version.</p>
  * <p>Example:</p>
  * <pre>
  *     <code>
- *          <version>x.1.x</version>
+ *          < version>x.1.x< /version>
  *          to
- *          <version>x.2.x</version>
+ *          < version>x.2.x< /version>
  *     </code>
  * </pre>
  * <p>Run the test-phase when this goal is executed.</p>

@@ -17,14 +17,14 @@ import java.util.Map;
 
 
 /**
- * <h>Determine PATCH version for MAVEN-project.</h>
+ * <h1>Determine PATCH version for MAVEN-project.</h1>
  * <p>This advances the tag of the project and the pom.xml version.</p>
  * <p>Example:</p>
  * <pre>
  *     <code>
- *          <version>x.x.1</version>
+ *          < version>x.x.1< /version>
  *          to
- *          <version>x.x.2</version>
+ *          < version>x.x.2< /version>
  *     </code>
  * </pre>
  * <p>Run the test-phase when this goal is executed.</p>
@@ -68,7 +68,7 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
 
   /**
-   * <p>Determine PATCHversion from POM-version.</p>
+   * <p>Determine PATCH version from POM-version.</p>
    *
    * @param version example: x.x.0-SNAPSHOT
    * @return list of development, git and release-version
