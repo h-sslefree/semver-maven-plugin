@@ -138,7 +138,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         runModeReleaseBranch.execute(getConfiguration(), rawVersions);
       } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE) {
         runModeNative.execute(getConfiguration(), rawVersions);
-      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH) {
+      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
         runModeNativeBranch.execute(getConfiguration(), rawVersions);
       }
 //    }

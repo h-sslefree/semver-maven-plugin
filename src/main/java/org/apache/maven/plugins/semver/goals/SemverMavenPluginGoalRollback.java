@@ -27,6 +27,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     File scmRoot = project.getBasedir();
     getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
+    LOG.info(FUNCTION_LINE_BREAK);
     LOG.info("Semver-goal                        : ROLLBACK");
     LOG.info("Run-mode                           : " + getConfiguration().getRunMode());
     LOG.info("Version from POM                   : " + version);
@@ -34,7 +35,7 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     LOG.info("SCM-root                           : " + scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
-    if(getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH) {
+    if(getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
 
       LOG.info("Perform a rollback for version     : [ " + version + " ]");
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
