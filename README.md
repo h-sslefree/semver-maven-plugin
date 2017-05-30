@@ -25,9 +25,6 @@ You have to specify the configuration-tag to set the RUN_MODE.
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
   <version>3.0.0</version>
-  <configuration>
-    <runMode>RELEASE</runMode>
-  </configuration>
 </plugin>
 ```
 
