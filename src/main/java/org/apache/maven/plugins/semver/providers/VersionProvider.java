@@ -26,6 +26,8 @@ public interface VersionProvider {
 
     Map<VersionProviderImpl.FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion);
 
+    String determineReleaseBranchTag(RunMode.RUNMODE runMode, String branchVersion, int patch, int minor, int major);
+
     String determineReleaseTag(RunMode.RUNMODE runMode, int patch, int minor, int major);
 
     String determineBuildMetaData(RunMode.RUNMODE runMode, String metaData, int patch, int minor, int major);

@@ -59,7 +59,7 @@ public class SemverConfiguration {
         if (userRunMode != null && !userRunMode.isEmpty()) {
             runMode = RunMode.RUNMODE.convertToEnum(userRunMode);
         }
-        if (runMode == RunMode.RUNMODE.RELEASE_BRANCH) {
+        if (runMode == RunMode.RUNMODE.RELEASE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM || runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
             if (userBranchVersion != null && !userBranchVersion.isEmpty()) {
                 branchVersion = userBranchVersion;
             }

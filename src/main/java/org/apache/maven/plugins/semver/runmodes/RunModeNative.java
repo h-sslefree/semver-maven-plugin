@@ -11,7 +11,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import java.util.Map;
 
 /**
- * @author sido u
+ *
+ * <h1>RunModeNative</h1>
+ *
+ * <p></p>
+ *
+ * @author sido
  */
 @Component(role = RunModeNative.class)
 public class RunModeNative implements RunMode {

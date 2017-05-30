@@ -2,13 +2,12 @@ package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -16,6 +15,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 
@@ -156,6 +156,28 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
+  }
+
+  /**
+   *
+   * <p>Perform a pull from the remote GIT-repository.</p>
+   *
+   * @return is pull completed?
+   */
+  private boolean checkRemoteUpdates() {
+    boolean isRemoteDifferent = false;
+    try {
+      FetchResult fetch = repository.fetch().setRemote("origin").setCredentialsProvider(provider).setDryRun(true).call();
+      if(!fetch.getTrackingRefUpdates().isEmpty()) {
+        isRemoteDifferent = true;
+      }
+    } catch (GitAPIException err) {
+      LOG.error(err.getMessage());
+      LOG.error("");
+      LOG.error("Please check your SCM-credentials to fix this issue");
+      Runtime.getRuntime().exit(1);
+    }
+    return isRemoteDifferent;
   }
 
   /**
@@ -353,23 +375,33 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     boolean isChanged = false;
     LOG.info("Check for local or remote changes");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    pull();
-    try {
-      Status status = repository.status().call();
-      if (!status.isClean()) {
-        LOG.error("Semver-action has failed");
-        LOG.error("There are uncomitted changes");
-        LOG.error("Please commit and push the open changes");
-        isChanged = true;
-      } else {
-        LOG.info("Local changes                      : workingtree is clean");
-        LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-      }
-    } catch (GitAPIException err) {
-      LOG.error(err.getMessage());
+    if(checkRemoteUpdates()) {
       isChanged = true;
+      LOG.error("Remote changes                    : remote origin is ahead of local repository");
+    } else {
+      LOG.info("Remote changes                     : remote origin is up to date");
     }
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    if(!isChanged) {
+      try {
+        Status status = repository.status().call();
+        if (!status.isClean()) {
+          isChanged = true;
+        } else {
+          LOG.info("Local changes                      : workingtree is clean");
+          LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+        }
+      } catch (GitAPIException err) {
+        LOG.error(err.getMessage());
+        isChanged = true;
+      }
+    }
+    if(isChanged) {
+      LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+      LOG.error("");
+      LOG.error("Semver-goal has failed");
+      LOG.error("There are uncomitted changes or the remote is ahead of local repository");
+      LOG.error("Please pull remote changes and/or commit and push the open changes");
+    }
     return isChanged;
   }
 

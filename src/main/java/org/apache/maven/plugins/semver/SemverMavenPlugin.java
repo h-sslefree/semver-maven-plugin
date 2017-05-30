@@ -104,7 +104,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param branchVersion get branchVersion from plugin configuration
    */
   public void setBranchVersion(String branchVersion) {
-    configuration.setBranchVersion(branchVersion);
+    this.branchVersion = branchVersion;
   }
 
   /**
@@ -165,7 +165,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setScmPassword(scmPassword);
       configuration.setRunMode(runMode);
       configuration.setBranchConversionUrl(branchConversionUrl);
-      if(runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH) {
+      if(runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM || runMode == RunMode.RUNMODE.RELEASE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
         if (branchProvider != null) {
           configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
         } else {

@@ -6,16 +6,21 @@ import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import java.util.Map;
 
 /**
+ *
+ * <h1></h1>
+ *
  * @author sido
  */
 public interface RunMode {
 
     /**
      * <ul>
-     * <li>release: maak gebruik van normale semantic-versioning en release-plugin</li>
-     * <li>release-rpm</li>
-     * <li>native</li>
-     * <li>native-rpm</li>
+     * <li>RELEASE: uses basic semantic-versioning and the release-plugin to create a tag</li>
+     * <li>RELEASE_BRANCH: uses semantic-versioning with branch-prefix and the release-plugin to create a tag</li>
+     * <li>RELEASE_BRANCH_RPM: uses semantic-versioning with branch-prefix and a parsed variant of the semantic-versioning as a release-number for RPM. It also uses the release-plugin to create a tag</li>
+     * <li>NATIVE (default): uses basic semantic-versioning to create a tag</li>
+     * <li>NATIVE_BRANCH: uses semantic-versioning with branch-prefix to create a tag</li>
+     * <li>NATIVE_BRANCH_RPM: uses semantic-versioning with branch-prefix and a parsed variant of the semantic-versioning as a release-number for RPM</li>
      * </ul>
      */
     enum RUNMODE {
@@ -48,5 +53,10 @@ public interface RunMode {
         }
     }
 
-    void execute(SemverConfiguration configuration, Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions);
+  /**
+   *
+   * @param configuration
+   * @param rawVersions
+   */
+  void execute(SemverConfiguration configuration, Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions);
 }
