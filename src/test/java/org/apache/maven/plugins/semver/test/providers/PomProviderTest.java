@@ -33,9 +33,9 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
     @Test
     public void createReleaseTest() {
 
-        RepositoryProvider repositoryProvider = new RepositoryProviderDefaultImpl();
-        PomProvider pomProvider = new PomProviderDefaultImpl();
-        VersionProvider versionProvider = new VersionProviderDefaultImpl();
+        RepositoryProvider repositoryProvider = new RepositoryProviderImpl();
+        PomProvider pomProvider = new PomProviderImpl();
+        VersionProvider versionProvider = new VersionProviderImpl();
 
         Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
         rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");

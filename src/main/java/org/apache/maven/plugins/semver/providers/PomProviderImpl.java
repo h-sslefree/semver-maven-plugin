@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 @Component(role = PomProvider.class)
-public class PomProviderDefaultImpl implements PomProvider {
+public class PomProviderImpl implements PomProvider {
 
   @Requirement
   private Logger LOG;
@@ -35,7 +35,7 @@ public class PomProviderDefaultImpl implements PomProvider {
    *
    */
   @Inject
-  public PomProviderDefaultImpl() {}
+  public PomProviderImpl() {}
 
   /**
    *

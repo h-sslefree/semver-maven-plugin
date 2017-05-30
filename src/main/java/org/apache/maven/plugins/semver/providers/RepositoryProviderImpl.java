@@ -34,7 +34,7 @@ import java.util.Map;
  * @author sido
  */
 @Component(role = RepositoryProvider.class)
-public class RepositoryProviderDefaultImpl implements RepositoryProvider {
+public class RepositoryProviderImpl implements RepositoryProvider {
 
   private static final String URL_GITHUB = "github.com";
 
@@ -54,7 +54,7 @@ public class RepositoryProviderDefaultImpl implements RepositoryProvider {
    * <p>Initialize the RepositoryProvider.</p>
    *
    */
-  public RepositoryProviderDefaultImpl() {}
+  public RepositoryProviderImpl() {}
 
   public void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword) {
     try {

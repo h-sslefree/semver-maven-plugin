@@ -22,9 +22,9 @@ public interface VersionProvider {
         RELEASE
     }
 
-    Map<VersionProviderDefaultImpl.FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions);
+    Map<VersionProviderImpl.FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions);
 
-    Map<VersionProviderDefaultImpl.FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion);
+    Map<VersionProviderImpl.FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion);
 
     String determineReleaseTag(RunMode.RUNMODE runMode, int patch, int minor, int major);
 

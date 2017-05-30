@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 @Component(role = VersionProvider.class)
-public class VersionProviderDefaultImpl implements VersionProvider {
+public class VersionProviderImpl implements VersionProvider {
 
     @Requirement
     private Logger LOG;
@@ -27,7 +27,7 @@ public class VersionProviderDefaultImpl implements VersionProvider {
      *
      */
     @Inject
-    public VersionProviderDefaultImpl() {}
+    public VersionProviderImpl() {}
 
     /**
      *

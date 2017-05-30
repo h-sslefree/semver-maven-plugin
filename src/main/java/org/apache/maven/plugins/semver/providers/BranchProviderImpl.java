@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @Component(role = BranchProvider.class)
-public class BranchProviderDefaultImpl implements BranchProvider {
+public class BranchProviderImpl implements BranchProvider {
 
     @Requirement
     private Logger LOG;
@@ -30,7 +30,7 @@ public class BranchProviderDefaultImpl implements BranchProvider {
      *
      */
     @Inject
-    public BranchProviderDefaultImpl() {}
+    public BranchProviderImpl() {}
 
     /**
      * <p>Determine branchVersion from GIT-branch</p>
