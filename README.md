@@ -100,4 +100,6 @@ To run the goals please execute the following commands:
 
 To build the semver-maven-plugin, execute the following command:
 
-`mvn clean package gpg:sign -Dgpg.passphrase=#passphrase#`
+`mvn clean package`
+
+This way you can use a SNAPSHOT-version to test in your applications.
