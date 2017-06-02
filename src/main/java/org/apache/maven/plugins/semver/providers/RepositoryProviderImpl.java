@@ -6,9 +6,7 @@ import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.exceptions.SemverExceptionMessages;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -20,6 +18,7 @@ import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,8 +40,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 
   @Requirement
   private Logger LOG;
-  @Requirement
-  private Prompter prompter;
+
+  private Console console = System.console();
 
   private boolean isInitialized = false;
 
@@ -120,12 +119,12 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       }
       try {
         if(scmDefaultUsername.isEmpty()){
-          scmUserName = prompter.prompt(messageUsername);
+          scmUserName = console.readLine(messageUsername);
         } else {
-          scmUserName = prompter.prompt(messageUsername, scmDefaultUsername);
+          scmUserName = console.readLine(messageUsername, scmDefaultUsername);
         }
-        scmPassword = prompter.promptForPassword(messagePassword);
-      } catch (PrompterException err) {
+        scmPassword = new String(console.readPassword(messagePassword));
+      } catch (Exception err) {
         LOG.error(err.getMessage());
       }
     }
