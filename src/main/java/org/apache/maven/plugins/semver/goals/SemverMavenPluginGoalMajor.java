@@ -45,7 +45,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
 
     LOG.info(FUNCTION_LINE_BREAK);
     LOG.info("Semver-goal                        : MAJOR");
-    LOG.info("Run-mode                           : {}" + getConfiguration().getRunMode());
+    LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
     LOG.info("Version from POM                   : [ {} ]", version);
     LOG.info("SCM-connection                     : {}", scmConnection);
     LOG.info("SCM-root                           : {}", scmRoot);
