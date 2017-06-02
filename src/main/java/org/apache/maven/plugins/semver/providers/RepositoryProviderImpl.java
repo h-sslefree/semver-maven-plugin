@@ -6,7 +6,6 @@ import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.exceptions.SemverExceptionMessages;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
