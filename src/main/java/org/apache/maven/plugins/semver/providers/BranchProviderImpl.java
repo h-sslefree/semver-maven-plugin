@@ -58,15 +58,15 @@ public class BranchProviderImpl implements BranchProvider {
             String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
             value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
           } else if (branch.equals("master")) {
-            LOG.info("Current branch matches            : master");
+            LOG.info("Current branch matches            : [ master ]");
             value = determineVersionFromMasterBranch(branch, branchConversionUrl);
           } else if (branch.matches("^[a-z0-9]*")) {
-            LOG.warn("Current branch matches md5-hash       : ^[a-z0-9]");
+            LOG.warn("Current branch matches md5-hash   : ^[a-z0-9]");
             LOG.warn("Application is running tests");
           } else {
-            LOG.error("Current branch does not match        : digit.digit.digit");
-            LOG.error("And current branch does not match    : v+digit.digit.digit+*");
-            LOG.error("And current branch does is not       : master");
+            LOG.error(" * Branch does not match         : [ digit.digit.digit ]");
+            LOG.error(" * Branch does not match         : [ v+digit.digit.digit+* ]");
+            LOG.error(" * Branch does is not            : [ master ]");
             LOG.error("Branch is not set, semantic versioning for RPM is terminated");
             Runtime.getRuntime().exit(1);
           }
@@ -113,7 +113,7 @@ public class BranchProviderImpl implements BranchProvider {
       HttpEntity entity = response.getEntity();
       branchVersion = EntityUtils.toString(entity);
       if (branchVersion != null) {
-        LOG.info("Conversion-service branch       : [ {} ]", branchVersion);
+        LOG.info("Conversion-service branch         : [ {} ]", branchVersion);
       } else {
         LOG.error("No branch version could be determined");
       }
