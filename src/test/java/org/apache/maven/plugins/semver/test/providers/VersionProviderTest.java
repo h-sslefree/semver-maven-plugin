@@ -63,12 +63,12 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "1.0.0");
@@ -81,12 +81,12 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfigurationReleaseBranch().getRunMode(), getConfigurationReleaseBranch().getMetaData(), getConfigurationReleaseBranch().getBranchVersion());
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "6.4.0-1.0.0");
@@ -99,12 +99,12 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfigurationReleaseBranchRpm().getRunMode(), getConfigurationReleaseBranchRpm().getMetaData(), getConfigurationReleaseBranchRpm().getBranchVersion());
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "6.4.0-001000000");
@@ -119,12 +119,12 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "1.0.0");
@@ -137,12 +137,12 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseBranchVersions(rawVersions, getConfigurationNativeBranch().getRunMode(), getConfigurationNativeBranch().getMetaData(), getConfigurationNativeBranch().getBranchVersion());
         assertEquals(finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE), "6.4.0-1.0.0");

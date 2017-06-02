@@ -37,12 +37,12 @@ public class PomProviderTest extends AbstractSemverMavenPluginTest {
         PomProvider pomProvider = new PomProviderImpl();
         VersionProvider versionProvider = new VersionProviderImpl();
 
-        Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions = new HashMap<>();
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.RELEASE, "1.0.0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.PATCH, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MINOR, "0");
-        rawVersions.put(SemverMavenPlugin.RAW_VERSION.MAJOR, "1");
+        Map<VersionProvider.RAW_VERSION, String> rawVersions = new HashMap<>();
+        rawVersions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
+        rawVersions.put(VersionProvider.RAW_VERSION.RELEASE, "1.0.0");
+        rawVersions.put(VersionProvider.RAW_VERSION.PATCH, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MINOR, "0");
+        rawVersions.put(VersionProvider.RAW_VERSION.MAJOR, "1");
 
         pomProvider.createReleasePom(versionProvider.determineReleaseVersions(rawVersions));
 
