@@ -29,15 +29,15 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
 
     LOG.info(FUNCTION_LINE_BREAK);
     LOG.info("Semver-goal                        : ROLLBACK");
-    LOG.info("Run-mode                           : " + getConfiguration().getRunMode());
-    LOG.info("Version from POM                   : " + version);
-    LOG.info("SCM-connection                     : " + scmConnection);
-    LOG.info("SCM-root                           : " + scmRoot);
+    LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
+    LOG.info("Version from POM                   : [ {} ]", version);
+    LOG.info("SCM-connection                     : {}", scmConnection);
+    LOG.info("SCM-root                           : {}", scmRoot);
     LOG.info(FUNCTION_LINE_BREAK);
 
     if(getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || getConfiguration().getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
 
-      LOG.info("Perform a rollback for version     : [ " + version + " ]");
+      LOG.info("Perform a rollback for version     : [ {} ]", version);
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
       if(FileWriterFactory.canRollBack()) {
         if(!getRepositoryProvider().isRemoteVersionCorrupt(version)) {
@@ -46,9 +46,9 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
           getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
           LOG.info(" * Push old pom.xml");
           getRepositoryProvider().push();
-          LOG.info(" * Delete SCM-tag                  : [ " + version + " ]");
+          LOG.info(" * Delete SCM-tag                  : [ {} ]", version);
           getRepositoryProvider().deleteTag(version);
-          LOG.info(" * Delete remote SCM-tag           : [ " + version + " ]");
+          LOG.info(" * Delete remote SCM-tag           : [ {} ]", version);
           getRepositoryProvider().pushTag();
           LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
           FileWriterFactory.removeBackupSemverPom();
