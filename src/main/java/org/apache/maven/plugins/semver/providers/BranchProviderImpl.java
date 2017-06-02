@@ -64,6 +64,7 @@ public class BranchProviderImpl implements BranchProvider {
             LOG.warn("Current branch matches md5-hash   : ^[a-z0-9]");
             LOG.warn("Application is running tests");
           } else {
+            LOG.error("Current branch does not match any known formats");
             LOG.error(" * Branch does not match         : [ digit.digit.digit ]");
             LOG.error(" * Branch does not match         : [ v+digit.digit.digit+* ]");
             LOG.error(" * Branch does is not            : [ master ]");
@@ -118,7 +119,7 @@ public class BranchProviderImpl implements BranchProvider {
         LOG.error("No branch version could be determined");
       }
     } catch (IOException err) {
-      LOG.error("Could not make request to branch-conversion-service", err);
+      LOG.error("Could not make request to conversion-service", err);
     } finally {
       try {
         if (response != null) {
@@ -128,7 +129,7 @@ public class BranchProviderImpl implements BranchProvider {
           httpClient.close();
         }
       } catch (IOException err) {
-        LOG.error("Could not close request to branch-conversion-service", err);
+        LOG.error("Could not close request to conversion-service", err);
       }
     }
     return branchVersion;

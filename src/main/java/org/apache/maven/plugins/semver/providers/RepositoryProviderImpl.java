@@ -38,6 +38,11 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 
   private static final String URL_GITHUB = "github.com";
 
+  private enum CREDENTIALS {
+    USERNAME,
+    PASSWORD
+  }
+
   @Requirement
   private Logger LOG;
 
@@ -103,38 +108,73 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    *
    * @return {@link CredentialsProvider} initialized credentialsProvider
    */
-  private CredentialsProvider initializeCredentialsProvider(String scmUrl, String configScmUsername, String configScmPassword) {
+  private CredentialsProvider initializeCredentialsProvider(String scmUrl, String configScmUserName, String configScmPassword) {
     LOG.info("Initializing SCM-credentialsprovider");
-    CredentialsProvider provider = null;
-    String scmUserName = configScmUsername;
-    String scmPassword = configScmPassword;
+    CredentialsProvider provider;
+
+    Map<CREDENTIALS, String> credentials = promptForCredentials(configScmUserName, configScmPassword, scmUrl);
+
+    provider = new UsernamePasswordCredentialsProvider(credentials.get(CREDENTIALS.USERNAME), credentials.get(CREDENTIALS.PASSWORD));
+    LOG.info(" * Validate credentials");
+    boolean isAuthorized = checkCredentials(provider);
+    while(!isAuthorized) {
+      Map<CREDENTIALS, String> newCredentials = promptForCredentials("", "", scmUrl);
+      provider = new UsernamePasswordCredentialsProvider(newCredentials.get(CREDENTIALS.USERNAME), newCredentials.get(CREDENTIALS.PASSWORD));
+      isAuthorized = checkCredentials(provider);
+    }
+    LOG.info(" * SCM-credentialsprovider is initialized");
+    isInitialized = true;
+
+    return provider;
+  }
+
+  /**
+   *
+   * <h1>Check if credentials are valid</h1>
+   * <p>Checks with a lsremote command if the remote repository is reachable</p>
+   *
+   * @param provider give the new {@link UsernamePasswordCredentialsProvider}
+   * @return isAuthorized
+   */
+  private boolean checkCredentials(CredentialsProvider provider) {
+    boolean isAuthorized = false;
+    try {
+      repository.lsRemote().setCredentialsProvider(provider).call();
+      isAuthorized = true;
+      LOG.info(" * Current credentials are valid");
+    } catch(GitAPIException err) {
+      LOG.error(err.getMessage());
+    }
+
+    return isAuthorized;
+  }
+
+  private Map<CREDENTIALS, String> promptForCredentials(String configScmUserName, String configScmPassword, String scmUrl) {
+    Map<CREDENTIALS, String> credentials = new HashMap<>();
     String scmDefaultUsername = "";
-    if(scmUserName.isEmpty() || scmPassword.isEmpty()) {
-      String messageUsername = "[info]  * Please enter your (SCM) username";
-      String messagePassword = "[info]  * Please enter your (SCM) password";
+    if(configScmUserName.isEmpty() || configScmPassword.isEmpty()) {
+      String messageUsername = "[info]  * Please enter your (SCM) username : ";
+      String messagePassword = "[info]  * Please enter your (SCM) password : ";
       if(scmUrl.contains(URL_GITHUB)) {
         scmDefaultUsername = "token";
-        messageUsername = "[info]  * Please enter your (SCM) token";
-        messagePassword = "[info]  * Please enter your (SCM) secret";
+        messageUsername = "[info]  * Please enter your (SCM) token : ";
+        messagePassword = "[info]  * Please enter your (SCM) secret : ";
       }
       try {
         if(scmDefaultUsername.isEmpty()){
-          scmUserName = console.readLine(messageUsername);
+          credentials.put(CREDENTIALS.USERNAME, console.readLine(messageUsername));
         } else {
-          scmUserName = console.readLine(messageUsername, scmDefaultUsername);
+          credentials.put(CREDENTIALS.USERNAME, console.readLine(messageUsername, scmDefaultUsername));
         }
-        scmPassword = new String(console.readPassword(messagePassword));
+        credentials.put(CREDENTIALS.PASSWORD, new String(console.readPassword(messagePassword)));
       } catch (Exception err) {
         LOG.error(err.getMessage());
       }
+    } else {
+      credentials.put(CREDENTIALS.USERNAME, configScmUserName);
+      credentials.put(CREDENTIALS.PASSWORD, configScmPassword);
     }
-    if (!(scmUserName.isEmpty() || scmPassword.isEmpty())) {
-      provider = new UsernamePasswordCredentialsProvider(scmUserName, scmPassword);
-      LOG.info(" * SCM-credentialsprovider is initialized");
-      isInitialized = true;
-    }
-
-    return provider;
+    return credentials;
   }
 
   /**
