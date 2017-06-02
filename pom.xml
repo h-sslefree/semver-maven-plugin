@@ -19,7 +19,7 @@
     <scm>
         <url>https://github.com/sidohaakma/semver-maven-plugin.git</url>
         <connection>scm:git:https://github.com/sidohaakma/semver-maven-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/sidohaakma/semver-maven-plugin.git</developerConnection>
+        <developerConnection>scm:git:https://git@github.com/sidohaakma/semver-maven-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
