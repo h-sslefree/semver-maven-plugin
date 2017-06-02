@@ -56,10 +56,14 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     try {
       if (!getVersionProvider().isVersionCorrupt(version) && !getRepositoryProvider().isChanged()) {
         rawVersions = determineRawVersions(version);
-        if(!getRepositoryProvider().isRemoteVersionCorrupt(rawVersions.get(VersionProvider.RAW_VERSION.SCM))) {
-          executeRunMode(rawVersions);
+        if(getConfiguration().checkRemoteVersionTags()) {
+          if(!getRepositoryProvider().isRemoteVersionCorrupt(rawVersions.get(VersionProvider.RAW_VERSION.SCM))) {
+            executeRunMode(rawVersions);
+          } else {
+            Runtime.getRuntime().exit(1);
+          }
         } else {
-          Runtime.getRuntime().exit(1);
+          executeRunMode(rawVersions);
         }
       } else {
         Runtime.getRuntime().exit(1);
@@ -67,6 +71,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
+
 
   }
 

@@ -40,23 +40,16 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
       LOG.info("Perform a rollback for version     : [ {} ]", version);
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
       if(FileWriterFactory.canRollBack()) {
-        if(!getRepositoryProvider().isRemoteVersionCorrupt(version)) {
-          FileWriterFactory.rollbackPom();
-          LOG.info(" * Commit old pom.xml");
-          getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
-          LOG.info(" * Push old pom.xml");
-          getRepositoryProvider().push();
-          LOG.info(" * Delete SCM-tag                  : [ {} ]", version);
-          getRepositoryProvider().deleteTag(version);
-          LOG.info(" * Delete remote SCM-tag           : [ {} ]", version);
-          getRepositoryProvider().pushTag();
-          LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-          FileWriterFactory.removeBackupSemverPom();
+        if(getConfiguration().checkRemoteVersionTags()) {
+          if(!getRepositoryProvider().isRemoteVersionCorrupt(version)) {
+            executeRollback(version);
+          } else {
+            LOG.error("");
+            LOG.error("Please check your repository state");
+            Runtime.getRuntime().exit(1);
+          }
         } else {
-          LOG.error("");
-          LOG.error("Remote version is higher then local version in your repository");
-          LOG.error("Please check your repository state");
-          Runtime.getRuntime().exit(1);
+          executeRollback(version);
         }
       }
     } else {
@@ -64,8 +57,21 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
       LOG.error("Ÿou have configured a wrong RUN_MODE ( " + getConfiguration().getRunMode() + " )");
       LOG.error("Ÿou have to use release:rollback to revert the version update");
     }
-
-
   }
+
+  private void executeRollback(String version) {
+    FileWriterFactory.rollbackPom();
+    LOG.info(" * Commit old pom.xml");
+    getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
+    LOG.info(" * Push old pom.xml");
+    getRepositoryProvider().push();
+    LOG.info(" * Delete SCM-tag                  : [ {} ]", version);
+    getRepositoryProvider().deleteTag(version);
+    LOG.info(" * Delete remote SCM-tag           : [ {} ]", version);
+    getRepositoryProvider().pushTag();
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    FileWriterFactory.removeBackupSemverPom();
+  }
+
 
 }

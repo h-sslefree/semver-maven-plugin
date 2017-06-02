@@ -68,6 +68,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private String branchConversionUrl;
   @Parameter(property = "metaData")
   private String metaData;
+  @Parameter(property = "checkRemoteVersionTags", defaultValue = "false")
+  private Boolean checkRemoteVersionTags;
 
   private SemverConfiguration configuration;
 
@@ -165,6 +167,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
         }
       }
       configuration.setMetaData(metaData);
+      configuration.setCheckRemoteVersionTags(checkRemoteVersionTags);
     }
     return configuration;
   }
