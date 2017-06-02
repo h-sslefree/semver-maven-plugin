@@ -55,13 +55,13 @@ public class PomProviderImpl implements PomProvider {
     releasePom.setVersion(scmTag);
     String commitMessage = "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    LOG.info("Commit new release-pom             : " + commitMessage);
+    LOG.info("Commit new release-pom             : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
-    LOG.info("Push new release-pom to remote     : " + commitMessage);
+    LOG.info("Push new release-pom to remote     : {}", commitMessage);
     repositoryProvider.push();
-    LOG.info("Create local scm-tag               : " + scmTag);
+    LOG.info("Create local scm-tag               : [ {} ]", scmTag);
     repositoryProvider.createTag(scmTag);
-    LOG.info("Create remote scm-tag              : " + scmTag);
+    LOG.info("Create remote scm-tag              : [ {} ]", scmTag);
     repositoryProvider.pushTag();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
@@ -82,9 +82,9 @@ public class PomProviderImpl implements PomProvider {
     updateVersion(nextDevelopementPom, developmentVersion);
     String commitMessage = "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    LOG.info("Commit next dev-pom                : " + commitMessage);
+    LOG.info("Commit next dev-pom                : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
-    LOG.info("Push next dev-pom to remote        : " + commitMessage);
+    LOG.info("Push next dev-pom to remote        : {}", commitMessage);
     repositoryProvider.push();
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }

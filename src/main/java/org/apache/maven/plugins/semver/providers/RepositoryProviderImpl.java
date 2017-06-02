@@ -3,6 +3,7 @@ package org.apache.maven.plugins.semver.providers;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.exceptions.SemverExceptionMessages;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -152,7 +153,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -174,7 +175,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return isRemoteDifferent;
@@ -194,7 +195,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     } catch (IOException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return currentBranch;
@@ -208,13 +209,13 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    */
   @Override
   public List<Ref> getLocalTags() {
-    List<Ref> tags = new ArrayList<Ref>();
+    List<Ref> tags = new ArrayList<>();
     try {
       tags = repository.tagList().call();
     } catch (GitAPIException err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return tags;
@@ -234,7 +235,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     } catch (Exception err) {
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return tags;
@@ -257,8 +258,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       isTagCreated = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
       Runtime.getRuntime().exit(1);
     }
     return isTagCreated;
@@ -280,8 +281,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       isSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -303,8 +304,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       isCommitSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
       Runtime.getRuntime().exit(1);
     }
 
@@ -326,8 +327,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       isPushSuccess = false;
       LOG.error(err.getMessage());
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
       Runtime.getRuntime().exit(1);
     }
     return isPushSuccess;
@@ -349,8 +350,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       LOG.error(err.getMessage());
       LOG.error("");
       LOG.error("");
-      LOG.error("Please check your SCM-credentials to fix this issue");
-      LOG.error("Please run semver:rollback to return to initial state");
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -415,7 +416,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    */
   @Override
   public void isLocalVersionCorrupt(String scmVersion) throws SemverException, IOException, GitAPIException {
-    LOG.info("Check for corrupt local tags       : [ " + scmVersion + " ]");
+    LOG.info("Check for corrupt local tags       : [ {} ]", scmVersion);
     pull();
     List<Ref> refs = getLocalTags();
     LOG.debug("Local tags                        ");
@@ -427,9 +428,10 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       for (Ref ref : refs) {
         if (ref.getName().contains(scmVersion)) {
           found = true;
-          LOG.warn(" * Delete corrupt local-tag                   : " + ref.getName().substring(10));
+          String tag = ref.getName().substring(10);
+          LOG.warn(" * Delete corrupt local-tag                   : [ {} ]", tag);
           deleteTag(ref.getName());
-          LOG.warn(" * Delete possible corrupt remote-tag         : " + ref.getName().substring(10));
+          LOG.warn(" * Delete possible corrupt remote-tag         : [ {} ]", tag);
           pushTag();
         }
       }
@@ -453,7 +455,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   @Override
   public boolean isRemoteVersionCorrupt(String scmVersion) {
     boolean isRemoteVersionCorrupt  = false;
-    LOG.info("Check for corrupt remote tags      : [ " + scmVersion + " ]");
+    LOG.info("Check for corrupt remote tags      : [ {} ]", scmVersion);
     DefaultArtifactVersion localVersion;
     if(scmVersion.contains("-SNAPSHOT")) {
       localVersion = new DefaultArtifactVersion(scmVersion.replaceFirst("-SNAPSHOT", ""));
@@ -463,14 +465,14 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     Map<String, Ref> remoteTags = getRemoteTags();
     for(Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
       DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
-      LOG.debug(" * Compare remote-tag [ " + remoteVersion + " ] with local-tag [ " + localVersion + " ]");
+      LOG.debug(" * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
       if(remoteVersion.compareTo(localVersion) > 0) {
-        LOG.error(" * Local version is corrupt       : [ local: " + localVersion + " ] [ remote: " + remoteVersion + " ] ");
+        LOG.error(" * Local version is corrupt       : [ local: {} ] [ remote: {} ]", remoteVersion, localVersion);
         isRemoteVersionCorrupt = true;
       }
     }
     if(!isRemoteVersionCorrupt) {
-      LOG.info(" * Remote is not ahead of local   : [ "+ scmVersion +" ]");
+      LOG.info(" * Remote is not ahead of local    : [ {} ]", scmVersion);
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isRemoteVersionCorrupt;

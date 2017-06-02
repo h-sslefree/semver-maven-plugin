@@ -29,33 +29,33 @@ public class VersionProviderImpl implements VersionProvider {
   }
 
   /**
-   * <p>Determine release versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
+   * <p>Determine release versions from {@link RAW_VERSION}.</p>
    *
-   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION} enumeration is used to define the map
    * @return finalVersions
    */
   @Override
-  public Map<FINAL_VERSION, String> determineReleaseVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
+  public Map<FINAL_VERSION, String> determineReleaseVersions(Map<RAW_VERSION, String> rawVersions) {
     Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
-    finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
-    finalVersions.put(FINAL_VERSION.RELEASE, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
-    finalVersions.put(FINAL_VERSION.SCM, rawVersions.get(SemverMavenPlugin.RAW_VERSION.RELEASE));
+    finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(RAW_VERSION.DEVELOPMENT));
+    finalVersions.put(FINAL_VERSION.RELEASE, rawVersions.get(RAW_VERSION.RELEASE));
+    finalVersions.put(FINAL_VERSION.SCM, rawVersions.get(RAW_VERSION.RELEASE));
     return finalVersions;
   }
 
   /**
-   * <p>Determine release-versions from {@link SemverMavenPlugin.RAW_VERSION}.</p>
+   * <p>Determine release-versions from {@link VersionProvider.RAW_VERSION}.</p>
    * <p>This version contains also the buildmeta-data and branch information.</p>
    *
-   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.SemverMavenPlugin.RAW_VERSION} enumeration is used to define the map
+   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION} enumeration is used to define the map
    * @return finalVersions
    */
   @Override
-  public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion) {
+  public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<VersionProvider.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion) {
 
-    int patch = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.PATCH));
-    int minor = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.MINOR));
-    int major = Integer.parseInt(rawVersions.get(SemverMavenPlugin.RAW_VERSION.MAJOR));
+    int patch = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.PATCH));
+    int minor = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.MINOR));
+    int major = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.MAJOR));
 
     String releaseTag = determineReleaseTag(runMode, patch, minor, major);
     String buildMetaData = determineBuildMetaData(runMode, metaData, patch, minor, major);
@@ -69,16 +69,17 @@ public class VersionProviderImpl implements VersionProvider {
 
     StringBuilder scmVersion = new StringBuilder();
     scmVersion.append(releaseVersion);
+    scmVersion.append(buildMetaData);
 
     if (LOG != null) {
-      LOG.info("New DEVELOPMENT-version            : " + rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
-      LOG.info("New BRANCH GIT build metadata      : " + buildMetaData);
-      LOG.info("New BRANCH GIT-version             : " + scmVersion);
-      LOG.info("New BRANCH RELEASE-version         : " + releaseVersion);
+      LOG.info("New DEVELOPMENT-version            : [ {} ]", rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
+      LOG.info("New BRANCH GIT build metadata      : [ {} ]", buildMetaData);
+      LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
+      LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     }
     Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
-    finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(SemverMavenPlugin.RAW_VERSION.DEVELOPMENT));
+    finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
     finalVersions.put(FINAL_VERSION.BUILD_METADATA, buildMetaData);
     finalVersions.put(FINAL_VERSION.SCM, scmVersion.toString());
     finalVersions.put(FINAL_VERSION.RELEASE, releaseVersion.toString());
@@ -195,7 +196,7 @@ public class VersionProviderImpl implements VersionProvider {
       LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string");
       LOG.error("");
     } else {
-      LOG.info("Pom-version is correct             : " + pomVersion);
+      LOG.info("Pom-version is correct             : [ {} ]", pomVersion);
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isVersionCorrupt;

@@ -49,7 +49,7 @@ public class BranchProviderImpl implements BranchProvider {
                 if(repositoryProvider != null && repositoryProvider.isInitialized()) {
                     branch = repositoryProvider.getCurrentBranch();
                 }
-                LOG.info("Current branch                    : " + branch);
+                LOG.info("Current branch                    : ", branch);
                 if (branch != null && !branch.isEmpty()) {
                     if (branch.matches("\\d+.\\d+.\\d+.*")) {
                         LOG.info("Current branch matches            : \\d+.\\d+.\\d+.*");
@@ -104,18 +104,18 @@ public class BranchProviderImpl implements BranchProvider {
      */
     private String determineVersionFromMasterBranch(String branch, String branchConversionUrl) {
         String branchVersion = "";
-        LOG.info("Setup connection to            : " + branchConversionUrl + branch);
+        LOG.info("Setup connection to            : {}{}", branchConversionUrl, branch);
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         CloseableHttpResponse response = null;
         try {
             HttpGet httpGet = new HttpGet(branchConversionUrl + branch);
             httpGet.addHeader("Content-Type", "application/json");
             response = httpClient.execute(httpGet);
-            LOG.info("branch-conversion-service returned response-code: " + response.getStatusLine());
+            LOG.info("Branch-Conversion-Service returned response-code: " + response.getStatusLine());
             HttpEntity entity = response.getEntity();
             branchVersion = EntityUtils.toString(entity);
             if (branchVersion != null) {
-                LOG.info("branch-conversion-service returned branchversion: " + branchVersion);
+                LOG.info("Branch-Conversion-Service returned branch-version: [ {} ]", branchVersion);
             } else {
                 LOG.error("No branch version could be determined");
             }
