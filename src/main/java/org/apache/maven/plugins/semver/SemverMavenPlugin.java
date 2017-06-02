@@ -130,7 +130,8 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    *
    * @param rawVersions rawVersions are the versions determined by the goal
    */
-  protected void executeRunMode(Map<RAW_VERSION, String> rawVersions) {
+  protected void executeRunMode(Map<VersionProvider.RAW_VERSION, String> rawVersions) {
+    //TODO:SH introduce remote checking again
 //    if(!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(RAW_VERSION.SCM))) {
       if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE) {
         runModeRelease.execute(getConfiguration(), rawVersions);
@@ -176,22 +177,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
     return configuration;
   }
-
-  /**
-   * <p>Version-type is mentoined here.</p>
-   *
-   * @author sido
-   */
-  public enum RAW_VERSION {
-    DEVELOPMENT,
-    RELEASE,
-    SCM,
-    MAJOR,
-    MINOR,
-    PATCH
-  }
-
-
 
 
 }
