@@ -27,7 +27,7 @@ public class RunModeNative implements RunMode {
     private VersionProvider versionProvider;
 
     @Override
-    public void execute(SemverConfiguration configuration, Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
+    public void execute(SemverConfiguration configuration, Map<VersionProvider.RAW_VERSION, String> rawVersions) {
         FileWriterFactory.backupSemverPom();
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         pomProvider.createReleasePom(finalVersions);

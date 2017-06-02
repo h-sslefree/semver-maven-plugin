@@ -26,7 +26,7 @@ public class RunModeRelease implements RunMode {
     private MavenProject project;
 
     @Override
-    public void execute(SemverConfiguration configuration, Map<SemverMavenPlugin.RAW_VERSION, String> rawVersions) {
+    public void execute(SemverConfiguration configuration, Map<VersionProvider.RAW_VERSION, String> rawVersions) {
         Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
         FileWriterFactory.createReleaseProperties(project, finalVersions);
     }
