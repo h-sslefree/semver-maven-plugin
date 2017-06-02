@@ -28,7 +28,7 @@ import java.util.Map;
  * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
  * <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
  * </ul>
- *  <ul>Add a tag to the GIT-version
+ * <ul>Add a tag to the GIT-version
  * <li>tag = 1</li>
  * </ul>
  * <ul>Add the branchVersion to the GIT-tag
@@ -131,24 +131,15 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
    * @param rawVersions rawVersions are the versions determined by the goal
    */
   protected void executeRunMode(Map<VersionProvider.RAW_VERSION, String> rawVersions) {
-    //TODO:SH introduce remote checking again
-//    if(!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(RAW_VERSION.SCM))) {
-      if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE) {
-        runModeRelease.execute(getConfiguration(), rawVersions);
-      } else if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
-        runModeReleaseBranch.execute(getConfiguration(), rawVersions);
-      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE) {
-        runModeNative.execute(getConfiguration(), rawVersions);
-      } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
-        runModeNativeBranch.execute(getConfiguration(), rawVersions);
-      }
-//    }
-//    else {
-//      LOG.error("");
-//      LOG.error("Remote version is higher then local version in your repository");
-//      LOG.error("Please check your repository state");
-//      Runtime.getRuntime().exit(1);
-//    }
+    if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE) {
+      runModeRelease.execute(getConfiguration(), rawVersions);
+    } else if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
+      runModeReleaseBranch.execute(getConfiguration(), rawVersions);
+    } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE) {
+      runModeNative.execute(getConfiguration(), rawVersions);
+    } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
+      runModeNativeBranch.execute(getConfiguration(), rawVersions);
+    }
   }
 
   protected VersionProvider getVersionProvider() {
@@ -166,7 +157,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setScmPassword(scmPassword);
       configuration.setRunMode(runMode);
       configuration.setBranchConversionUrl(branchConversionUrl);
-      if(runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM || runMode == RunMode.RUNMODE.RELEASE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
+      if (runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM || runMode == RunMode.RUNMODE.RELEASE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
         if (branchProvider != null) {
           configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
         } else {
