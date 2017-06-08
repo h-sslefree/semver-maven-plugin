@@ -4,13 +4,12 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
 
 /**
- * <p>Semver Configuration is used to merge 3 types of configuration:
+ * <p>Semver Configuration is used to merge 3 types of configuration:</p>
  * <ul>
- * <li>MAVEN-plugin configuration</li>
- * <li>CLI configuration</li>
- * <li>Default configuration</li>
+ * <li>MAVEN-plugin configuration (determined in the xml-configuration)</li>
+ * <li>CLI configuration (give in parameters, for example <i>-Dusername=#name#</i>)</li>
+ * <li>Default configuration (determined by the plugin)</li>
  * </ul>
- * </p>
  *
  * @author sido
  */
@@ -118,9 +117,10 @@ public class SemverConfiguration {
    * <ul>Possible runModes are:
    * <li>When {@link RunMode.RUNMODE} = RELEASE then determine version from POM-version</li>
    * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
-   * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_HOSEE then determine version from POM-version (without maven-release-plugin)</li>
+   * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_RPM then determine version from POM-version (without maven-release-plugin)</li>
    * <li>When {@link RunMode.RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
    * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+   * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH_RPM then determine version from POM-version (without maven-release-plugin)</li>
    * <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
    * </ul>
    *
@@ -183,11 +183,7 @@ public class SemverConfiguration {
   }
 
   /**
-   * <p>
-   * THe branchConversionUrl is used to determine which version contains <br>
-   * is the master-branch. THis is necessary to determine the next version of the <br>
-   * <b>master</b>-brnach.
-   * </p>
+   * <p>THe branchConversionUrl is used to determine which version contains is the master-branch. This is necessary to determine the next version of the <b>master</b>-branch</p>.
    *
    * @return branchConversionUrl
    */
@@ -201,13 +197,11 @@ public class SemverConfiguration {
   }
 
   /**
-   * <p>Version metaData is used to describe the version that is tagged.</p>
-   * <p>
-   * For example:<br>
-   * RPM-version: 6.4.0-002001003+2.1.5<br>
-   * THe +2.1.3 is the metaData from the version<br>
-   * It is parsed from 002001003.
-   * </p>
+   * <p>Version-metaData is used to describe the version that is tagged.</p>
+   * <p>For example:</p>
+   * <p>RPM-version: 6.4.0-002001003+2.1.5</p>
+   * <p>The +2.1.3 is the metaData from the version</p>
+   * <p>It is parsed from 002001003.</p>
    *
    * @return metaData
    */
@@ -222,6 +216,10 @@ public class SemverConfiguration {
 
   /**
    *
+   * <h1>Check remote version-tags</h1>
+   *
+   * <p></p>
+   *
    * @param checkRemoteVersionTags
    */
   public void setCheckRemoteVersionTags(Boolean checkRemoteVersionTags) {
@@ -231,9 +229,9 @@ public class SemverConfiguration {
 
   /**
    *
-   * <h1></h1>
+   * <h1>Check remote version-tags</h1>
    *
-   * <p></p>
+   * <p>Flag to determine if remote versions have to be tagged.</p>
    *
    * @return
    */
