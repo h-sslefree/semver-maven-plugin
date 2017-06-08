@@ -103,3 +103,41 @@ To build the semver-maven-plugin, execute the following command:
 `mvn clean package`
 
 This way you can use a SNAPSHOT-version to test in your applications.
+
+## Deploy
+
+First you have t create a new key with **gpg**. If you do not have gpg installed on your system you have to install it.
+For Ubuntu do following command will install **gpg**
+
+`sudo apt-get install gpg`
+
+Secondly you have to generate a new key. The following command will generate a new key.
+
+`gpg --gen-key`
+
+The MAVEN-settings are as followed. You have to add the content below to your **settings.xml**. The paraphrase has to match the phrase you entered when you generated your key with **gpg --gen-key**.
+
+```
+<profile>
+    <id>sign</id>
+    activation>
+        <activeByDefault>true</activeByDefault>
+    </activation>
+    <properties>
+        <gpg.passphrase>password</gpg.passphrase>
+    </properties> 
+</profile>
+```
+
+Then you can deploy the artifact with MAVEN. Execute the following command.
+
+`mvn clean deploy`
+
+See: [Upload to Maven-Central](https://blog.idrsolutions.com/2015/06/how-to-upload-your-java-artifact-to-maven-central/)
+
+
+
+
+
+
+
