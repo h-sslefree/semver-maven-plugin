@@ -82,14 +82,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Component
   private BranchProvider branchProvider;
 
-  @Component(role = RunModeNative.class)
-  private RunMode runModeNative;
-  @Component(role = RunModeNativeBranch.class)
-  private RunMode runModeNativeBranch;
-  @Component(role = RunModeRelease.class)
-  private RunMode runModeRelease;
-  @Component(role = RunModeReleaseBranch.class)
-  private RunMode runModeReleaseBranch;
+  protected RunMode runModeImpl;
 
   /**
    * <p>Override runMode through configuration properties</p>
@@ -127,23 +120,6 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     this.metaData = metaData;
   }
 
-  /**
-   * <p>Executes the configured runMode for each goal.</p>
-   *
-   * @param rawVersions rawVersions are the versions determined by the goal
-   */
-  protected void executeRunMode(Map<VersionProvider.RAW_VERSION, String> rawVersions) {
-    if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE) {
-      runModeRelease.execute(getConfiguration(), rawVersions);
-    } else if (configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
-      runModeReleaseBranch.execute(getConfiguration(), rawVersions);
-    } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE) {
-      runModeNative.execute(getConfiguration(), rawVersions);
-    } else if (configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH || configuration.getRunMode() == RunMode.RUNMODE.NATIVE_BRANCH_RPM) {
-      runModeNativeBranch.execute(getConfiguration(), rawVersions);
-    }
-  }
-
   protected VersionProvider getVersionProvider() {
     return this.versionProvider;
   }
@@ -159,18 +135,53 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setScmPassword(scmPassword);
       configuration.setRunMode(runMode);
       configuration.setBranchConversionUrl(branchConversionUrl);
-      if (runMode == RunMode.RUNMODE.NATIVE_BRANCH || runMode == RunMode.RUNMODE.NATIVE_BRANCH_RPM || runMode == RunMode.RUNMODE.RELEASE_BRANCH || runMode == RunMode.RUNMODE.RELEASE_BRANCH_RPM) {
-        if (branchProvider != null) {
-          configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
-        } else {
-          configuration.setBranchVersion(branchVersion);
-        }
-      }
       configuration.setMetaData(metaData);
       configuration.setCheckRemoteVersionTags(checkRemoteVersionTags);
+      initializeRunMode(runMode);
     }
     return configuration;
   }
 
+  /**
+   *
+   * @param runMode
+   */
+  private void initializeRunMode(RunMode.RUNMODE runMode) {
+    switch(runMode) {
+      case NATIVE:
+        this.runModeImpl = new RunModeNative();
+        break;
+      case NATIVE_BRANCH:
+        this.runModeImpl = new RunModeNativeBranch();
+        initializeBranchVersion();
+        break;
+      case NATIVE_BRANCH_RPM:
+        this.runModeImpl = new RunModeNativeBranch();
+        initializeBranchVersion();
+        break;
+      case RELEASE:
+        this.runModeImpl = new RunModeRelease();
+        break;
+      case RELEASE_BRANCH:
+        this.runModeImpl = new RunModeReleaseBranch();
+        initializeBranchVersion();
+        break;
+      case RELEASE_BRANCH_RPM:
+        this.runModeImpl = new RunModeReleaseBranch();
+        initializeBranchVersion();
+        break;
+      default:
+        this.runModeImpl = new RunModeNative();
+        break;
+    }
+  }
+
+  private void initializeBranchVersion() {
+    if (branchProvider != null) {
+      configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
+    } else {
+      configuration.setBranchVersion(branchVersion);
+    }
+  }
 
 }

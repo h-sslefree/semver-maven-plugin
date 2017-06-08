@@ -2,6 +2,7 @@ package org.apache.maven.plugins.semver.runmodes;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
+import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 
 import java.util.Map;
@@ -56,8 +57,11 @@ public interface RunMode {
 
   /**
    *
+   *
+   *
+   * @param goal
    * @param configuration
-   * @param rawVersions
+   * @param pomVersion
    */
-  void execute(SemverConfiguration configuration, Map<VersionProvider.RAW_VERSION, String> rawVersions);
+  void execute(SemverGoal.SEMVER_GOAL goal, SemverConfiguration configuration, String pomVersion);
 }

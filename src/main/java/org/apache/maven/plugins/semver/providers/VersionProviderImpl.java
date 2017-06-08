@@ -1,13 +1,17 @@
 package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +30,84 @@ public class VersionProviderImpl implements VersionProvider {
    */
   @Inject
   public VersionProviderImpl() {
+  }
+
+  /**
+   * <p>Determine raw version list from POM-version.</p>
+   *
+   * @param pomVersion example: 0.x.x-SNAPSHOT
+   * @return list of development, git and release-version
+   * @throws SemverException native exception
+   * @throws IOException write to disk exception
+   * @throws GitAPIException repository exception
+   */
+  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoal.SEMVER_GOAL goal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String pomVersion) throws SemverException, IOException, GitAPIException {
+
+    Map<VersionProvider.RAW_VERSION, String> versions = new HashMap<>();
+
+    int majorVersion;
+    int minorVersion;
+    int patchVersion;
+
+    String[] rawVersion = pomVersion.split("\\.");
+    if (rawVersion.length > 0 && rawVersion.length == 3) {
+      LOG.debug("Set version-variables from POM.xml");
+      LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+      majorVersion = Integer.valueOf(rawVersion[0]);
+      minorVersion = Integer.valueOf(rawVersion[1]);
+      patchVersion = Integer.valueOf(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
+    } else {
+      LOG.error("Unrecognized version-pattern");
+      LOG.error("Semver plugin is terminating");
+      throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parseble version-pattern");
+    }
+
+    LOG.debug("MAJOR-version                     : [ {} ]", majorVersion);
+    LOG.debug("MINOR-version                     : [ {} ]", minorVersion);
+    LOG.debug("PATCH-version                     : [ {} ]", patchVersion);
+    LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+
+    if(goal == SemverGoal.SEMVER_GOAL.MAJOR) {
+      majorVersion = majorVersion + 1;
+      minorVersion = 0;
+      patchVersion = 0;
+    } else if(goal == SemverGoal.SEMVER_GOAL.MINOR) {
+      minorVersion = minorVersion + 1;
+      patchVersion = 0;
+    } else if(goal == SemverGoal.SEMVER_GOAL.PATCH) {
+      patchVersion = patchVersion + 1;
+    }
+
+    String developmentVersion = majorVersion + "." + minorVersion + "." + patchVersion + "-SNAPSHOT";
+
+
+    //TODO:SH move this part to a RunModeNative and RunModeNativeRpm implementation
+    String releaseVersion;
+    String scmVersion;
+    if(runMode.equals(RunMode.RUNMODE.NATIVE_BRANCH) || runMode.equals(RunMode.RUNMODE.NATIVE_BRANCH_RPM)) {
+      scmVersion = determineReleaseBranchTag(runMode, configBranchVersion, patchVersion, minorVersion, majorVersion);
+      releaseVersion = scmVersion;
+    } else {
+      scmVersion = determineReleaseTag(runMode, patchVersion, minorVersion, majorVersion);
+      releaseVersion = majorVersion + "." + minorVersion + "." + patchVersion;
+    }
+
+    String metaData = determineBuildMetaData(runMode, configMetaData, patchVersion, minorVersion, majorVersion);
+
+    LOG.info("New DEVELOPMENT-version            : [ {} ]", developmentVersion);
+    LOG.info("New GIT-version                    : [ {}{} ]", scmVersion, metaData);
+    LOG.info("New RELEASE-version                : [ {} ]", releaseVersion);
+    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+
+    versions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, developmentVersion);
+    versions.put(VersionProvider.RAW_VERSION.RELEASE, releaseVersion);
+    versions.put(VersionProvider.RAW_VERSION.SCM, scmVersion+metaData);
+    versions.put(VersionProvider.RAW_VERSION.MAJOR, String.valueOf(majorVersion));
+    versions.put(VersionProvider.RAW_VERSION.MINOR, String.valueOf(minorVersion));
+    versions.put(VersionProvider.RAW_VERSION.PATCH, String.valueOf(patchVersion));
+
+    repositoryProvider.isLocalVersionCorrupt(scmVersion);
+    return versions;
   }
 
   /**

@@ -2,8 +2,11 @@ package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -13,6 +16,8 @@ import java.util.Map;
  * @author sido
  */
 public interface VersionProvider {
+
+  Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoal.SEMVER_GOAL goal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String version) throws SemverException, IOException, GitAPIException;
 
   Map<VersionProviderImpl.FINAL_VERSION, String> determineReleaseVersions(Map<RAW_VERSION, String> rawVersions);
 
