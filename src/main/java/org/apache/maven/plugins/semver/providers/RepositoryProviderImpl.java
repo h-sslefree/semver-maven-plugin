@@ -4,6 +4,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.exceptions.SemverExceptionMessages;
+import org.apache.maven.plugins.semver.utils.SemverConsole;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.Git;
@@ -44,8 +45,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 
   @Requirement
   private Logger LOG;
-
-  private Console console = System.console();
 
   private boolean isInitialized = false;
 
@@ -161,11 +160,11 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       }
       try {
         if(scmDefaultUsername.isEmpty()){
-          credentials.put(CREDENTIALS.USERNAME, console.readLine(messageUsername));
+          credentials.put(CREDENTIALS.USERNAME, SemverConsole.readLine(messageUsername));
         } else {
-          credentials.put(CREDENTIALS.USERNAME, console.readLine(messageUsername, scmDefaultUsername));
+          credentials.put(CREDENTIALS.USERNAME, SemverConsole.readLine(messageUsername, scmDefaultUsername));
         }
-        credentials.put(CREDENTIALS.PASSWORD, new String(console.readPassword(messagePassword)));
+        credentials.put(CREDENTIALS.PASSWORD, SemverConsole.readPassword(messagePassword));
       } catch (Exception err) {
         LOG.error(err.getMessage());
       }

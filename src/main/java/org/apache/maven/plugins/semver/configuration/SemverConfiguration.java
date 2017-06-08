@@ -230,6 +230,11 @@ public class SemverConfiguration {
   }
 
   /**
+   *
+   * <h1></h1>
+   *
+   * <p></p>
+   *
    * @return
    */
   public boolean checkRemoteVersionTags() {

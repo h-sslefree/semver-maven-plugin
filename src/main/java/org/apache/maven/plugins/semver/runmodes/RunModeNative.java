@@ -1,9 +1,8 @@
 package org.apache.maven.plugins.semver.runmodes;
 
-import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
-import org.apache.maven.plugins.semver.goals.SemverGoal;
+import org.apache.maven.plugins.semver.goals.SemverGoals;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
@@ -35,18 +34,15 @@ public class RunModeNative implements RunMode {
     private RepositoryProvider repositoryProvider;
 
     @Override
-    public void execute(SemverGoal.SEMVER_GOAL goal, SemverConfiguration configuration, String pomVersion) {
-        FileWriterFactory.backupSemverPom();
+    public void execute(SemverGoals.SEMVER_GOAL semverGoal, SemverConfiguration configuration, String pomVersion) {
         try {
-            Map<VersionProvider.RAW_VERSION, String> rawVersions = versionProvider.determineRawVersions(goal, configuration.getRunMode(), configuration.getBranchVersion(), configuration.getMetaData(), pomVersion);
-            if (!repositoryProvider.isRemoteVersionCorrupt(rawVersions.get(VersionProvider.RAW_VERSION.SCM))) {
-                Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
-                pomProvider.createReleasePom(finalVersions);
-                pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
-                FileWriterFactory.removeBackupSemverPom();
-            } else {
-                Runtime.getRuntime().exit(1);
-            }
+            Map<VersionProvider.RAW_VERSION, String> rawVersions = versionProvider.determineRawVersions(semverGoal, configuration.getRunMode(), configuration.getBranchVersion(), configuration.getMetaData(), pomVersion);
+            RunMode.checkRemoteVersionTags(repositoryProvider, configuration, rawVersions.get(VersionProvider.RAW_VERSION.SCM));
+            FileWriterFactory.backupSemverPom();
+            Map<VersionProvider.FINAL_VERSION, String> finalVersions = versionProvider.determineReleaseVersions(rawVersions);
+            pomProvider.createReleasePom(finalVersions);
+            pomProvider.createNextDevelopmentPom(finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
+            FileWriterFactory.removeBackupSemverPom();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }

@@ -84,6 +84,17 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   protected RunMode runModeImpl;
 
+  @Component(role = RunModeNative.class)
+  private RunMode runModeNative;
+  @Component(role = RunModeNativeBranch.class)
+  private RunMode runModeNativeBranch;
+  @Component(role = RunModeRelease.class)
+  private RunMode runModeRelease;
+  @Component(role = RunModeReleaseBranch.class)
+  private RunMode runModeReleaseBranch;
+
+
+
   /**
    * <p>Override runMode through configuration properties</p>
    *
@@ -149,29 +160,36 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private void initializeRunMode(RunMode.RUNMODE runMode) {
     switch(runMode) {
       case NATIVE:
-        this.runModeImpl = new RunModeNative();
+        LOG.info("Initialize NATIVE-runmode implementation");
+        this.runModeImpl = runModeNative;
         break;
       case NATIVE_BRANCH:
-        this.runModeImpl = new RunModeNativeBranch();
+        LOG.info("Initialize NATIVE_BRANCH-runmode implementation");
+        this.runModeImpl = runModeNativeBranch;
         initializeBranchVersion();
         break;
       case NATIVE_BRANCH_RPM:
-        this.runModeImpl = new RunModeNativeBranch();
+        LOG.info("Initialize NATIVE_BRANCH_RPM-runmode implementation");
+        this.runModeImpl = runModeNativeBranch;
         initializeBranchVersion();
         break;
       case RELEASE:
-        this.runModeImpl = new RunModeRelease();
+        LOG.info("Initialize RELEASE-runmode implementation");
+        this.runModeImpl = runModeRelease;
         break;
       case RELEASE_BRANCH:
-        this.runModeImpl = new RunModeReleaseBranch();
+        LOG.info("Initialize RELEASE_BRANCH-runmode implementation");
+        this.runModeImpl = runModeReleaseBranch;
         initializeBranchVersion();
         break;
       case RELEASE_BRANCH_RPM:
-        this.runModeImpl = new RunModeReleaseBranch();
+        LOG.info("Initialize RELEASE_BRANCH_RPM-runmode implementation");
+        this.runModeImpl = runModeReleaseBranch;
         initializeBranchVersion();
         break;
       default:
-        this.runModeImpl = new RunModeNative();
+        LOG.info("Initialize DEFAULT-runmode implementation");
+        this.runModeImpl = runModeNative;
         break;
     }
   }

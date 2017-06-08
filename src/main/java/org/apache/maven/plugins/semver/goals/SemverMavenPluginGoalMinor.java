@@ -6,15 +6,8 @@ import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.providers.VersionProvider;
-import org.apache.maven.plugins.semver.runmodes.RunMode;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -45,7 +38,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
     LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info("Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MINOR.getDescription());
+    LOG.info("Semver-goal                        : {}", SemverGoals.SEMVER_GOAL.MINOR.getDescription());
     LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
     LOG.info("Version from POM                   : [ {} ]", pomVersion);
     LOG.info("SCM-connection                     : {}", scmConnection);
@@ -54,11 +47,7 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
 
     try {
       if (!getVersionProvider().isVersionCorrupt(pomVersion) && !getRepositoryProvider().isChanged()) {
-        if (getConfiguration().checkRemoteVersionTags()) {
-          runModeImpl.execute(SemverGoal.SEMVER_GOAL.MINOR, getConfiguration(), pomVersion);
-        } else {
-          Runtime.getRuntime().exit(1);
-        }
+        runModeImpl.execute(SemverGoals.SEMVER_GOAL.MINOR, getConfiguration(), pomVersion);
       } else {
         Runtime.getRuntime().exit(1);
       }

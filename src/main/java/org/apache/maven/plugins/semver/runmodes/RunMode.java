@@ -1,14 +1,11 @@
 package org.apache.maven.plugins.semver.runmodes;
 
-import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.goals.SemverGoal;
+import org.apache.maven.plugins.semver.goals.SemverGoals;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 
-import java.util.Map;
-
 /**
- *
  * <h1></h1>
  *
  * @author sido
@@ -55,13 +52,18 @@ public interface RunMode {
         }
     }
 
-  /**
-   *
-   *
-   *
-   * @param goal
-   * @param configuration
-   * @param pomVersion
-   */
-  void execute(SemverGoal.SEMVER_GOAL goal, SemverConfiguration configuration, String pomVersion);
+    static void checkRemoteVersionTags(RepositoryProvider provider, SemverConfiguration configuration, String scmTag) {
+        if (configuration.checkRemoteVersionTags()) {
+            if (provider.isRemoteVersionCorrupt(scmTag)) {
+                Runtime.getRuntime().exit(1);
+            }
+        }
+    }
+
+    /**
+     * @param semverGoal
+     * @param configuration
+     * @param pomVersion
+     */
+    void execute(SemverGoals.SEMVER_GOAL semverGoal, SemverConfiguration configuration, String pomVersion);
 }

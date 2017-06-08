@@ -1,9 +1,8 @@
 package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.goals.SemverGoal;
+import org.apache.maven.plugins.semver.goals.SemverGoals;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -41,7 +40,7 @@ public class VersionProviderImpl implements VersionProvider {
    * @throws IOException write to disk exception
    * @throws GitAPIException repository exception
    */
-  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoal.SEMVER_GOAL goal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String pomVersion) throws SemverException, IOException, GitAPIException {
+  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoals.SEMVER_GOAL semverGoal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String pomVersion) throws SemverException, IOException, GitAPIException {
 
     Map<VersionProvider.RAW_VERSION, String> versions = new HashMap<>();
 
@@ -67,14 +66,14 @@ public class VersionProviderImpl implements VersionProvider {
     LOG.debug("PATCH-version                     : [ {} ]", patchVersion);
     LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
 
-    if(goal == SemverGoal.SEMVER_GOAL.MAJOR) {
+    if(semverGoal == SemverGoals.SEMVER_GOAL.MAJOR) {
       majorVersion = majorVersion + 1;
       minorVersion = 0;
       patchVersion = 0;
-    } else if(goal == SemverGoal.SEMVER_GOAL.MINOR) {
+    } else if(semverGoal == SemverGoals.SEMVER_GOAL.MINOR) {
       minorVersion = minorVersion + 1;
       patchVersion = 0;
-    } else if(goal == SemverGoal.SEMVER_GOAL.PATCH) {
+    } else if(semverGoal == SemverGoals.SEMVER_GOAL.PATCH) {
       patchVersion = patchVersion + 1;
     }
 

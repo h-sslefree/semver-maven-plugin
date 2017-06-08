@@ -2,12 +2,12 @@ package org.apache.maven.plugins.semver.goals;
 
 /**
  *
- * <h1>SemverGaol</h1>
+ * <h1>SemverGoals</h1>
  *
  *
  * @author sido
  */
-public class SemverGoal {
+public class SemverGoals {
 
     public enum SEMVER_GOAL {
         MAJOR("MAJOR"),
@@ -17,7 +17,7 @@ public class SemverGoal {
 
         private String description = "";
 
-        private SEMVER_GOAL(String description) {
+        SEMVER_GOAL(String description) {
             this.description = description;
         }
 
@@ -26,7 +26,7 @@ public class SemverGoal {
         }
     }
 
-    private SemverGoal() {}
+    private SemverGoals() {}
 
 
 }
