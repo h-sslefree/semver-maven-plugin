@@ -37,7 +37,7 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
 
     LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info("Semver-goal                        : {}", SemverGoals.SEMVER_GOAL.MAJOR.getDescription());
+    LOG.info("Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MAJOR.getDescription());
     LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
     LOG.info("Version from POM                   : [ {} ]", pomVersion);
     LOG.info("SCM-connection                     : {}", scmConnection);
@@ -45,19 +45,11 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
     LOG.info(FUNCTION_LINE_BREAK);
 
     try {
-      if (!getVersionProvider().isVersionCorrupt(pomVersion) && !getRepositoryProvider().isChanged()) {
-        runModeImpl.execute(SemverGoals.SEMVER_GOAL.MAJOR, getConfiguration(), pomVersion);
-      } else {
-        Runtime.getRuntime().exit(1);
-      }
+      runModeImpl.execute(SemverGoal.SEMVER_GOAL.MAJOR, getConfiguration(), pomVersion);
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
 
-
   }
-
-
-
 
 }
