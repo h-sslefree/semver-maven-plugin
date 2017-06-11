@@ -31,12 +31,6 @@ public class BranchProviderImpl implements BranchProvider {
   public BranchProviderImpl() {
   }
 
-  /**
-   * <p>Determine branchVersion from GIT-branch</p>
-   *
-   * @param branchVersion branch version for the GIT-tag
-   * @return branchVersion
-   */
   @Override
   public String determineBranchVersionFromGitBranch(String branchVersion, String branchConversionUrl) {
     String value = null;

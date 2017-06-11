@@ -55,7 +55,7 @@ public class SemverConfiguration {
       userScmPassword = session.getUserProperties().getProperty("password");
       userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
       userMetaData = session.getUserProperties().getProperty("userMetaData");
-      userCheckRemoteVersionTags = Boolean.valueOf(session.getUserProperties().getProperty("checkRemoteVersionTags"));
+      userCheckRemoteVersionTags = Boolean.valueOf(session.getUserProperties().getProperty("checkRemoteRepository"));
     }
 
     if (userRunMode != null && !userRunMode.isEmpty()) {
@@ -220,7 +220,7 @@ public class SemverConfiguration {
    *
    * <p></p>
    *
-   * @param checkRemoteVersionTags
+   * @param checkRemoteVersionTags set the check on remote versions flag
    */
   public void setCheckRemoteVersionTags(Boolean checkRemoteVersionTags) {
     this.checkRemoteVersionTags = checkRemoteVersionTags;
@@ -233,7 +233,7 @@ public class SemverConfiguration {
    *
    * <p>Flag to determine if remote versions have to be tagged.</p>
    *
-   * @return
+   * @return is flag set?
    */
   public boolean checkRemoteVersionTags() {
     return this.checkRemoteVersionTags;

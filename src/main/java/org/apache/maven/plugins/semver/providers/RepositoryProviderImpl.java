@@ -18,6 +18,7 @@ import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
@@ -57,8 +58,10 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    * <p>Initialize the RepositoryProvider.</p>
    *
    */
+  @Inject
   public RepositoryProviderImpl() {}
 
+  @Override
   public void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword) {
     try {
       repository = initializeRepository(baseDir);
@@ -69,6 +72,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     }
   }
 
+  @Override
   public boolean isInitialized() {
     return this.isInitialized;
   }
@@ -147,6 +151,15 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isAuthorized;
   }
 
+  /**
+   *
+   * <p>Create a prompt o fill in credentials</p>
+   *
+   * @param configScmUserName
+   * @param configScmPassword
+   * @param scmUrl
+   * @return
+   */
   private Map<CREDENTIALS, String> promptForCredentials(String configScmUserName, String configScmPassword, String scmUrl) {
     Map<CREDENTIALS, String> credentials = new HashMap<>();
     String scmDefaultUsername = "";
@@ -175,12 +188,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return credentials;
   }
 
-  /**
-   *
-   * <p>Perform a pull from the remote GIT-repository.</p>
-   *
-   * @return is pull completed?
-   */
   @Override
   public boolean pull() {
     boolean isSuccess = true;
@@ -218,12 +225,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isRemoteDifferent;
   }
 
-  /**
-   *
-   * <p>Get the currentbranch to determine the current branch version.</p>
-   *
-   * @return current branch
-   */
   @Override
   public String getCurrentBranch() {
     String currentBranch = "";
@@ -238,12 +239,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return currentBranch;
   }
 
-  /**
-   *
-   * <p>Return a list of local SCM-tags.</p>
-   *
-   * @return local SCM-tags
-   */
   @Override
   public List<Ref> getLocalTags() {
     List<Ref> tags = new ArrayList<>();
@@ -258,12 +253,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return tags;
   }
 
-  /**
-   *
-   * <p>Return a list of remote SCM-tags.</p>
-   *
-   * @return remote SCM-tags
-   */
   @Override
   public Map<String, Ref> getRemoteTags() {
     Map<String, Ref> tags = new HashMap<>();
@@ -278,13 +267,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return tags;
   }
 
-  /**
-   *
-   * <p>Create a local SCM-tag.</p>
-   *
-   * @param tag SCM-tag to create
-   * @return is the SCM-tag succesfully created
-   */
+
   @Override
   public boolean createTag(String tag) {
     boolean isTagCreated = true;
@@ -302,13 +285,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isTagCreated;
   }
 
-  /**
-   *
-   * <p>Delete a local SCM-tag</p>
-   *
-   * @param tag SCM-tag to delete
-   * @return is the tag succesfully deleted?
-   */
+
   @Override
   public boolean deleteTag(String tag) {
     boolean isSuccess = true;
@@ -325,13 +302,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isSuccess;
   }
 
-  /**
-   *
-   * <p>Perform a commit on the local repository</p>
-   *
-   * @param message SCM-commit message
-   * @return is the commit completed?
-   */
+
   @Override
   public boolean commit(String message) {
     boolean isCommitSuccess = true;
@@ -349,12 +320,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isCommitSuccess;
   }
 
-  /**
-   *
-   * <p>Push all changes to remote.</p>
-   *
-   * @return is push successfull
-   */
   @Override
   public boolean push(){
     boolean isPushSuccess = true;
@@ -371,12 +336,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isPushSuccess;
   }
 
-  /**
-   *
-   * <p>Push a SCM-tag to the remote SCM-repository.</p>
-   *
-   * @return is the tag succesfully pushed
-   */
   @Override
   public boolean pushTag() {
     boolean isSuccess = true;
@@ -394,20 +353,11 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isSuccess;
   }
 
-  /**
-   * <p>Close the repository when finished.</p>
-   */
   @Override
   public void closeRepository() {
     repository.close();
   }
 
-  /**
-   *
-   * <p>Determine if there are any open changes in the SCM-repository.</p>
-   *
-   * @return are there any open changes?
-   */
   @Override
   public boolean isChanged() {
     boolean isChanged = false;
@@ -443,14 +393,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isChanged;
   }
 
-  /**
-   * <p>When a <i>release:rollback</i> is performed local SCM-tags have to be cleaned to perform the next release.</p>
-   *
-   * @param scmVersion scmVersion
-   * @throws SemverException native plugin exception
-   * @throws IOException disk write exception
-   * @throws GitAPIException repository exception
-   */
   @Override
   public void isLocalVersionCorrupt(String scmVersion) throws SemverException, IOException, GitAPIException {
     LOG.info("Check for corrupt local tags       : [ {} ]", scmVersion);
@@ -482,13 +424,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     closeRepository();
   }
 
-  /**
-   *
-   * <p>Determine if remote version is corrupt.</p>
-   *
-   * @param scmVersion the pomVersion which has to be evaluated
-   * @return is corrupt or not
-   */
   @Override
   public boolean isRemoteVersionCorrupt(String scmVersion) {
     boolean isRemoteVersionCorrupt  = false;

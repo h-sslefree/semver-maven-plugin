@@ -9,5 +9,11 @@ package org.apache.maven.plugins.semver.providers;
   */
 public interface BranchProvider {
 
+    /**
+     * <p>Determine branchVersion from GIT-branch</p>
+     *
+     * @param branchVersion branch version for the GIT-tag
+     * @return branchVersion
+     */
     String determineBranchVersionFromGitBranch(String branchVersion, String branchConversionUrl);
 }

@@ -1,18 +1,24 @@
 package org.apache.maven.plugins.semver.runmodes;
 
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.goals.SemverGoals;
+import org.apache.maven.plugins.semver.exceptions.SemverException;
+import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 
 /**
- * <h1></h1>
+ * <h1>RunMode</h1>
+ *
+ * <p>Possible RunModes that can be configured for this plugin.</p>
  *
  * @author sido
  */
 public interface RunMode {
 
     /**
+     *
+     * <p>Different kind of RunModes you can configure.</p>
+     *
      * <ul>
      * <li>RELEASE: uses basic semantic-versioning and the release-plugin to create a tag</li>
      * <li>RELEASE_BRANCH: uses semantic-versioning with branch-prefix and the release-plugin to create a tag</li>
@@ -52,18 +58,34 @@ public interface RunMode {
         }
     }
 
-    static void checkRemoteVersionTags(RepositoryProvider provider, SemverConfiguration configuration, String scmTag) {
+    /**
+     *
+     * <p>Run all checks before performing the RunMode.</p>
+     *
+     * @param repositoryProvider provider for the GIT-repos
+     * @param versionProvider privder for version mutations
+     * @param configuration configuration for plugin
+     * @param scmTag the version that has to be checked
+     */
+    static void checkRemoteRepository(RepositoryProvider repositoryProvider, VersionProvider versionProvider, SemverConfiguration configuration, String scmTag) throws SemverException {
         if (configuration.checkRemoteVersionTags()) {
-            if (provider.isRemoteVersionCorrupt(scmTag)) {
+            if (repositoryProvider.isRemoteVersionCorrupt(scmTag)) {
                 Runtime.getRuntime().exit(1);
             }
+        }
+        if (versionProvider.isVersionCorrupt(scmTag) || repositoryProvider.isChanged()) {
+            Runtime.getRuntime().exit(1);
         }
     }
 
     /**
-     * @param semverGoal
-     * @param configuration
-     * @param pomVersion
+     *
+     *
+     * <p>Execute each RunMode implementation.</p>
+     *
+     * @param semverGoal {@link SemverGoal} that is called
+     * @param configuration plugin configuration
+     * @param pomVersion pom version
      */
-    void execute(SemverGoals.SEMVER_GOAL semverGoal, SemverConfiguration configuration, String pomVersion);
+    void execute(SemverGoal.SEMVER_GOAL semverGoal, SemverConfiguration configuration, String pomVersion);
 }

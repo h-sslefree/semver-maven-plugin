@@ -14,22 +14,19 @@ import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * <p>Abstract class to use as template for each goal in the plugin.</p>
- * <p>
- * <p>Possible usages are:</p>
  * <ul>Possible runModes are:
  * <li>When {@link RunMode.RUNMODE} = RELEASE then determine version from POM-version</li>
  * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
- * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_RPM then determine version from POM-version (without maven-release-plugin)</li>
+ * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_RPM then determine version from POM-version for an RPM-artifact(with maven-release-plugin)</li>
  * <li>When {@link RunMode.RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
  * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
+ * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH_RPM then determine version from POM-version for an RPM-artifact (without maven-release-plugin)</li>
  * <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
  * </ul>
  * <ul>Add a tag to the GIT-version
- * <li>tag = 1</li>
+ * <li>tag = 1.0.0</li>
  * </ul>
  * <ul>Add the branchVersion to the GIT-tag
  * <li>branchVersion = featureX</li>
@@ -68,7 +65,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private String branchConversionUrl;
   @Parameter(property = "metaData")
   private String metaData;
-  @Parameter(property = "checkRemoteVersionTags", defaultValue = "false")
+  @Parameter(property = "checkRemoteRepository", defaultValue = "false")
   private Boolean checkRemoteVersionTags;
 
   private SemverConfiguration configuration;
@@ -139,6 +136,12 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     return this.repositoryProvider;
   }
 
+  /**
+   *
+   *
+   *
+   * @return
+   */
   public SemverConfiguration getConfiguration() {
     if (configuration == null) {
       configuration = new SemverConfiguration(session);
@@ -155,7 +158,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   /**
    *
-   * @param runMode
+   * <h1>Initialize configured {@link org.apache.maven.plugins.semver.runmodes.RunMode.RUNMODE}.</h1>
+   *
+   * @param runMode configured RUN_MODE
    */
   private void initializeRunMode(RunMode.RUNMODE runMode) {
     switch(runMode) {
@@ -194,6 +199,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     }
   }
 
+  /**
+   *
+   * <h1>Initialize branchVersion</h1>
+   *
+   * <p>If a branchVersion or branchVersionConversion-url is given then a branchVersion can be determined.</p>
+   *
+   */
   private void initializeBranchVersion() {
     if (branchProvider != null) {
       configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));

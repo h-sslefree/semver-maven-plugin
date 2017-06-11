@@ -2,12 +2,13 @@ package org.apache.maven.plugins.semver.goals;
 
 /**
  *
- * <h1>SemverGoals</h1>
+ * <h1>SemverGoal</h1>
  *
+ * <p></p>
  *
  * @author sido
  */
-public class SemverGoals {
+public class SemverGoal {
 
     public enum SEMVER_GOAL {
         MAJOR("MAJOR"),
@@ -26,7 +27,7 @@ public class SemverGoals {
         }
     }
 
-    private SemverGoals() {}
+    private SemverGoal() {}
 
 
 }

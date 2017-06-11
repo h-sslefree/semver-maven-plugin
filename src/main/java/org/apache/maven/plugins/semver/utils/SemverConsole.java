@@ -13,6 +13,14 @@ import java.io.InputStreamReader;
  */
 public class SemverConsole {
 
+    /**
+     *
+     *
+     *
+     * @param message
+     * @return
+     * @throws IOException
+     */
     public static String readLine(String message) throws IOException {
         if (System.console() != null) {
             return System.console().readLine(message);
@@ -23,6 +31,13 @@ public class SemverConsole {
         }
     }
 
+    /**
+     *
+     * @param message
+     * @param args
+     * @return
+     * @throws IOException
+     */
     public static String readLine(String message, Object... args) throws IOException {
         if (System.console() != null) {
             return System.console().readLine(message, args);
@@ -33,6 +48,12 @@ public class SemverConsole {
         }
     }
 
+    /**
+     *
+     * @param message
+     * @return
+     * @throws IOException
+     */
     public static String readPassword(String message)  throws IOException {
         if (System.console() != null) {
             return String.valueOf(System.console().readPassword(message));
@@ -41,6 +62,9 @@ public class SemverConsole {
         }
     }
 
+    /**
+     * <p>Protect illegal usage.</p>
+     */
     private SemverConsole() {}
 
 

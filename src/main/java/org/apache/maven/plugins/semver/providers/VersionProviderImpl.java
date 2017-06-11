@@ -2,7 +2,7 @@ package org.apache.maven.plugins.semver.providers;
 
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
-import org.apache.maven.plugins.semver.goals.SemverGoals;
+import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -31,16 +31,7 @@ public class VersionProviderImpl implements VersionProvider {
   public VersionProviderImpl() {
   }
 
-  /**
-   * <p>Determine raw version list from POM-version.</p>
-   *
-   * @param pomVersion example: 0.x.x-SNAPSHOT
-   * @return list of development, git and release-version
-   * @throws SemverException native exception
-   * @throws IOException write to disk exception
-   * @throws GitAPIException repository exception
-   */
-  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoals.SEMVER_GOAL semverGoal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String pomVersion) throws SemverException, IOException, GitAPIException {
+  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(SemverGoal.SEMVER_GOAL semverGoal, RunMode.RUNMODE runMode, String configBranchVersion, String configMetaData, String pomVersion) throws SemverException, IOException, GitAPIException {
 
     Map<VersionProvider.RAW_VERSION, String> versions = new HashMap<>();
 
@@ -66,14 +57,14 @@ public class VersionProviderImpl implements VersionProvider {
     LOG.debug("PATCH-version                     : [ {} ]", patchVersion);
     LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
 
-    if(semverGoal == SemverGoals.SEMVER_GOAL.MAJOR) {
+    if(semverGoal == SemverGoal.SEMVER_GOAL.MAJOR) {
       majorVersion = majorVersion + 1;
       minorVersion = 0;
       patchVersion = 0;
-    } else if(semverGoal == SemverGoals.SEMVER_GOAL.MINOR) {
+    } else if(semverGoal == SemverGoal.SEMVER_GOAL.MINOR) {
       minorVersion = minorVersion + 1;
       patchVersion = 0;
-    } else if(semverGoal == SemverGoals.SEMVER_GOAL.PATCH) {
+    } else if(semverGoal == SemverGoal.SEMVER_GOAL.PATCH) {
       patchVersion = patchVersion + 1;
     }
 
@@ -109,12 +100,6 @@ public class VersionProviderImpl implements VersionProvider {
     return versions;
   }
 
-  /**
-   * <p>Determine release versions from {@link RAW_VERSION}.</p>
-   *
-   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION} enumeration is used to define the map
-   * @return finalVersions
-   */
   @Override
   public Map<FINAL_VERSION, String> determineReleaseVersions(Map<RAW_VERSION, String> rawVersions) {
     Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
@@ -124,13 +109,6 @@ public class VersionProviderImpl implements VersionProvider {
     return finalVersions;
   }
 
-  /**
-   * <p>Determine release-versions from {@link VersionProvider.RAW_VERSION}.</p>
-   * <p>This version contains also the buildmeta-data and branch information.</p>
-   *
-   * @param rawVersions raw version map with development version patch, minor and major the {@link org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION} enumeration is used to define the map
-   * @return finalVersions
-   */
   @Override
   public Map<FINAL_VERSION, String> determineReleaseBranchVersions(Map<VersionProvider.RAW_VERSION, String> rawVersions, RunMode.RUNMODE runMode, String metaData, String branchVersion) {
 
@@ -168,21 +146,6 @@ public class VersionProviderImpl implements VersionProvider {
     return finalVersions;
   }
 
-  /**
-   * <p>Determine general release-tag.</p>
-   * <p>Examples:</p>
-   * <ul><b>NORMAL-release</b>
-   * <li>1.1.1</li>
-   * </ul>
-   * <ul><b>BRANCH-release</b>
-   * <li>1.1.1-001001001</li>
-   * </ul>
-   *
-   * @param patch patch is the number to define a bugfix in symantic-versioning
-   * @param minor minor is the number to define a feature in symantic-versioning
-   * @param major major is the number to define a breaking change in symantic-versioning
-   * @return release tag
-   */
   @Override
   public String determineReleaseBranchTag(RunMode.RUNMODE runMode, String branchVersion, int patch, int minor, int major) {
     StringBuilder releaseTag = new StringBuilder();
@@ -199,21 +162,6 @@ public class VersionProviderImpl implements VersionProvider {
     return releaseTag.toString();
   }
 
-  /**
-   * <p>Determine general release-tag.</p>
-   * <p>Examples:</p>
-   * <ul><b>NORMAL-release</b>
-   * <li>1.1.1</li>
-   * </ul>
-   * <ul><b>BRANCH-release</b>
-   * <li>1.1.1-001001001</li>
-   * </ul>
-   *
-   * @param patch patch is the number to define a bugfix in symantic-versioning
-   * @param minor minor is the number to define a feature in symantic-versioning
-   * @param major major is the number to define a breaking change in symantic-versioning
-   * @return release tag
-   */
   @Override
   public String determineReleaseTag(RunMode.RUNMODE runMode, int patch, int minor, int major) {
     StringBuilder releaseTag = new StringBuilder();
@@ -229,14 +177,6 @@ public class VersionProviderImpl implements VersionProvider {
     return releaseTag.toString();
   }
 
-  /**
-   * <p>Determine wether or not buildMetaData had to be added to the scmversion for GIT</p>
-   *
-   * @param patch patch is the number to define a bugfix in symantic-versioning
-   * @param minor minor is the number to define a feature in symantic-versioning
-   * @param major major is the number to define a breaking change in symantic-versioning
-   * @return build metadata
-   */
   @Override
   public String determineBuildMetaData(RunMode.RUNMODE runmode, String metaData, int patch, int minor, int major) {
     StringBuilder buildMetaData = new StringBuilder();
@@ -253,14 +193,6 @@ public class VersionProviderImpl implements VersionProvider {
     return buildMetaData.toString();
   }
 
-  /**
-   * <p>Determine if the version in the pom.xml is corrupt.</p>
-   * <p>If this is the case then exit the semver-plugin.</p>
-   *
-   * @param pomVersion get pom version from project
-   * @return is version corrupt?
-   * @throws SemverException native semver exception
-   */
   @Override
   public boolean isVersionCorrupt(String pomVersion) throws SemverException {
     boolean isVersionCorrupt = false;

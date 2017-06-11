@@ -37,13 +37,6 @@ public class PomProviderImpl implements PomProvider {
   @Inject
   public PomProviderImpl() {}
 
-  /**
-   *
-   * <h>Create release-pom</h>
-   * <p>Create a release-pom for the build.</p>
-   *
-   * @param finalVersions final versions from the plugin-goals
-   */
   @Override
   public void createReleasePom(Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
     LOG.info("Create release-pom");
@@ -66,13 +59,6 @@ public class PomProviderImpl implements PomProvider {
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
   }
 
-  /**
-   *
-   * <h>Create development-pom</h>
-   * <p>Create next development-pom for this project</p>
-   *
-   * @param developmentVersion developmentVersion
-   */
   @Override
   public void createNextDevelopmentPom(String developmentVersion) {
     LOG.info("Create next development-pom");
