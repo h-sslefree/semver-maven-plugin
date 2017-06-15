@@ -2,10 +2,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.maven.plugins</groupId>
+    <groupId>org.haakma.maven.plugins</groupId>
     <artifactId>semver-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.2.1-SNAPSHOT</version>
+    <version>3.3.0-SNAPSHOT</version>
     <name>Semantic Versioning Plugin</name>
     <description>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</description>
     <url>https://github.com/sidohaakma/semver-maven-plugin</url>
