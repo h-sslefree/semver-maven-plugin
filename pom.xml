@@ -60,6 +60,7 @@
         <maven.nexus.staging.plugin-version>1.6.3</maven.nexus.staging.plugin-version>
         <maven.gpg.plugin-version>1.6</maven.gpg.plugin-version>
         <maven.javadoc.plugin-version>2.10.4</maven.javadoc.plugin-version>
+        <maven.semver.plugin-version>3.3.0</maven.semver.plugin-version>
 
         <maven.plugin-version>3.3.9</maven.plugin-version>
         <maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
@@ -78,6 +79,11 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.haakma.maven.plugins</groupId>
+                <artifactId>semver-maven-plugin</artifactId>
+                <version>${maven.semver.plugin-version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
