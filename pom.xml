@@ -10,6 +10,13 @@
     <description>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</description>
     <url>https://github.com/sidohaakma/semver-maven-plugin</url>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
@@ -35,7 +42,7 @@
         <developer>
             <name>Sido Haakma</name>
             <email>sido@haakma.org</email>
-            <organization>haakma.org</organization>
+            <organization>haakma-org</organization>
             <organizationUrl>http://www.haakma.org</organizationUrl>
         </developer>
     </developers>
@@ -147,9 +154,8 @@
                 <version>${maven.nexus.staging.plugin-version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <stagingProfileId>19375019933d12</stagingProfileId>
+                    <serverId>nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
