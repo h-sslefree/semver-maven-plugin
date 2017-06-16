@@ -16,6 +16,7 @@ public class SemverConsole {
     /**
      *
      *
+     * <p>Implements the readLine from {@link System#console()}. If the {@link System#console()} = null then the {@link BufferedReader} is implemented.</p>
      *
      * @param message
      * @return
