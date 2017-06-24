@@ -152,7 +152,7 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <useAgent>false</useAgent>
+                            <passphraseServerId>gpg.passphrase</passphraseServerId>
                         </configuration>
                     </execution>
                 </executions>
