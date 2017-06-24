@@ -1,8 +1,9 @@
 node {
   def mvnHome
-  def gitRemoteUser = 'jenkins';
-  def gitRemoteUrl = 'github.com/sidohaakma/semver-maven-plugin';
-  def artifactId = "semver-maven-plugin";
+  def gitRemoteUser = 'jenkins'
+  def gitRemoteUrl = 'github.com/sidohaakma/semver-maven-plugin'
+  def artifactId = "semver-maven-plugin"
+  def pom = readMavenPom file: 'pom.xml'
   stage('Preparation') {
     // Clean workspace
     step([$class: 'WsCleanup', cleanWhenFailure: false])
@@ -10,6 +11,8 @@ node {
     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-git', url: 'http://' + gitRemoteUser + '@' + gitRemoteUrl + '.git']]]
     // Get the Maven tool.
     mvnHome = tool 'MAVEN'
+    // set display name
+    currentBuild.displayName = pom.version
   }
   stage('Test') {
     echo "Test artifact : ${artifactId}"
@@ -25,7 +28,6 @@ node {
     echo "Deploy artifact : ${artifactId}";
     // deploy it in the staging repo
     sh "'${mvnHome}/bin/mvn' deploy -DskipTests"
-    pom = readMavenPom file: 'pom.xml'
     emailext body: '''Hi everybody,
       <br>
       <br>
