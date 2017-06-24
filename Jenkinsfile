@@ -25,13 +25,14 @@ node {
     echo "Deploy artifact : ${artifactId}";
     // deploy it in the staging repo
     sh "'${mvnHome}/bin/mvn' deploy -DskipTests"
+    pom = readMavenPom file: 'pom.xml'
     emailext body: '''Hi everybody,
       <br>
       <br>
       There is a new version available of <i>${JOB_NAME}</i>.
       <br>
       <br>
-      The new version is: <b>''' + versionTag + '''</b>.
+      The new version is: <b>''' + pom.version + '''</b>.
       <br>
       <br>
       The Changelog is available on:
@@ -43,7 +44,7 @@ node {
       Kind regards,
       <br>
       <br>
-      Build-team''', subject: 'New version of ${JOB_NAME} - ' + versionTag, to: 'sido@haakma.org'
+      Build-team''', subject: 'New version of ${JOB_NAME} - ' + pom.version, to: 'sido@haakma.org'
     currentBuild.result = 'SUCCESS';
   }
 }
