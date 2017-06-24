@@ -154,7 +154,7 @@
                         <configuration>
                             <useAgent>false</useAgent>
                             <gpgArguments>
-                                <gpgArgument>--pinentry-mode loopback</gpgArgument>
+                                <gpgArgument>--batch</gpgArgument>
                             </gpgArguments>
                         </configuration>
                     </execution>
