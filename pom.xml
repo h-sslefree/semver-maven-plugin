@@ -152,9 +152,8 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <useAgent>false</useAgent>
                             <gpgArguments>
-                                <gpgArgument>--batch</gpgArgument>
+                                <argument>--pinentry-mode loopback</argument>
                             </gpgArguments>
                         </configuration>
                     </execution>
