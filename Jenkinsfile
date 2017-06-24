@@ -19,12 +19,12 @@ node {
   }
   stage('Build') {
     echo "Build artifact : ${artifactId}"
-    sh "'${mvnHome}/bin/mvn' package -DskipTests"
+    sh "'${mvnHome}/bin/mvn' package -DskipTests -X"
   }
   stage('Release') {
     echo "Deploy artifact : ${artifactId}";
     // deploy it in the staging repo
-    sh "'${mvnHome}/bin/mvn' deploy -DskipTests"
+    sh "'${mvnHome}/bin/mvn' deploy -DskipTests -X"
     emailext body: '''Hi everybody,
       <br>
       <br>
