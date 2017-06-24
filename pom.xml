@@ -151,11 +151,6 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <configuration>
-                            <gpgArguments>
-                                <argument>--pinentry-mode loopback</argument>
-                            </gpgArguments>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
