@@ -147,7 +147,6 @@ public class VersionProviderImpl implements VersionProvider {
   }
 
   /**
-   *
    * <p>Sometimes there is no metaData. To make sure no blank fileeds are displayed this method determines if there is metaData.</p>
    *
    * @param buildMetaData source metaData
