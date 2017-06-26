@@ -132,7 +132,7 @@ public class VersionProviderImpl implements VersionProvider {
 
     if (LOG != null) {
       LOG.info("New DEVELOPMENT-version            : [ {} ]", rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
-      LOG.info("New BRANCH GIT build metadata      : [ {} ]", buildMetaData);
+      LOG.info("New BRANCH GIT build metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
       LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
       LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
@@ -144,6 +144,21 @@ public class VersionProviderImpl implements VersionProvider {
     finalVersions.put(FINAL_VERSION.RELEASE, releaseVersion.toString());
 
     return finalVersions;
+  }
+
+  /**
+   *
+   * <p>Sometimes there is no metaData. To make sure no blank fileeds are displayed this method determines if there is metaData.</p>
+   *
+   * @param buildMetaData source metaData
+   * @return metaData for logging purposes
+   */
+  private String determineLogBuildMetaData(String buildMetaData) {
+    String logBuildMetaData = "no build metadata determined";
+    if(!buildMetaData.isEmpty()) {
+      logBuildMetaData = buildMetaData;
+    }
+    return logBuildMetaData;
   }
 
   @Override
