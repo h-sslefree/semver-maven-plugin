@@ -217,10 +217,10 @@ public class VersionProviderImpl implements VersionProvider {
       LOG.error("");
       LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
       LOG.error("");
-    } else if (!pomVersion.contains("-SNAPSHOT")) {
+    } else if (pomVersion.contains("-SNAPSHOT")) {
       isVersionCorrupt = true;
       LOG.error("");
-      LOG.error("The version in the pom.xml does not contain -SNAPSHOT. Please repair the version-string");
+      LOG.error("The version in the pom.xml [ {} ] does not contain -SNAPSHOT. Please repair the version-string", pomVersion);
       LOG.error("");
     } else {
       LOG.info("Pom-version is correct             : [ {} ]", pomVersion);
