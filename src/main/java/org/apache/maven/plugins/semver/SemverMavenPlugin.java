@@ -138,9 +138,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   /**
    *
+   * <p>Determine configuration for semver-maven-plugin.</p>
    *
-   *
-   * @return
+   * @return {@link SemverConfiguration}
    */
   public SemverConfiguration getConfiguration() {
     if (configuration == null) {

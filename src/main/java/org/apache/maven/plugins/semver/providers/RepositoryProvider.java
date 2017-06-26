@@ -14,7 +14,8 @@ import java.util.Map;
  *
  * <h1>RepositoryProvider</h1>
  *
- * <p></p>
+ * <p>The repository provider does all communication between the local and remote repository</p>
+ * <p>At this moment only GIT is supported.</p>
  *
  * @author sido
  */
