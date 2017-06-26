@@ -276,10 +276,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.tag().setName(tag).call();
     } catch (GitAPIException err) {
       isTagCreated = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
+      logException(err);
       Runtime.getRuntime().exit(1);
     }
     return isTagCreated;
@@ -293,10 +290,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.tagDelete().setTags(tag).call();
     } catch (GitAPIException err) {
       isSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
+      logException(err);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -310,13 +304,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.commit().setAll(true).setMessage(message).call();
     } catch (GitAPIException err) {
       isCommitSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
+      logException(err);
       Runtime.getRuntime().exit(1);
     }
-
     return isCommitSuccess;
   }
 
@@ -327,13 +317,22 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.push().setPushAll().setRemote("origin").setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isPushSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
-      Runtime.getRuntime().exit(1);
+      logException(err);
     }
     return isPushSuccess;
+  }
+
+  /**
+   *
+   * <p>Log the exception.</p>
+   *
+   * @param err {@link GitAPIException}
+   */
+  private void logException(GitAPIException err) {
+    LOG.error(err.getMessage());
+    LOG.error("");
+    LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+    LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
   }
 
   @Override
@@ -343,11 +342,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
+      logException(err);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;

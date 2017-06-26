@@ -49,7 +49,7 @@ public class VersionProviderImpl implements VersionProvider {
     } else {
       LOG.error("Unrecognized version-pattern");
       LOG.error("Semver plugin is terminating");
-      throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parseble version-pattern");
+      throw new SemverException("Unrecognized version-pattern", "Could not parse version from POM.xml because of not parsable version-pattern");
     }
 
     LOG.debug("MAJOR-version                     : [ {} ]", majorVersion);
@@ -132,7 +132,7 @@ public class VersionProviderImpl implements VersionProvider {
 
     if (LOG != null) {
       LOG.info("New DEVELOPMENT-version            : [ {} ]", rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
-      LOG.info("New BRANCH GIT build metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
+      LOG.info("New BRANCH GIT build-metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
       LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
       LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
