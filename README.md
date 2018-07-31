@@ -10,7 +10,7 @@ Include the following depedency in your pom.xml
 
 ```
 <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
+  <groupId>org.haakma.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
   <version>3.0.0</version>
 </plugin>
@@ -22,7 +22,7 @@ You have to specify the configuration-tag to set the RUN_MODE.
  
 ```
 <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
+  <groupId>org.haakma.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
   <version>3.0.0</version>
 </plugin>
