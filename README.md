@@ -12,7 +12,7 @@ Include the following depedency in your pom.xml
 <plugin>
   <groupId>org.haakma.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
-  <version>3.0.0</version>
+  <version>3.3.1</version>
 </plugin>
 ```
 
@@ -24,7 +24,7 @@ You have to specify the configuration-tag to set the RUN_MODE.
 <plugin>
   <groupId>org.haakma.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
-  <version>3.0.0</version>
+  <version>3.3.1</version>
 </plugin>
 ```
 
