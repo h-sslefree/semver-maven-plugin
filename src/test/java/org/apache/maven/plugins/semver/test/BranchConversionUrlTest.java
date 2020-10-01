@@ -1,5 +1,8 @@
 package org.apache.maven.plugins.semver.test;
 
+import static org.apache.commons.logging.LogFactory.getLog;
+
+import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -9,19 +12,9 @@ import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.junit.Test;
 
-import java.io.IOException;
-
-import static org.apache.commons.logging.LogFactory.getLog;
-
-/**
- *
- *
- *
- * @author sido
- */
 public class BranchConversionUrlTest extends AbstractSemverMavenPluginTest {
 
-  private static final Log log = getLog(BranchConversionUrlTest.class);
+  private static final Log LOG = getLog(BranchConversionUrlTest.class);
 
   @Test
   public void testBranchConversionUrl() {
@@ -34,29 +27,26 @@ public class BranchConversionUrlTest extends AbstractSemverMavenPluginTest {
       HttpGet httpGet = new HttpGet(config.getBranchConversionUrl());
       httpGet.addHeader("Content-Type", "application/json");
       response = httpClient.execute(httpGet);
-      log.info("Versionizer returned response-code: " + response.getStatusLine());
+      LOG.info("Versionizer returned response-code: " + response.getStatusLine());
       String branchVersion = EntityUtils.toString(response.getEntity());
       if (branchVersion != null) {
-        log.info("Versionizer returned branch version: " + branchVersion);
+        LOG.info("Versionizer returned branch version: " + branchVersion);
       } else {
-        log.error("No branch version could be determined");
+        LOG.error("No branch version could be determined");
       }
     } catch (IOException err) {
-      log.error("Could not make request to versionizer", err);
+      LOG.error("Could not make request to versionizer", err);
     } finally {
       try {
-        if(response != null) {
+        if (response != null) {
           response.close();
         }
-        if(httpClient != null) {
+        if (httpClient != null) {
           httpClient.close();
         }
       } catch (IOException err) {
-        log.error("Could not close request to versionizer", err);
+        LOG.error("Could not close request to versionizer", err);
       }
     }
   }
-
 }
-
-
