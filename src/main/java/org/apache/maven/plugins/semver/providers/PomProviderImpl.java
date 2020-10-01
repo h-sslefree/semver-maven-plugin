@@ -1,5 +1,9 @@
 package org.apache.maven.plugins.semver.providers;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+
+import java.util.Map;
+import javax.inject.Inject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
@@ -8,31 +12,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import java.util.Map;
-
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
-
 @Component(role = PomProvider.class)
 public class PomProviderImpl implements PomProvider {
 
-  @Requirement
-  private Logger LOG;
-  @Requirement
-  private RepositoryProvider repositoryProvider;
-  @Requirement
-  private BuildPluginManager pluginManager;
+  @Requirement private Logger LOG;
+  @Requirement private RepositoryProvider repositoryProvider;
+  @Requirement private BuildPluginManager pluginManager;
 
-  @Requirement
-  private MavenProject project;
-  @Requirement
-  private MavenSession session;
+  @Requirement private MavenProject project;
+  @Requirement private MavenSession session;
 
   /**
-   *
    * <h>POM-provider</h>
-   * <p>This class provides pom.xml.</p>
    *
+   * <p>This class provides pom.xml.
    */
   @Inject
   public PomProviderImpl() {}
@@ -46,7 +39,8 @@ public class PomProviderImpl implements PomProvider {
     releasePom.getScm().setTag(scmTag);
     updateVersion(releasePom, finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
     releasePom.setVersion(scmTag);
-    String commitMessage = "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
+    String commitMessage =
+        "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit new release-pom             : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
@@ -66,7 +60,8 @@ public class PomProviderImpl implements PomProvider {
     MavenProject nextDevelopementPom = project;
     nextDevelopementPom.getScm().setTag("");
     updateVersion(nextDevelopementPom, developmentVersion);
-    String commitMessage = "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
+    String commitMessage =
+        "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     LOG.info("Commit next dev-pom                : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
@@ -78,30 +73,20 @@ public class PomProviderImpl implements PomProvider {
   private void checkSnapshotVersions(String version) {
     try {
       executeMojo(
-              plugin(
-                      groupId("org.codehaus.mojo"),
-                      artifactId("versions-maven-plugin"),
-                      version("2.3")
-              ),
-              goal("set"),
-              configuration(
-                      element(name("generateBackupPoms"), "false"),
-                      element(name("newVersion"), version)
-              ),
-              executionEnvironment(
-                      project,
-                      session,
-                      pluginManager
-              ));
+          plugin(groupId("org.codehaus.mojo"), artifactId("versions-maven-plugin"), version("2.3")),
+          goal("set"),
+          configuration(
+              element(name("generateBackupPoms"), "false"), element(name("newVersion"), version)),
+          executionEnvironment(project, session, pluginManager));
     } catch (Exception err) {
       LOG.error(err.getMessage());
     }
   }
 
   /**
-   *
    * <h>Update pom-versions</h>
-   * <p>Makes use the versions-plugin to advance the pom.xml's.</p>
+   *
+   * <p>Makes use the versions-plugin to advance the pom.xml's.
    *
    * @param project {@link MavenProject} from parent Mojo
    * @param version the updated version
@@ -109,24 +94,13 @@ public class PomProviderImpl implements PomProvider {
   private void updateVersion(MavenProject project, String version) {
     try {
       executeMojo(
-              plugin(
-                      groupId("org.codehaus.mojo"),
-                      artifactId("versions-maven-plugin"),
-                      version("2.3")
-              ),
-              goal("set"),
-              configuration(
-                      element(name("generateBackupPoms"), "false"),
-                      element(name("newVersion"), version)
-              ),
-              executionEnvironment(
-                      project,
-                      session,
-                      pluginManager
-              ));
+          plugin(groupId("org.codehaus.mojo"), artifactId("versions-maven-plugin"), version("2.3")),
+          goal("set"),
+          configuration(
+              element(name("generateBackupPoms"), "false"), element(name("newVersion"), version)),
+          executionEnvironment(project, session, pluginManager));
     } catch (Exception err) {
       LOG.error(err.getMessage());
     }
   }
-
 }

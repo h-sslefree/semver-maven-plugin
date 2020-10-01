@@ -10,99 +10,122 @@ import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.plugins.semver.runmodes.*;
+import org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Abstract class to use as template for each goal in the plugin.</p>
- * <ul>Possible runModes are:
- * <li>When {@link RunMode.RUNMODE} = RELEASE then determine version from POM-version</li>
- * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH then determine version from GIT-branch</li>
- * <li>When {@link RunMode.RUNMODE} = RELEASE_BRANCH_RPM then determine version from POM-version for an RPM-artifact(with maven-release-plugin)</li>
- * <li>When {@link RunMode.RUNMODE} = NATIVE then determine version from POM-version (without maven-release-plugin)</li>
- * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH then determine version from POM-version (without maven-release-plugin)</li>
- * <li>When {@link RunMode.RUNMODE} = NATIVE_BRANCH_RPM then determine version from POM-version for an RPM-artifact (without maven-release-plugin)</li>
- * <li>When {@link RunMode.RUNMODE} = RUNMODE_NOT_SPECIFIED does nothing</li>
+ * Abstract class to use as template for each goal in the plugin.
+ *
+ * <ul>
+ *   Possible runModes are:
+ *   <li>When {@link RUN_MODE} = RELEASE then determine version from POM-version
+ *   <li>When {@link RUN_MODE} = RELEASE_BRANCH then determine version from GIT-branch
+ *   <li>When {@link RUN_MODE} = RELEASE_BRANCH_RPM then determine version from POM-version for an
+ *       RPM-artifact(with maven-release-plugin)
+ *   <li>When {@link RUN_MODE} = NATIVE then determine version from POM-version (without
+ *       maven-release-plugin)
+ *   <li>When {@link RUN_MODE} = NATIVE_BRANCH then determine version from POM-version (without
+ *       maven-release-plugin)
+ *   <li>When {@link RUN_MODE} = NATIVE_BRANCH_RPM then determine version from POM-version for an
+ *       RPM-artifact (without maven-release-plugin)
+ *   <li>When {@link RUN_MODE} = RUNMODE_NOT_SPECIFIED does nothing
  * </ul>
- * <ul>Add a tag to the GIT-version
- * <li>tag = 1.0.0</li>
+ *
+ * <ul>
+ *   Add a tag to the GIT-version
+ *   <li>tag = 1.0.0
  * </ul>
- * <ul>Add the branchVersion to the GIT-tag
- * <li>branchVersion = featureX</li>
+ *
+ * <ul>
+ *   Add the branchVersion to the GIT-tag
+ *   <li>branchVersion = featureX
  * </ul>
- * <ul>Possible value for the branchConversionUrl is
- * <li>branchConversionUrl = http://localhost/determineBranchVersion</li>
+ *
+ * <ul>
+ *   Possible value for the branchConversionUrl is
+ *   <li>branchConversionUrl = http://localhost/determineBranchVersion
  * </ul>
- * <ul>Add metaData to the GIT-version
- * <li>metaData = beta</li>
+ *
+ * <ul>
+ *   Add metaData to the GIT-version
+ *   <li>metaData = beta
  * </ul>
  *
  * @author sido
  */
 public abstract class SemverMavenPlugin extends AbstractMojo {
 
-  public static final String MOJO_LINE_BREAK = "------------------------------------------------------------------------";
-  public static final String FUNCTION_LINE_BREAK = "************************************************************************";
+  public static final String MOJO_LINE_BREAK =
+      "------------------------------------------------------------------------";
+  public static final String FUNCTION_LINE_BREAK =
+      "************************************************************************";
 
   protected final Logger LOG = LoggerFactory.getLogger(SemverMavenPlugin.class);
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
   protected MavenProject project;
+
   @Parameter(property = "session", defaultValue = "${session}", readonly = true, required = true)
   protected MavenSession session;
+
   @Parameter(property = "tag")
   protected String preparedReleaseTag;
+
   @Parameter(property = "runMode", required = true, defaultValue = "NATIVE")
-  private RunMode.RUNMODE runMode;
+  private RUN_MODE runMode;
+
   @Parameter(property = "username", defaultValue = "")
   private String scmUsername = "";
+
   @Parameter(property = "password", defaultValue = "")
   private String scmPassword = "";
+
   @Parameter(property = "branchVersion")
   private String branchVersion;
+
   @Parameter(property = "branchConversionUrl")
   private String branchConversionUrl;
+
   @Parameter(property = "metaData")
   private String metaData;
+
   @Parameter(property = "checkRemoteRepository", defaultValue = "false")
   private Boolean checkRemoteVersionTags;
 
   private SemverConfiguration configuration;
 
-  @Component
-  private VersionProvider versionProvider;
-  @Component
-  private PomProvider pomProvider;
-  @Component
-  private RepositoryProvider repositoryProvider;
-  @Component
-  private BranchProvider branchProvider;
+  @Component private VersionProvider versionProvider;
+  @Component private PomProvider pomProvider;
+  @Component private RepositoryProvider repositoryProvider;
+  @Component private BranchProvider branchProvider;
 
   protected RunMode runModeImpl;
 
   @Component(role = RunModeNative.class)
   private RunMode runModeNative;
+
   @Component(role = RunModeNativeBranch.class)
   private RunMode runModeNativeBranch;
+
   @Component(role = RunModeRelease.class)
   private RunMode runModeRelease;
+
   @Component(role = RunModeReleaseBranch.class)
   private RunMode runModeReleaseBranch;
 
-
-
   /**
-   * <p>Override runMode through configuration properties</p>
+   * Override runMode through configuration properties
    *
    * @param runMode get runMode from plugin configuration
    */
-  public void setRunMode(RunMode.RUNMODE runMode) {
+  public void setRunMode(RUN_MODE runMode) {
     this.runMode = runMode;
   }
 
   /**
-   * <p>Override branchVersion through configuration properties</p>
+   * Override branchVersion through configuration properties
    *
    * @param branchVersion get branchVersion from plugin configuration
    */
@@ -111,7 +134,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * <p>Override branchConversionUrl through configuration properties</p>
+   * Override branchConversionUrl through configuration properties
    *
    * @param branchConversionUrl get branchConversionUrl from plugin configuration
    */
@@ -120,7 +143,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   * <p>Create a postfix for the versionTag</p>
+   * Create a postfix for the versionTag
    *
    * @param metaData for example "-solr"
    */
@@ -137,8 +160,7 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   }
 
   /**
-   *
-   * <p>Determine configuration for semver-maven-plugin.</p>
+   * Determine configuration for semver-maven-plugin.
    *
    * @return {@link SemverConfiguration}
    */
@@ -158,12 +180,13 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   /**
    *
-   * <h1>Initialize configured {@link org.apache.maven.plugins.semver.runmodes.RunMode.RUNMODE}.</h1>
+   *
+   * <h1>Initialize configured {@link RUN_MODE}.</h1>
    *
    * @param runMode configured RUN_MODE
    */
-  private void initializeRunMode(RunMode.RUNMODE runMode) {
-    switch(runMode) {
+  private void initializeRunMode(RUN_MODE runMode) {
+    switch (runMode) {
       case NATIVE:
         LOG.info("Initialize NATIVE-runmode implementation");
         this.runModeImpl = runModeNative;
@@ -201,17 +224,18 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   /**
    *
+   *
    * <h1>Initialize branchVersion</h1>
    *
-   * <p>If a branchVersion or branchVersionConversion-url is given then a branchVersion can be determined.</p>
-   *
+   * <p>If a branchVersion or branchVersionConversion-url is given then a branchVersion can be
+   * determined.
    */
   private void initializeBranchVersion() {
     if (branchProvider != null) {
-      configuration.setBranchVersion(branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
+      configuration.setBranchVersion(
+          branchProvider.determineBranchVersionFromGitBranch(branchVersion, branchConversionUrl));
     } else {
       configuration.setBranchVersion(branchVersion);
     }
   }
-
 }

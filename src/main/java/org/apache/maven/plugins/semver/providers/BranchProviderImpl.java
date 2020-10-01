@@ -1,5 +1,7 @@
 package org.apache.maven.plugins.semver.providers;
 
+import java.io.IOException;
+import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -12,27 +14,23 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import java.io.IOException;
-
 @Component(role = BranchProvider.class)
 public class BranchProviderImpl implements BranchProvider {
 
-  @Requirement
-  private Logger LOG;
-  @Requirement
-  private RepositoryProvider repositoryProvider;
+  @Requirement private Logger LOG;
+  @Requirement private RepositoryProvider repositoryProvider;
 
   /**
    * <h>BranchProvider constructor</h>
-   * <p>Initializes the BranchProvider.</p>
+   *
+   * <p>Initializes the BranchProvider.
    */
   @Inject
-  public BranchProviderImpl() {
-  }
+  public BranchProviderImpl() {}
 
   @Override
-  public String determineBranchVersionFromGitBranch(String branchVersion, String branchConversionUrl) {
+  public String determineBranchVersionFromGitBranch(
+      String branchVersion, String branchConversionUrl) {
     String value = null;
     if (branchVersion == null || branchVersion.isEmpty()) {
       LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
@@ -82,14 +80,18 @@ public class BranchProviderImpl implements BranchProvider {
 
   /**
    * <h>Master branch version detemination</h>
-   * <p>Which new version is to be determined from the master-branch. This is done by an external service defined in the configuration of the plugin</p>
-   * <p>Example:</p>
+   *
+   * <p>Which new version is to be determined from the master-branch. This is done by an external
+   * service defined in the configuration of the plugin
+   *
+   * <p>Example:
+   *
    * <pre>
-   *     <code>
+   * {@code
    *          <configuration>
    *              <branchConversionUrl>http://branchvconversion.com/</branchConversionUrl>
    *          </configuration>
-   *     </code>
+   * }
    * </pre>
    *
    * @param branch branch from which a version has te be determined
@@ -128,5 +130,4 @@ public class BranchProviderImpl implements BranchProvider {
     }
     return branchVersion;
   }
-
 }

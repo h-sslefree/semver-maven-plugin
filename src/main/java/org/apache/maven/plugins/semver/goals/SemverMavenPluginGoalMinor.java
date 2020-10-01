@@ -1,5 +1,6 @@
 package org.apache.maven.plugins.semver.goals;
 
+import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
@@ -7,21 +8,22 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 
-import java.io.File;
-
-
 /**
+ *
+ *
  * <h1>Determine MINOR version for MAVEN-project.</h1>
- * <p>This advances the tag of the project and the pom.xml version.</p>
- * <p>Example:</p>
- * <pre>
- *     <code>
- *          < version>x.1.x< /version>
- *          to
- *          < version>x.2.x< /version>
- *     </code>
- * </pre>
- * <p>Run the test-phase when this goal is executed.</p>
+ *
+ * <p>This advances the tag of the project and the pom.xml version.
+ *
+ * <p>Example:
+ *
+ * <pre>{@code
+ * <version>x.1.x</version>
+ * to
+ * <version>x.2.x</version>
+ * }</pre>
+ *
+ * <p>Run the test-phase when this goal is executed.
  *
  * @author sido
  */
@@ -35,10 +37,16 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     String pomVersion = project.getVersion();
     String scmConnection = project.getScm().getConnection();
     File scmRoot = project.getBasedir();
-    getRepositoryProvider().initialize(scmRoot, scmConnection, getConfiguration().getScmUsername(), getConfiguration().getScmPassword());
+    getRepositoryProvider()
+        .initialize(
+            scmRoot,
+            scmConnection,
+            getConfiguration().getScmUsername(),
+            getConfiguration().getScmPassword());
 
     LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info("Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MINOR.getDescription());
+    LOG.info(
+        "Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MINOR.getDescription());
     LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
     LOG.info("Version from POM                   : [ {} ]", pomVersion);
     LOG.info("SCM-connection                     : {}", scmConnection);
@@ -50,8 +58,5 @@ public class SemverMavenPluginGoalMinor extends SemverMavenPlugin {
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
-
-
   }
-
 }

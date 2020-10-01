@@ -1,5 +1,12 @@
 package org.apache.maven.plugins.semver.providers;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
@@ -18,19 +25,13 @@ import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import java.io.Console;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static java.lang.String.format;
 
 /**
- *
  * <h>RepositoryProvider</h>
- * <p>Provider that is used to make connection to SCM repository and handle all request to and from that repository.</p>
+ *
+ * <p>Provider that is used to make connection to SCM repository and handle all request to and from
+ * that repository.
  *
  * @author sido
  */
@@ -38,31 +39,27 @@ import java.util.Map;
 public class RepositoryProviderImpl implements RepositoryProvider {
 
   private static final String URL_GITHUB = "github.com";
+  private static final String BASE_BRANCH = "origin";
 
   private enum CREDENTIALS {
     USERNAME,
     PASSWORD
   }
 
-  @Requirement
-  private Logger LOG;
+  @Requirement private Logger LOG;
 
   private boolean isInitialized = false;
 
   private Git repository;
   private CredentialsProvider provider;
 
-
-  /**
-   *
-   * <p>Initialize the RepositoryProvider.</p>
-   *
-   */
+  /** Initialize the RepositoryProvider. */
   @Inject
   public RepositoryProviderImpl() {}
 
   @Override
-  public void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword) {
+  public void initialize(
+      File baseDir, String scmUrl, String configScmUsername, String configScmPassword) {
     try {
       repository = initializeRepository(baseDir);
       provider = initializeCredentialsProvider(scmUrl, configScmUsername, configScmPassword);
@@ -78,14 +75,14 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   /**
-   * <p>Initialize SCM-repo for determining branch and tag information.</p>
+   * Initialize SCM-repo for determining branch and tag information.
    *
    * @param baseDir SCm root-directory
    * @return {@link Git} SCM-repository
    * @throws SemverException exception for not initializing local and remote repository
    */
   private Git initializeRepository(File baseDir) throws SemverException {
-    Git repository = null;
+    Git initRepository = null;
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     LOG.info("Initializing SCM-repository");
     FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
@@ -94,46 +91,55 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     Repository repo = null;
     try {
       repo = repoBuilder.build();
-      repository = new Git(repo);
+      initRepository = new Git(repo);
       LOG.info(" * SCM-repository is initialized");
     } catch (Exception err) {
       LOG.error(" * This is not a valid SCM-repository.");
       LOG.error(" * Please run this goal in a valid SCM-repository");
       LOG.error(" * Could not initialize repostory", err);
-      throw new SemverException("This is not a valid SCM-repository", "Please run this goal in a valid SCM-repository");
+      throw new SemverException(
+          "This is not a valid SCM-repository", "Please run this goal in a valid SCM-repository");
     }
-    return repository;
+    return initRepository;
   }
 
   /**
-   * <p>Initialize credentialsprovider to acces remote SCM repository.</p>
+   * Initialize credentialsprovider to acces remote SCM repository.
    *
    * @return {@link CredentialsProvider} initialized credentialsProvider
    */
-  private CredentialsProvider initializeCredentialsProvider(String scmUrl, String configScmUserName, String configScmPassword) {
+  private CredentialsProvider initializeCredentialsProvider(
+      String scmUrl, String configScmUserName, String configScmPassword) {
     LOG.info("Initializing SCM-credentialsprovider");
-    CredentialsProvider provider;
+    CredentialsProvider initProvider;
 
-    Map<CREDENTIALS, String> credentials = promptForCredentials(configScmUserName, configScmPassword, scmUrl);
+    Map<CREDENTIALS, String> credentials =
+        promptForCredentials(configScmUserName, configScmPassword, scmUrl);
 
-    provider = new UsernamePasswordCredentialsProvider(credentials.get(CREDENTIALS.USERNAME), credentials.get(CREDENTIALS.PASSWORD));
+    initProvider =
+        new UsernamePasswordCredentialsProvider(
+            credentials.get(CREDENTIALS.USERNAME), credentials.get(CREDENTIALS.PASSWORD));
     LOG.info(" * Validate credentials");
-    boolean isAuthorized = checkCredentials(provider);
-    while(!isAuthorized) {
+    boolean isAuthorized = checkCredentials(initProvider);
+    while (!isAuthorized) {
       Map<CREDENTIALS, String> newCredentials = promptForCredentials("", "", scmUrl);
-      provider = new UsernamePasswordCredentialsProvider(newCredentials.get(CREDENTIALS.USERNAME), newCredentials.get(CREDENTIALS.PASSWORD));
-      isAuthorized = checkCredentials(provider);
+      initProvider =
+          new UsernamePasswordCredentialsProvider(
+              newCredentials.get(CREDENTIALS.USERNAME), newCredentials.get(CREDENTIALS.PASSWORD));
+      isAuthorized = checkCredentials(initProvider);
     }
     LOG.info(" * SCM-credentialsprovider is initialized");
     isInitialized = true;
 
-    return provider;
+    return initProvider;
   }
 
   /**
    *
+   *
    * <h1>Check if credentials are valid</h1>
-   * <p>Checks with a lsremote command if the remote repository is reachable</p>
+   *
+   * <p>Checks with a lsremote command if the remote repository is reachable
    *
    * @param provider give the new {@link UsernamePasswordCredentialsProvider}
    * @return isAuthorized
@@ -144,7 +150,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.lsRemote().setCredentialsProvider(provider).call();
       isAuthorized = true;
       LOG.info(" * Current credentials are valid");
-    } catch(GitAPIException err) {
+    } catch (GitAPIException err) {
       LOG.error(err.getMessage());
     }
 
@@ -152,30 +158,31 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   /**
+   * Create a prompt o fill in credentials
    *
-   * <p>Create a prompt o fill in credentials</p>
-   *
-   * @param configScmUserName
-   * @param configScmPassword
-   * @param scmUrl
-   * @return
+   * @param configScmUserName username
+   * @param configScmPassword password
+   * @param scmUrl source control url
+   * @return a map with the credentials
    */
-  private Map<CREDENTIALS, String> promptForCredentials(String configScmUserName, String configScmPassword, String scmUrl) {
+  private Map<CREDENTIALS, String> promptForCredentials(
+      String configScmUserName, String configScmPassword, String scmUrl) {
     Map<CREDENTIALS, String> credentials = new HashMap<>();
     String scmDefaultUsername = "";
-    if(configScmUserName.isEmpty() || configScmPassword.isEmpty()) {
+    if (configScmUserName.isEmpty() || configScmPassword.isEmpty()) {
       String messageUsername = "[info]  * Please enter your (SCM) username : ";
       String messagePassword = "[info]  * Please enter your (SCM) password : ";
-      if(scmUrl.contains(URL_GITHUB)) {
+      if (scmUrl.contains(URL_GITHUB)) {
         scmDefaultUsername = "token";
         messageUsername = "[info]  * Please enter your (SCM) token : ";
         messagePassword = "[info]  * Please enter your (SCM) secret : ";
       }
       try {
-        if(scmDefaultUsername.isEmpty()){
+        if (scmDefaultUsername.isEmpty()) {
           credentials.put(CREDENTIALS.USERNAME, SemverConsole.readLine(messageUsername));
         } else {
-          credentials.put(CREDENTIALS.USERNAME, SemverConsole.readLine(messageUsername, scmDefaultUsername));
+          credentials.put(
+              CREDENTIALS.USERNAME, SemverConsole.readLine(messageUsername, scmDefaultUsername));
         }
         credentials.put(CREDENTIALS.PASSWORD, SemverConsole.readPassword(messagePassword));
       } catch (Exception err) {
@@ -204,16 +211,21 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   /**
-   *
-   * <p>Perform a pull from the remote GIT-repository.</p>
+   * Perform a pull from the remote GIT-repository.
    *
    * @return is pull completed?
    */
   private boolean checkRemoteUpdates() {
     boolean isRemoteDifferent = false;
     try {
-      FetchResult fetch = repository.fetch().setRemote("origin").setCredentialsProvider(provider).setDryRun(true).call();
-      if(!fetch.getTrackingRefUpdates().isEmpty()) {
+      FetchResult fetch =
+          repository
+              .fetch()
+              .setRemote(BASE_BRANCH)
+              .setCredentialsProvider(provider)
+              .setDryRun(true)
+              .call();
+      if (!fetch.getTrackingRefUpdates().isEmpty()) {
         isRemoteDifferent = true;
       }
     } catch (GitAPIException err) {
@@ -267,7 +279,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return tags;
   }
 
-
   @Override
   public boolean createTag(String tag) {
     boolean isTagCreated = true;
@@ -282,7 +293,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     return isTagCreated;
   }
 
-
   @Override
   public boolean deleteTag(String tag) {
     boolean isSuccess = true;
@@ -295,7 +305,6 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     }
     return isSuccess;
   }
-
 
   @Override
   public boolean commit(String message) {
@@ -311,10 +320,10 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   @Override
-  public boolean push(){
+  public boolean push() {
     boolean isPushSuccess = true;
     try {
-      repository.push().setPushAll().setRemote("origin").setCredentialsProvider(provider).call();
+      repository.push().setPushAll().setRemote(BASE_BRANCH).setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isPushSuccess = false;
       logException(err);
@@ -323,8 +332,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   /**
-   *
-   * <p>Log the exception.</p>
+   * Log the exception.
    *
    * @param err {@link GitAPIException}
    */
@@ -339,7 +347,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   public boolean pushTag() {
     boolean isSuccess = true;
     try {
-      repository.push().setPushTags().setRemote("origin").setCredentialsProvider(provider).call();
+      repository.push().setPushTags().setRemote(BASE_BRANCH).setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isSuccess = false;
       logException(err);
@@ -358,13 +366,13 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     boolean isChanged = false;
     LOG.info("Check for local or remote changes");
     LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    if(checkRemoteUpdates()) {
+    if (checkRemoteUpdates()) {
       isChanged = true;
       LOG.error("Remote changes                    : remote origin is ahead of local repository");
     } else {
       LOG.info("Remote changes                     : remote origin is up to date");
     }
-    if(!isChanged) {
+    if (!isChanged) {
       try {
         Status status = repository.status().call();
         if (!status.isClean()) {
@@ -378,7 +386,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         isChanged = true;
       }
     }
-    if(isChanged) {
+    if (isChanged) {
       LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
       LOG.error("");
       LOG.error("Semver-goal has failed");
@@ -389,15 +397,16 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   }
 
   @Override
-  public void isLocalVersionCorrupt(String scmVersion) throws SemverException, IOException, GitAPIException {
+  public void isLocalVersionCorrupt(String scmVersion)
+      throws SemverException, IOException, GitAPIException {
     LOG.info("Check for corrupt local tags       : [ {} ]", scmVersion);
     pull();
     List<Ref> refs = getLocalTags();
     LOG.debug("Local tags                        ");
-    for(Ref ref : refs) {
-      LOG.debug(" * " + ref.getName());
+    for (Ref ref : refs) {
+      LOG.debug(format(" * %s", ref.getName()));
     }
-    if (refs.isEmpty()) {
+    if (!refs.isEmpty()) {
       boolean found = false;
       for (Ref ref : refs) {
         if (ref.getName().contains(scmVersion)) {
@@ -421,28 +430,30 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 
   @Override
   public boolean isRemoteVersionCorrupt(String scmVersion) {
-    boolean isRemoteVersionCorrupt  = false;
+    boolean isRemoteVersionCorrupt = false;
     LOG.info("Check for corrupt remote tags      : [ {} ]", scmVersion);
     DefaultArtifactVersion localVersion;
-    if(scmVersion.contains("-SNAPSHOT")) {
+    if (scmVersion.contains("-SNAPSHOT")) {
       localVersion = new DefaultArtifactVersion(scmVersion.replaceFirst("-SNAPSHOT", ""));
     } else {
       localVersion = new DefaultArtifactVersion(scmVersion);
     }
     Map<String, Ref> remoteTags = getRemoteTags();
-    for(Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
+    for (Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
       DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
       LOG.debug(" * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
-      if(remoteVersion.compareTo(localVersion) > 0) {
-        LOG.error(" * Local version is corrupt       : [ local: {} ] [ remote: {} ]", remoteVersion, localVersion);
+      if (remoteVersion.compareTo(localVersion) > 0) {
+        LOG.error(
+            " * Local version is corrupt       : [ local: {} ] [ remote: {} ]",
+            remoteVersion,
+            localVersion);
         isRemoteVersionCorrupt = true;
       }
     }
-    if(!isRemoteVersionCorrupt) {
+    if (!isRemoteVersionCorrupt) {
       LOG.info(" * Remote is not ahead of local    : [ {} ]", scmVersion);
     }
     LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isRemoteVersionCorrupt;
   }
-
 }
