@@ -10,7 +10,7 @@ Include the following depedency in your pom.xml
 
 ```
 <plugin>
-  <groupId>org.haakma.maven.plugins</groupId>
+  <groupId>nl.hasslefree.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
   <version>3.3.1</version>
 </plugin>
@@ -22,7 +22,7 @@ You have to specify the configuration-tag to set the RUN_MODE.
  
 ```
 <plugin>
-  <groupId>org.haakma.maven.plugins</groupId>
+  <groupId>nl.hasslefree.maven.plugins</groupId>
   <artifactId>semver-maven-plugin</artifactId>
   <version>3.3.1</version>
 </plugin>
@@ -104,6 +104,13 @@ To build the semver-maven-plugin, execute the following command:
 
 This way you can use a SNAPSHOT-version to test in your applications.
 
+### Development
+
+## Formatting code
+Run `mvn fmt:format` to format your code according to the google-style.
+
+### Tests
+Run `mvn test` to start the unit test suite 
 
 
 

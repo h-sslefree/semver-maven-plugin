@@ -2,13 +2,12 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.haakma.maven.plugins</groupId>
+    <groupId>nl.hasslefree.maven.plugins</groupId>
     <artifactId>semver-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>3.3.1-SNAPSHOT</version>
     <name>Semantic Versioning Plugin</name>
     <description>Semantic versioning plugin for enabling symantic versioning in the maven-release-plugin</description>
-    <url>https://github.com/sidohaakma/semver-maven-plugin</url>
 
     <distributionManagement>
         <snapshotRepository>
@@ -20,13 +19,13 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
-        <version>40</version>
+        <version>50</version>
     </parent>
 
     <scm>
-        <url>https://github.com/sidohaakma/semver-maven-plugin.git</url>
-        <connection>scm:git:https://github.com/sidohaakma/semver-maven-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/sidohaakma/semver-maven-plugin.git</developerConnection>
+        <url>https://github.com/h-sslefree/semver-maven-plugin.git</url>
+        <connection>scm:git:https://github.com/h-sslefree/semver-maven-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/h-sslefree/semver-maven-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -48,46 +47,42 @@
     </developers>
 
     <properties>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.sourceCompiler>1.8</project.build.sourceCompiler>
 
-        <gitlog-pattern>^(?!PATCH\s*[\[\(].*[\]\)]|FIX\s*[\[\(].*[\]\)]|FEATURE\s*[\[\(].*[\]\)]|CHORE\s*[\[\(].*[\]\)]|BREAKING\s*[\[\(].*[\]\)]).*</gitlog-pattern>
+        <gitlog-pattern>
+            ^(?!PATCH\s*[\[\(].*[\]\)]|FIX\s*[\[\(].*[\]\)]|FEATURE\s*[\[\(].*[\]\)]|CHORE\s*[\[\(].*[\]\)]|BREAKING\s*[\[\(].*[\]\)]).*
+        </gitlog-pattern>
 
-        <maven.plugin.plugin-version>3.5</maven.plugin.plugin-version>
-        <maven.compiler.plugin-version>3.1</maven.compiler.plugin-version>
+        <gpg.executable>gpg</gpg.executable>
+        <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+        <gpg.defaultKeyring>false</gpg.defaultKeyring>
+        <gpg.publicKeyring>${env.GPG_DIR}/pubring.gpg</gpg.publicKeyring>
+        <gpg.secretKeyring>${env.GPG_DIR}/secring.gpg</gpg.secretKeyring>
+
         <maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
         <maven.nexus.staging.plugin-version>1.6.3</maven.nexus.staging.plugin-version>
-        <maven.gpg.plugin-version>1.6</maven.gpg.plugin-version>
-        <maven.javadoc.plugin-version>2.10.4</maven.javadoc.plugin-version>
-        <maven.semver.plugin-version>3.3.0</maven.semver.plugin-version>
-
+        <fmt-maven-plugin.version>2.9</fmt-maven-plugin.version>
         <maven.plugin-version>3.3.9</maven.plugin-version>
-        <maven.plugin.annotations-version>3.4</maven.plugin.annotations-version>
         <helper.maven.plugin-version>2.3.2</helper.maven.plugin-version>
 
-        <org.eclipse.jgit-version>4.5.0.201609210915-r</org.eclipse.jgit-version>
+        <org.eclipse.jgit-version>5.9.0.202009080501-r</org.eclipse.jgit-version>
+        <httpclient-version>4.5.12</httpclient-version>
+        <httpcore-version>4.4.13</httpcore-version>
         <plexus.interactivity.api-version>1.0-alpha-6</plexus.interactivity.api-version>
         <plexus.components-version>1.7.1</plexus.components-version>
-        <mojo.executer-version>2.3.0</mojo.executer-version>
+        <mojo.executer-version>2.3.1</mojo.executer-version>
 
         <maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
         <junit-version>4.12</junit-version>
-
     </properties>
-
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.haakma.maven.plugins</groupId>
-                <artifactId>semver-maven-plugin</artifactId>
-                <version>${maven.semver.plugin-version}</version>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>${maven.plugin.plugin-version}</version>
                 <configuration>
                     <goalPrefix>semver</goalPrefix>
                 </configuration>
@@ -117,7 +112,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin-version}</version>
                 <configuration>
                     <source>${project.build.sourceCompiler}</source>
                     <target>${project.build.sourceCompiler}</target>
@@ -143,10 +137,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.plugin-version}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -155,6 +149,42 @@
                 <configuration>
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${maven.nexus.staging.plugin-version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>${fmt-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -175,6 +205,16 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${org.eclipse.jgit-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore-version}</version>
         </dependency>
 
         <dependency>
@@ -206,8 +246,6 @@
             <version>${maven.plugin.testing.harness-version}</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -216,52 +254,4 @@
         </dependency>
 
     </dependencies>
-    <profiles>
-        <profile>
-            <id>ossrh</id>
-            <properties>
-                <gpg.executable>gpg</gpg.executable>
-                <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
-                <gpg.defaultKeyring>false</gpg.defaultKeyring>
-                <gpg.publicKeyring>${env.GPG_DIR}/pubring.gpg</gpg.publicKeyring>
-                <gpg.secretKeyring>${env.GPG_DIR}/secring.gpg</gpg.secretKeyring>
-            </properties>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven.gpg.plugin-version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${maven.nexus.staging.plugin-version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
