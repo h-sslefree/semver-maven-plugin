@@ -47,22 +47,32 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
   public void execute() {
 
     String pomVersion = mavenProject.getVersion();
-    String scmConnection = mavenProject.getScm().getConnection();
-    File scmRoot = mavenProject.getBasedir();
-    getRepositoryProvider()
-        .initialize(
-            scmRoot,
-            scmConnection,
-            getConfiguration().getScmUsername(),
-            getConfiguration().getScmPassword());
+    String scmConnection = null;
+    File scmRoot = null;
+    if (getConfiguration().pushTags() && mavenProject.getScm() != null) {
+      scmConnection = mavenProject.getScm().getConnection();
+      scmRoot = mavenProject.getBasedir();
+      getRepositoryProvider()
+          .initialize(
+              scmRoot,
+              scmConnection,
+              getConfiguration().getScmUsername(),
+              getConfiguration().getScmPassword());
+    } else {
+      logger.error(" * No SCM information supplied");
+      logger.error(" * Please described the scm block in the pom.xml");
+      Runtime.getRuntime().exit(1);
+    }
 
     logger.info(FUNCTION_LINE_BREAK);
     logger.info(
         "Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MAJOR.getDescription());
     logger.info("Run-mode                           : {}", getConfiguration().getRunMode());
     logger.info("Version from POM                   : [ {} ]", pomVersion);
-    logger.info("SCM-connection                     : {}", scmConnection);
-    logger.info("SCM-root                           : {}", scmRoot);
+    if (getConfiguration().pushTags()) {
+      logger.info("SCM-connection                     : {}", scmConnection);
+      logger.info("SCM-root                           : {}", scmRoot);
+    }
     logger.info(FUNCTION_LINE_BREAK);
 
     try {

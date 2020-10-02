@@ -1,5 +1,7 @@
 package org.apache.maven.plugins.semver.configuration;
 
+import static java.lang.Boolean.valueOf;
+
 import javax.inject.Inject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE;
@@ -26,6 +28,7 @@ public class SemverConfiguration {
   private String branchConversionUrl;
   private String metaData;
   private Boolean checkRemoteVersionTags;
+  private Boolean pushTags;
 
   private final MavenSession session;
 
@@ -49,6 +52,7 @@ public class SemverConfiguration {
     String userBranchConversionUrl = "";
     String userMetaData = "";
     Boolean userCheckRemoteVersionTags = false;
+    Boolean userPushTags = false;
     if (session != null) {
       userRunMode = session.getUserProperties().getProperty("runMode");
       userBranchVersion = session.getUserProperties().getProperty("branchVersion");
@@ -56,8 +60,9 @@ public class SemverConfiguration {
       userScmPassword = session.getUserProperties().getProperty("password");
       userBranchConversionUrl = session.getUserProperties().getProperty("branchConversionUrl");
       userMetaData = session.getUserProperties().getProperty("userMetaData");
+      userPushTags = valueOf(session.getUserProperties().getProperty("push"));
       userCheckRemoteVersionTags =
-          Boolean.valueOf(session.getUserProperties().getProperty("checkRemoteRepository"));
+          valueOf(session.getUserProperties().getProperty("checkRemoteRepository"));
     }
 
     if (userRunMode != null && !userRunMode.isEmpty()) {
@@ -108,11 +113,18 @@ public class SemverConfiguration {
     }
 
     if (checkRemoteVersionTags == null || !checkRemoteVersionTags) {
-      if (!userCheckRemoteVersionTags) {
+      if (userCheckRemoteVersionTags != null) {
         checkRemoteVersionTags = userCheckRemoteVersionTags;
       } else {
         checkRemoteVersionTags = false;
       }
+    }
+    if (pushTags == null || !pushTags) {
+      if (userPushTags != null) {
+        pushTags = userPushTags;
+      }
+    } else {
+      pushTags = false;
     }
   }
 
@@ -254,5 +266,10 @@ public class SemverConfiguration {
    */
   public boolean checkRemoteVersionTags() {
     return this.checkRemoteVersionTags;
+  }
+
+
+  public boolean pushTags() {
+    return this.pushTags;
   }
 }
