@@ -35,9 +35,9 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
   @Override
   public void execute() {
 
-    String version = project.getVersion();
-    String scmConnection = project.getScm().getConnection();
-    File scmRoot = project.getBasedir();
+    String version = mavenProject.getVersion();
+    String scmConnection = mavenProject.getScm().getConnection();
+    File scmRoot = mavenProject.getBasedir();
     getRepositoryProvider()
         .initialize(
             scmRoot,
@@ -45,29 +45,29 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
             getConfiguration().getScmUsername(),
             getConfiguration().getScmPassword());
 
-    LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info(
+    logger.info(FUNCTION_LINE_BREAK);
+    logger.info(
         "Semver-goal                        : {}",
         SemverGoal.SEMVER_GOAL.ROLLBACK.getDescription());
-    LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
-    LOG.info("Version from POM                   : [ {} ]", version);
-    LOG.info("SCM-connection                     : {}", scmConnection);
-    LOG.info("SCM-root                           : {}", scmRoot);
-    LOG.info(FUNCTION_LINE_BREAK);
+    logger.info("Run-mode                           : {}", getConfiguration().getRunMode());
+    logger.info("Version from POM                   : [ {} ]", version);
+    logger.info("SCM-connection                     : {}", scmConnection);
+    logger.info("SCM-root                           : {}", scmRoot);
+    logger.info(FUNCTION_LINE_BREAK);
 
     if (getConfiguration().getRunMode() == RunMode.RUN_MODE.NATIVE
         || getConfiguration().getRunMode() == RunMode.RUN_MODE.NATIVE_BRANCH
         || getConfiguration().getRunMode() == RunMode.RUN_MODE.NATIVE_BRANCH_RPM) {
 
-      LOG.info("Perform a rollback for version     : [ {} ]", version);
-      LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+      logger.info("Perform a rollback for version     : [ {} ]", version);
+      logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
       if (FileWriterFactory.canRollBack()) {
         if (getConfiguration().checkRemoteVersionTags()) {
           if (!getRepositoryProvider().isRemoteVersionCorrupt(version)) {
             executeRollback(version);
           } else {
-            LOG.error("");
-            LOG.error("Please check your repository state");
+            logger.error("");
+            logger.error("Please check your repository state");
             Runtime.getRuntime().exit(1);
           }
         } else {
@@ -75,24 +75,24 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
         }
       }
     } else {
-      LOG.error("");
-      LOG.error(
+      logger.error("");
+      logger.error(
           format("Ÿou have configured a wrong RUN_MODE ( %s )", getConfiguration().getRunMode()));
-      LOG.error("Ÿou have to use release:rollback to revert the version update");
+      logger.error("Ÿou have to use release:rollback to revert the version update");
     }
   }
 
   private void executeRollback(String version) {
     FileWriterFactory.rollbackPom();
-    LOG.info(" * Commit old pom.xml");
+    logger.info(" * Commit old pom.xml");
     getRepositoryProvider().commit("[semver-maven-plugin] rollback version  : [ " + version + " ]");
-    LOG.info(" * Push old pom.xml");
+    logger.info(" * Push old pom.xml");
     getRepositoryProvider().push();
-    LOG.info(" * Delete SCM-tag                  : [ {} ]", version);
+    logger.info(" * Delete SCM-tag                  : [ {} ]", version);
     getRepositoryProvider().deleteTag(version);
-    LOG.info(" * Delete remote SCM-tag           : [ {} ]", version);
+    logger.info(" * Delete remote SCM-tag           : [ {} ]", version);
     getRepositoryProvider().pushTag();
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     FileWriterFactory.removeBackupSemverPom();
   }
 }

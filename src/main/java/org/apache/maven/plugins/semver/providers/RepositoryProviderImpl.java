@@ -370,7 +370,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     if (checkRemoteUpdates()) {
       isChanged = true;
-      logger.error("Remote changes                    : remote origin is ahead of local repository");
+      logger.error(
+          "Remote changes                    : remote origin is ahead of local repository");
     } else {
       logger.info("Remote changes                     : remote origin is up to date");
     }
@@ -442,7 +443,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     Map<String, Ref> remoteTags = getRemoteTags();
     for (Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
       DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
-      logger.debug(" * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
+      logger.debug(
+          " * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
       if (remoteVersion.compareTo(localVersion) > 0) {
         logger.error(
             " * Local version is corrupt       : [ local: {} ] [ remote: {} ]",

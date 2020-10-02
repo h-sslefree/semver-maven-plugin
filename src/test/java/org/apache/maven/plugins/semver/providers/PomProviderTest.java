@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugins.semver.providers.*;
 import org.apache.maven.plugins.semver.providers.VersionProvider.FINAL_VERSION;
 import org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION;
 import org.apache.maven.project.MavenProject;

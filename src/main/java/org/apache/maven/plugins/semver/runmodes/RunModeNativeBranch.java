@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class RunModeNativeBranch implements RunMode {
 
-  private final Logger LOG = LoggerFactory.getLogger(RunModeNativeBranch.class);
+  private final Logger logger = LoggerFactory.getLogger(RunModeNativeBranch.class);
 
   private final PomProvider pomProvider;
   private final VersionProvider versionProvider;
@@ -63,7 +63,7 @@ public class RunModeNativeBranch implements RunMode {
           finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT));
       FileWriterFactory.removeBackupSemverPom();
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      logger.error(e.getMessage());
     }
   }
 }

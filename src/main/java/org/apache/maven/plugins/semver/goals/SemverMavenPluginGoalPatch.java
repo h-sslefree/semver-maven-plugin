@@ -46,14 +46,14 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
   @Override
   public void execute() {
 
-    String pomVersion = project.getVersion();
-    if (project.getScm() == null) {
-      LOG.error("No source control information available");
+    String pomVersion = mavenProject.getVersion();
+    if (mavenProject.getScm() == null) {
+      logger.error("No source control information available");
       Runtime.getRuntime().exit(1);
     }
-    String scmConnection = project.getScm().getConnection();
+    String scmConnection = mavenProject.getScm().getConnection();
 
-    File scmRoot = project.getBasedir();
+    File scmRoot = mavenProject.getBasedir();
     getRepositoryProvider()
         .initialize(
             scmRoot,
@@ -61,19 +61,19 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
             getConfiguration().getScmUsername(),
             getConfiguration().getScmPassword());
 
-    LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info(
+    logger.info(FUNCTION_LINE_BREAK);
+    logger.info(
         "Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.PATCH.getDescription());
-    LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
-    LOG.info("Version from POM                   : [ {} ]", pomVersion);
-    LOG.info("SCM-connection                     : {}", scmConnection);
-    LOG.info("SCM-root                           : {}", scmRoot);
-    LOG.info(FUNCTION_LINE_BREAK);
+    logger.info("Run-mode                           : {}", getConfiguration().getRunMode());
+    logger.info("Version from POM                   : [ {} ]", pomVersion);
+    logger.info("SCM-connection                     : {}", scmConnection);
+    logger.info("SCM-root                           : {}", scmRoot);
+    logger.info(FUNCTION_LINE_BREAK);
 
     try {
       runModeImpl.execute(SemverGoal.SEMVER_GOAL.PATCH, getConfiguration(), pomVersion);
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      logger.error(e.getMessage());
     }
   }
 }

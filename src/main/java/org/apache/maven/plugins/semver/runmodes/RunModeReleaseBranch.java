@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class RunModeReleaseBranch implements RunMode {
 
-  private final Logger LOG = LoggerFactory.getLogger(RunModeReleaseBranch.class);
+  private final Logger logger = LoggerFactory.getLogger(RunModeReleaseBranch.class);
 
   private final MavenProject mavenProject;
   private final VersionProvider versionProvider;
@@ -59,7 +59,7 @@ public class RunModeReleaseBranch implements RunMode {
               configuration.getBranchVersion());
       FileWriterFactory.createReleaseProperties(mavenProject, finalVersions);
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      logger.error(e.getMessage());
     }
   }
 }

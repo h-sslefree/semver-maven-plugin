@@ -40,7 +40,7 @@ public class SemverConsole {
     if (console() != null) {
       return console().readLine(message, args);
     } else {
-      System.out.print(String.format(message, args));
+      System.out.printf(message, args);
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       return reader.readLine();
     }

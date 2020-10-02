@@ -43,23 +43,23 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
 
-    String version = project.getVersion();
-    String scmConnection = project.getScm().getConnection();
-    File scmRoot = project.getBasedir();
+    String version = mavenProject.getVersion();
+    String scmConnection = mavenProject.getScm().getConnection();
+    File scmRoot = mavenProject.getBasedir();
 
-    LOG.info("Semver-goal                       : CLEANUP-GIT-TAGS");
-    LOG.info("Run-mode                          : " + getConfiguration().getRunMode());
-    LOG.info("Version from POM                  : " + version);
-    LOG.info("SCM-connection                    : " + scmConnection);
-    LOG.info("SCM-root                          : " + scmRoot);
-    LOG.info(FUNCTION_LINE_BREAK);
+    logger.info("Semver-goal                       : CLEANUP-GIT-TAGS");
+    logger.info("Run-mode                          : " + getConfiguration().getRunMode());
+    logger.info("Version from POM                  : " + version);
+    logger.info("SCM-connection                    : " + scmConnection);
+    logger.info("SCM-root                          : " + scmRoot);
+    logger.info(FUNCTION_LINE_BREAK);
 
     try {
       cleanupGitRemoteTags(scmConnection, scmRoot);
     } catch (IOException e) {
-      LOG.error("Error when determining config", e);
+      logger.error("Error when determining config", e);
     } catch (GitAPIException e) {
-      LOG.error("Error when determining GIT-repo", e);
+      logger.error("Error when determining GIT-repo", e);
     }
   }
 
@@ -73,8 +73,8 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
    */
   private void cleanupGitRemoteTags(String scmConnection, File scmRoot)
       throws IOException, GitAPIException {
-    LOG.info("Determine local and remote SCM-tags for SCM-repo");
-    LOG.info(MOJO_LINE_BREAK);
+    logger.info("Determine local and remote SCM-tags for SCM-repo");
+    logger.info(MOJO_LINE_BREAK);
     getRepositoryProvider().pull();
     List<Ref> refs = getRepositoryProvider().getLocalTags();
     if (refs.isEmpty()) {
@@ -82,20 +82,20 @@ public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
       for (Ref ref : refs) {
         if (ref.getName().contains(preparedReleaseTag)) {
           found = true;
-          LOG.info("Delete local SCM-tag                 : " + ref.getName().substring(10));
+          logger.info("Delete local SCM-tag                 : " + ref.getName().substring(10));
           getRepositoryProvider().deleteTag(ref.getName());
-          LOG.info("Delete remote SCM-tag                : " + ref.getName().substring(10));
+          logger.info("Delete remote SCM-tag                : " + ref.getName().substring(10));
           getRepositoryProvider().pushTag();
         }
       }
       if (!found) {
-        LOG.info("No local or remote prepared SCM-tags found");
+        logger.info("No local or remote prepared SCM-tags found");
       }
     } else {
-      LOG.info("No local or remote prepared SCM-tags found");
+      logger.info("No local or remote prepared SCM-tags found");
     }
 
     getRepositoryProvider().closeRepository();
-    LOG.info(MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
   }
 }

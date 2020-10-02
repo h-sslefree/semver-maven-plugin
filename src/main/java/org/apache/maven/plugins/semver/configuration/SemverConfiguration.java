@@ -1,5 +1,6 @@
 package org.apache.maven.plugins.semver.configuration;
 
+import javax.inject.Inject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE;
 
@@ -26,13 +27,14 @@ public class SemverConfiguration {
   private String metaData;
   private Boolean checkRemoteVersionTags;
 
-  private MavenSession session;
+  private final MavenSession session;
 
   /**
    * Combining user properties with configuration properties in {@link SemverConfiguration}
    *
    * @param session MavenSession
    */
+  @Inject
   public SemverConfiguration(MavenSession session) {
     this.session = session;
     mergeConfiguration();

@@ -62,10 +62,10 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   public static final String FUNCTION_LINE_BREAK =
       "************************************************************************";
 
-  protected final Logger LOG = LoggerFactory.getLogger(SemverMavenPlugin.class);
+  protected final Logger logger = LoggerFactory.getLogger(SemverMavenPlugin.class);
 
   @Parameter(property = "project", defaultValue = "${project}", readonly = true, required = true)
-  protected MavenProject project;
+  protected MavenProject mavenProject;
 
   @Parameter(property = "session", defaultValue = "${session}", readonly = true, required = true)
   protected MavenSession session;
@@ -188,28 +188,29 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   private void initializeRunMode(RUN_MODE runMode) {
     switch (runMode) {
       case NATIVE:
-        LOG.info("Initialize NATIVE-runmode implementation");
+        logger.info("Initialize NATIVE-runmode implementation");
         this.runModeImpl = new RunModeNative(pomProvider, versionProvider, repositoryProvider);
         break;
       case NATIVE_BRANCH_RPM:
       case NATIVE_BRANCH:
-        LOG.info("Initialize NATIVE_BRANCH-runmode implementation");
+        logger.info("Initialize NATIVE_BRANCH-runmode implementation");
         this.runModeImpl =
             new RunModeNativeBranch(pomProvider, versionProvider, repositoryProvider);
         initializeBranchVersion();
         break;
       case RELEASE:
-        LOG.info("Initialize RELEASE-runmode implementation");
-        this.runModeImpl = new RunModeRelease(project, versionProvider, repositoryProvider);
+        logger.info("Initialize RELEASE-runmode implementation");
+        this.runModeImpl = new RunModeRelease(mavenProject, versionProvider, repositoryProvider);
         break;
       case RELEASE_BRANCH_RPM:
       case RELEASE_BRANCH:
-        LOG.info("Initialize RELEASE_BRANCH-runmode implementation");
-        this.runModeImpl = new RunModeReleaseBranch(project, versionProvider, repositoryProvider);
+        logger.info("Initialize RELEASE_BRANCH-runmode implementation");
+        this.runModeImpl =
+            new RunModeReleaseBranch(mavenProject, versionProvider, repositoryProvider);
         initializeBranchVersion();
         break;
       default:
-        LOG.info("Initialize DEFAULT-runmode implementation");
+        logger.info("Initialize DEFAULT-runmode implementation");
         this.runModeImpl = new RunModeNative(pomProvider, versionProvider, repositoryProvider);
         break;
     }

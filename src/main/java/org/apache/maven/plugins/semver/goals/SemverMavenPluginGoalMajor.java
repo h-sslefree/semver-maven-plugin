@@ -46,9 +46,9 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
   @Override
   public void execute() {
 
-    String pomVersion = project.getVersion();
-    String scmConnection = project.getScm().getConnection();
-    File scmRoot = project.getBasedir();
+    String pomVersion = mavenProject.getVersion();
+    String scmConnection = mavenProject.getScm().getConnection();
+    File scmRoot = mavenProject.getBasedir();
     getRepositoryProvider()
         .initialize(
             scmRoot,
@@ -56,19 +56,19 @@ public class SemverMavenPluginGoalMajor extends SemverMavenPlugin {
             getConfiguration().getScmUsername(),
             getConfiguration().getScmPassword());
 
-    LOG.info(FUNCTION_LINE_BREAK);
-    LOG.info(
+    logger.info(FUNCTION_LINE_BREAK);
+    logger.info(
         "Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.MAJOR.getDescription());
-    LOG.info("Run-mode                           : {}", getConfiguration().getRunMode());
-    LOG.info("Version from POM                   : [ {} ]", pomVersion);
-    LOG.info("SCM-connection                     : {}", scmConnection);
-    LOG.info("SCM-root                           : {}", scmRoot);
-    LOG.info(FUNCTION_LINE_BREAK);
+    logger.info("Run-mode                           : {}", getConfiguration().getRunMode());
+    logger.info("Version from POM                   : [ {} ]", pomVersion);
+    logger.info("SCM-connection                     : {}", scmConnection);
+    logger.info("SCM-root                           : {}", scmRoot);
+    logger.info(FUNCTION_LINE_BREAK);
 
     try {
       runModeImpl.execute(SemverGoal.SEMVER_GOAL.MAJOR, getConfiguration(), pomVersion);
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      logger.error(e.getMessage());
     }
   }
 }
