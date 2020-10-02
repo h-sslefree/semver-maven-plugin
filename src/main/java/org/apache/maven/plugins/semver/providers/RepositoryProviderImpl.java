@@ -1,19 +1,20 @@
 package org.apache.maven.plugins.semver.providers;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.exceptions.SemverExceptionMessages;
 import org.apache.maven.plugins.semver.utils.SemverConsole;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -24,8 +25,7 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
-
-import static java.lang.String.format;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h>RepositoryProvider</h>
@@ -35,7 +35,8 @@ import static java.lang.String.format;
  *
  * @author sido
  */
-@Component(role = RepositoryProvider.class)
+@Named
+@Singleton
 public class RepositoryProviderImpl implements RepositoryProvider {
 
   private static final String URL_GITHUB = "github.com";
@@ -46,16 +47,12 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     PASSWORD
   }
 
-  @Requirement private Logger LOG;
+  private final Logger logger = LoggerFactory.getLogger(RepositoryProviderImpl.class);
 
   private boolean isInitialized = false;
 
   private Git repository;
   private CredentialsProvider provider;
-
-  /** Initialize the RepositoryProvider. */
-  @Inject
-  public RepositoryProviderImpl() {}
 
   @Override
   public void initialize(
@@ -64,7 +61,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository = initializeRepository(baseDir);
       provider = initializeCredentialsProvider(scmUrl, configScmUsername, configScmPassword);
     } catch (SemverException err) {
-      LOG.error(err.getMessage());
+      logger.error(err.getMessage());
       Runtime.getRuntime().exit(1);
     }
   }
@@ -82,21 +79,21 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    * @throws SemverException exception for not initializing local and remote repository
    */
   private Git initializeRepository(File baseDir) throws SemverException {
-    Git initRepository = null;
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-    LOG.info("Initializing SCM-repository");
+    Git initRepository;
+    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info("Initializing SCM-repository");
     FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
     repoBuilder.addCeilingDirectory(baseDir);
     repoBuilder.findGitDir(baseDir);
-    Repository repo = null;
+    Repository repo;
     try {
       repo = repoBuilder.build();
       initRepository = new Git(repo);
-      LOG.info(" * SCM-repository is initialized");
+      logger.info(" * SCM-repository is initialized");
     } catch (Exception err) {
-      LOG.error(" * This is not a valid SCM-repository.");
-      LOG.error(" * Please run this goal in a valid SCM-repository");
-      LOG.error(" * Could not initialize repostory", err);
+      logger.error(" * This is not a valid SCM-repository.");
+      logger.error(" * Please run this goal in a valid SCM-repository");
+      logger.error(" * Could not initialize repostory", err);
       throw new SemverException(
           "This is not a valid SCM-repository", "Please run this goal in a valid SCM-repository");
     }
@@ -110,7 +107,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    */
   private CredentialsProvider initializeCredentialsProvider(
       String scmUrl, String configScmUserName, String configScmPassword) {
-    LOG.info("Initializing SCM-credentialsprovider");
+    logger.info("Initializing SCM-credentialsprovider");
     CredentialsProvider initProvider;
 
     Map<CREDENTIALS, String> credentials =
@@ -119,7 +116,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     initProvider =
         new UsernamePasswordCredentialsProvider(
             credentials.get(CREDENTIALS.USERNAME), credentials.get(CREDENTIALS.PASSWORD));
-    LOG.info(" * Validate credentials");
+    logger.info(" * Validate credentials");
     boolean isAuthorized = checkCredentials(initProvider);
     while (!isAuthorized) {
       Map<CREDENTIALS, String> newCredentials = promptForCredentials("", "", scmUrl);
@@ -128,7 +125,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
               newCredentials.get(CREDENTIALS.USERNAME), newCredentials.get(CREDENTIALS.PASSWORD));
       isAuthorized = checkCredentials(initProvider);
     }
-    LOG.info(" * SCM-credentialsprovider is initialized");
+    logger.info(" * SCM-credentialsprovider is initialized");
     isInitialized = true;
 
     return initProvider;
@@ -149,9 +146,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     try {
       repository.lsRemote().setCredentialsProvider(provider).call();
       isAuthorized = true;
-      LOG.info(" * Current credentials are valid");
+      logger.info(" * Current credentials are valid");
     } catch (GitAPIException err) {
-      LOG.error(err.getMessage());
+      logger.error(err.getMessage());
     }
 
     return isAuthorized;
@@ -186,7 +183,7 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         }
         credentials.put(CREDENTIALS.PASSWORD, SemverConsole.readPassword(messagePassword));
       } catch (Exception err) {
-        LOG.error(err.getMessage());
+        logger.error(err.getMessage());
       }
     } else {
       credentials.put(CREDENTIALS.USERNAME, configScmUserName);
@@ -202,9 +199,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       repository.pull().setCredentialsProvider(provider).call();
     } catch (GitAPIException err) {
       isSuccess = false;
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      logger.error(err.getMessage());
+      logger.error("");
+      logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return isSuccess;
@@ -229,9 +226,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         isRemoteDifferent = true;
       }
     } catch (GitAPIException err) {
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      logger.error(err.getMessage());
+      logger.error("");
+      logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return isRemoteDifferent;
@@ -243,9 +240,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     try {
       currentBranch = repository.getRepository().getBranch();
     } catch (IOException err) {
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      logger.error(err.getMessage());
+      logger.error("");
+      logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return currentBranch;
@@ -257,9 +254,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     try {
       tags = repository.tagList().call();
     } catch (GitAPIException err) {
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      logger.error(err.getMessage());
+      logger.error("");
+      logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return tags;
@@ -271,9 +268,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     try {
       tags = repository.pull().setCredentialsProvider(provider).getRepository().getTags();
     } catch (Exception err) {
-      LOG.error(err.getMessage());
-      LOG.error("");
-      LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+      logger.error(err.getMessage());
+      logger.error("");
+      logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
       Runtime.getRuntime().exit(1);
     }
     return tags;
@@ -337,17 +334,22 @@ public class RepositoryProviderImpl implements RepositoryProvider {
    * @param err {@link GitAPIException}
    */
   private void logException(GitAPIException err) {
-    LOG.error(err.getMessage());
-    LOG.error("");
-    LOG.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
-    LOG.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
+    logger.error(err.getMessage());
+    logger.error("");
+    logger.error(SemverExceptionMessages.MESSAGE_ERROR_SCM_CREDENTIALS);
+    logger.error(SemverExceptionMessages.MESSAGE_ERROR_PERFORM_ROLLBACK);
   }
 
   @Override
   public boolean pushTag() {
     boolean isSuccess = true;
     try {
-      repository.push().setPushTags().setRemote(BASE_BRANCH).setCredentialsProvider(provider).call();
+      repository
+          .push()
+          .setPushTags()
+          .setRemote(BASE_BRANCH)
+          .setCredentialsProvider(provider)
+          .call();
     } catch (GitAPIException err) {
       isSuccess = false;
       logException(err);
@@ -364,13 +366,13 @@ public class RepositoryProviderImpl implements RepositoryProvider {
   @Override
   public boolean isChanged() {
     boolean isChanged = false;
-    LOG.info("Check for local or remote changes");
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info("Check for local or remote changes");
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     if (checkRemoteUpdates()) {
       isChanged = true;
-      LOG.error("Remote changes                    : remote origin is ahead of local repository");
+      logger.error("Remote changes                    : remote origin is ahead of local repository");
     } else {
-      LOG.info("Remote changes                     : remote origin is up to date");
+      logger.info("Remote changes                     : remote origin is up to date");
     }
     if (!isChanged) {
       try {
@@ -378,33 +380,32 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         if (!status.isClean()) {
           isChanged = true;
         } else {
-          LOG.info("Local changes                      : workingtree is clean");
-          LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+          logger.info("Local changes                      : workingtree is clean");
+          logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
         }
       } catch (GitAPIException err) {
-        LOG.error(err.getMessage());
+        logger.error(err.getMessage());
         isChanged = true;
       }
     }
     if (isChanged) {
-      LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
-      LOG.error("");
-      LOG.error("Semver-goal has failed");
-      LOG.error("There are uncomitted changes or the remote is ahead of local repository");
-      LOG.error("Please pull remote changes and/or commit and push the open changes");
+      logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+      logger.error("");
+      logger.error("Semver-goal has failed");
+      logger.error("There are uncomitted changes or the remote is ahead of local repository");
+      logger.error("Please pull remote changes and/or commit and push the open changes");
     }
     return isChanged;
   }
 
   @Override
-  public void isLocalVersionCorrupt(String scmVersion)
-      throws SemverException, IOException, GitAPIException {
-    LOG.info("Check for corrupt local tags       : [ {} ]", scmVersion);
+  public void isLocalVersionCorrupt(String scmVersion) {
+    logger.info("Check for corrupt local tags       : [ {} ]", scmVersion);
     pull();
     List<Ref> refs = getLocalTags();
-    LOG.debug("Local tags                        ");
+    logger.debug("Local tags                        ");
     for (Ref ref : refs) {
-      LOG.debug(format(" * %s", ref.getName()));
+      logger.debug(format(" * %s", ref.getName()));
     }
     if (!refs.isEmpty()) {
       boolean found = false;
@@ -412,26 +413,26 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         if (ref.getName().contains(scmVersion)) {
           found = true;
           String tag = ref.getName().substring(10);
-          LOG.warn(" * Delete corrupt local-tag                   : [ {} ]", tag);
+          logger.warn(" * Delete corrupt local-tag                   : [ {} ]", tag);
           deleteTag(ref.getName());
-          LOG.warn(" * Delete possible corrupt remote-tag         : [ {} ]", tag);
+          logger.warn(" * Delete possible corrupt remote-tag         : [ {} ]", tag);
           pushTag();
         }
       }
       if (!found) {
-        LOG.info(" * No corrupt local tags where found");
+        logger.info(" * No corrupt local tags where found");
       }
     } else {
-      LOG.info(" * No corrupt local tags where found");
+      logger.info(" * No corrupt local tags where found");
     }
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     closeRepository();
   }
 
   @Override
   public boolean isRemoteVersionCorrupt(String scmVersion) {
     boolean isRemoteVersionCorrupt = false;
-    LOG.info("Check for corrupt remote tags      : [ {} ]", scmVersion);
+    logger.info("Check for corrupt remote tags      : [ {} ]", scmVersion);
     DefaultArtifactVersion localVersion;
     if (scmVersion.contains("-SNAPSHOT")) {
       localVersion = new DefaultArtifactVersion(scmVersion.replaceFirst("-SNAPSHOT", ""));
@@ -441,9 +442,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
     Map<String, Ref> remoteTags = getRemoteTags();
     for (Map.Entry<String, Ref> remoteTag : remoteTags.entrySet()) {
       DefaultArtifactVersion remoteVersion = new DefaultArtifactVersion(remoteTag.getKey());
-      LOG.debug(" * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
+      logger.debug(" * Compare remote-tag [ {} ] with local-tag [ {} ]", remoteVersion, localVersion);
       if (remoteVersion.compareTo(localVersion) > 0) {
-        LOG.error(
+        logger.error(
             " * Local version is corrupt       : [ local: {} ] [ remote: {} ]",
             remoteVersion,
             localVersion);
@@ -451,9 +452,9 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       }
     }
     if (!isRemoteVersionCorrupt) {
-      LOG.info(" * Remote is not ahead of local    : [ {} ]", scmVersion);
+      logger.info(" * Remote is not ahead of local    : [ {} ]", scmVersion);
     }
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isRemoteVersionCorrupt;
   }
 }

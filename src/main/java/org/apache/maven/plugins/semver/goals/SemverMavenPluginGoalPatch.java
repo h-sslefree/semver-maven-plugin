@@ -1,12 +1,15 @@
 package org.apache.maven.plugins.semver.goals;
 
 import java.io.File;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import javax.inject.Inject;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.providers.BranchProvider;
+import org.apache.maven.plugins.semver.providers.PomProvider;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
+import org.apache.maven.plugins.semver.providers.VersionProvider;
 
 /**
  *
@@ -31,8 +34,17 @@ import org.apache.maven.plugins.semver.SemverMavenPlugin;
 @Execute(phase = LifecyclePhase.TEST)
 public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
+  @Inject
+  public SemverMavenPluginGoalPatch(
+      VersionProvider versionProvider,
+      PomProvider pomProvider,
+      RepositoryProvider repositoryProvider,
+      BranchProvider branchProvider) {
+    super(versionProvider, pomProvider, repositoryProvider, branchProvider);
+  }
+
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() {
 
     String pomVersion = project.getVersion();
     if (project.getScm() == null) {

@@ -1,8 +1,8 @@
 package org.apache.maven.plugins.semver;
 
+import javax.inject.Inject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
@@ -96,24 +96,24 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
 
   private SemverConfiguration configuration;
 
-  @Component private VersionProvider versionProvider;
-  @Component private PomProvider pomProvider;
-  @Component private RepositoryProvider repositoryProvider;
-  @Component private BranchProvider branchProvider;
+  private final VersionProvider versionProvider;
+  private final PomProvider pomProvider;
+  private final RepositoryProvider repositoryProvider;
+  private final BranchProvider branchProvider;
 
   protected RunMode runModeImpl;
 
-  @Component(role = RunModeNative.class)
-  private RunMode runModeNative;
-
-  @Component(role = RunModeNativeBranch.class)
-  private RunMode runModeNativeBranch;
-
-  @Component(role = RunModeRelease.class)
-  private RunMode runModeRelease;
-
-  @Component(role = RunModeReleaseBranch.class)
-  private RunMode runModeReleaseBranch;
+  @Inject
+  public SemverMavenPlugin(
+      VersionProvider versionProvider,
+      PomProvider pomProvider,
+      RepositoryProvider repositoryProvider,
+      BranchProvider branchProvider) {
+    this.versionProvider = versionProvider;
+    this.pomProvider = pomProvider;
+    this.repositoryProvider = repositoryProvider;
+    this.branchProvider = branchProvider;
+  }
 
   /**
    * Override runMode through configuration properties
@@ -189,35 +189,28 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
     switch (runMode) {
       case NATIVE:
         LOG.info("Initialize NATIVE-runmode implementation");
-        this.runModeImpl = runModeNative;
-        break;
-      case NATIVE_BRANCH:
-        LOG.info("Initialize NATIVE_BRANCH-runmode implementation");
-        this.runModeImpl = runModeNativeBranch;
-        initializeBranchVersion();
+        this.runModeImpl = new RunModeNative(pomProvider, versionProvider, repositoryProvider);
         break;
       case NATIVE_BRANCH_RPM:
-        LOG.info("Initialize NATIVE_BRANCH_RPM-runmode implementation");
-        this.runModeImpl = runModeNativeBranch;
+      case NATIVE_BRANCH:
+        LOG.info("Initialize NATIVE_BRANCH-runmode implementation");
+        this.runModeImpl =
+            new RunModeNativeBranch(pomProvider, versionProvider, repositoryProvider);
         initializeBranchVersion();
         break;
       case RELEASE:
         LOG.info("Initialize RELEASE-runmode implementation");
-        this.runModeImpl = runModeRelease;
-        break;
-      case RELEASE_BRANCH:
-        LOG.info("Initialize RELEASE_BRANCH-runmode implementation");
-        this.runModeImpl = runModeReleaseBranch;
-        initializeBranchVersion();
+        this.runModeImpl = new RunModeRelease(project, versionProvider, repositoryProvider);
         break;
       case RELEASE_BRANCH_RPM:
-        LOG.info("Initialize RELEASE_BRANCH_RPM-runmode implementation");
-        this.runModeImpl = runModeReleaseBranch;
+      case RELEASE_BRANCH:
+        LOG.info("Initialize RELEASE_BRANCH-runmode implementation");
+        this.runModeImpl = new RunModeReleaseBranch(project, versionProvider, repositoryProvider);
         initializeBranchVersion();
         break;
       default:
         LOG.info("Initialize DEFAULT-runmode implementation");
-        this.runModeImpl = runModeNative;
+        this.runModeImpl = new RunModeNative(pomProvider, versionProvider, repositoryProvider);
         break;
     }
   }

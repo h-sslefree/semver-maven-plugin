@@ -1,33 +1,39 @@
 package org.apache.maven.plugins.semver.runmodes;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- * <h1>RunModeNative</h1>
- *
- * <p>This is the default runmode to
- *
- * @author sido
- */
-@Component(role = RunModeNative.class)
+@Named
+@Singleton
 public class RunModeNative implements RunMode {
 
-  @Requirement private Logger LOG;
+  private final Logger LOG = LoggerFactory.getLogger(RunModeNative.class);
 
-  @Requirement private PomProvider pomProvider;
-  @Requirement private VersionProvider versionProvider;
-  @Requirement private RepositoryProvider repositoryProvider;
+  private final PomProvider pomProvider;
+  private final VersionProvider versionProvider;
+  private final RepositoryProvider repositoryProvider;
+
+  @Inject
+  public RunModeNative(
+      PomProvider pomProvider,
+      VersionProvider versionProvider,
+      RepositoryProvider repositoryProvider) {
+    this.pomProvider = requireNonNull(pomProvider);
+    this.versionProvider = requireNonNull(versionProvider);
+    this.repositoryProvider = requireNonNull(repositoryProvider);
+  }
 
   @Override
   public void execute(

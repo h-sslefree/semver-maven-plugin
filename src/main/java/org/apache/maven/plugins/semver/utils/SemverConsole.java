@@ -1,10 +1,10 @@
 package org.apache.maven.plugins.semver.utils;
 
+import static java.lang.System.console;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import static java.lang.System.console;
 
 /**
  *

@@ -9,9 +9,9 @@
 	<name>Test Semver Plugin</name>
 
 	<scm>
-		<url>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</url>
-		<connection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</developerConnection>
+		<url>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</url>
+		<connection>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</connection>
+		<developerConnection>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</developerConnection>
 	</scm>
 	
 	<dependencies>
@@ -26,8 +26,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.bicat</groupId>
+				<groupId>nl.hasslefree.maven.plugins</groupId>
 				<artifactId>semver-maven-plugin</artifactId>
+				<version>3.3.1-SNAPSHOT</version>
 				<configuration>
 					<runMode>RELEASE_BRANCH</runMode>
 				</configuration>

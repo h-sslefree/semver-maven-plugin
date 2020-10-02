@@ -1,14 +1,17 @@
 package org.apache.maven.plugins.semver.goals;
 
+import static java.lang.String.format;
+
 import java.io.File;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import javax.inject.Inject;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
+import org.apache.maven.plugins.semver.providers.BranchProvider;
+import org.apache.maven.plugins.semver.providers.PomProvider;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
+import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
-
-import static java.lang.String.format;
 
 /**
  * Rollback failed PATCH, MINOR or MAJOR.
@@ -20,8 +23,17 @@ import static java.lang.String.format;
 @Mojo(name = "rollback")
 public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
 
+  @Inject
+  public SemverMavenPluginGoalRollback(
+      VersionProvider versionProvider,
+      PomProvider pomProvider,
+      RepositoryProvider repositoryProvider,
+      BranchProvider branchProvider) {
+    super(versionProvider, pomProvider, repositoryProvider, branchProvider);
+  }
+
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() {
 
     String version = project.getVersion();
     String scmConnection = project.getScm().getConnection();
@@ -64,7 +76,8 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
       }
     } else {
       LOG.error("");
-      LOG.error(format("Ÿou have configured a wrong RUN_MODE ( %s )", getConfiguration().getRunMode()));
+      LOG.error(
+          format("Ÿou have configured a wrong RUN_MODE ( %s )", getConfiguration().getRunMode()));
       LOG.error("Ÿou have to use release:rollback to revert the version update");
     }
   }

@@ -3,10 +3,15 @@ package org.apache.maven.plugins.semver.goals;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import javax.inject.Inject;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.providers.BranchProvider;
+import org.apache.maven.plugins.semver.providers.PomProvider;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
+import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
@@ -21,6 +26,15 @@ import org.eclipse.jgit.lib.Ref;
 @Deprecated
 @Mojo(name = "cleanup-git-tags")
 public class SemverMavenPluginGoalCleanupGitTags extends SemverMavenPlugin {
+
+  @Inject
+  public SemverMavenPluginGoalCleanupGitTags(
+      VersionProvider versionProvider,
+      PomProvider pomProvider,
+      RepositoryProvider repositoryProvider,
+      BranchProvider branchProvider) {
+    super(versionProvider, pomProvider, repositoryProvider, branchProvider);
+  }
 
   /**
    * @throws MojoExecutionException

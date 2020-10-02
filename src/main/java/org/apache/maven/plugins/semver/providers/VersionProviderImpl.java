@@ -1,31 +1,33 @@
 package org.apache.maven.plugins.semver.providers;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.apache.maven.plugins.semver.goals.SemverGoal;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Component(role = VersionProvider.class)
+@Named
+@Singleton
 public class VersionProviderImpl implements VersionProvider {
 
-  @Requirement private Logger LOG;
-  @Requirement private RepositoryProvider repositoryProvider;
+  private Logger LOG = LoggerFactory.getLogger(VersionProviderImpl.class);
 
-  /**
-   * In the constructor the logging and the configuration is given.
-   *
-   * <p>These are elements which continue to return in the different methods.
-   */
+  private RepositoryProvider repositoryProvider;
+
   @Inject
-  public VersionProviderImpl() {}
+  public VersionProviderImpl(RepositoryProvider repositoryProvider) {
+    this.repositoryProvider = requireNonNull(repositoryProvider);
+  }
 
   public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(
       SemverGoal.SEMVER_GOAL semverGoal,
@@ -142,16 +144,15 @@ public class VersionProviderImpl implements VersionProvider {
     scmVersion.append(releaseVersion);
     scmVersion.append(buildMetaData);
 
-    if (LOG != null) {
-      LOG.info(
-          "New DEVELOPMENT-version            : [ {} ]",
-          rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
-      LOG.info(
-          "New BRANCH GIT build-metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
-      LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
-      LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
-      LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
-    }
+    LOG.info(
+        "New DEVELOPMENT-version            : [ {} ]",
+        rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
+    LOG.info(
+        "New BRANCH GIT build-metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
+    LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
+    LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
+    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+
     Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
     finalVersions.put(
         FINAL_VERSION.DEVELOPMENT, rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));

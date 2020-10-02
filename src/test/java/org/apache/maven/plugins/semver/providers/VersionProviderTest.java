@@ -1,31 +1,33 @@
-package org.apache.maven.plugins.semver.test.providers;
+package org.apache.maven.plugins.semver.providers;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
+import org.apache.maven.plugins.semver.providers.RepositoryProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider;
 import org.apache.maven.plugins.semver.providers.VersionProvider.FINAL_VERSION;
 import org.apache.maven.plugins.semver.providers.VersionProvider.RAW_VERSION;
 import org.apache.maven.plugins.semver.providers.VersionProviderImpl;
 import org.apache.maven.plugins.semver.runmodes.RunMode;
-import org.apache.maven.plugins.semver.test.AbstractSemverMavenPluginTest;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-/**
- *
- *
- * <h1>VersionFactoryTest</h1>
- *
- * <p>Testing the version factory withoutthe pom context.
- *
- * @author sido
- */
-public class VersionProviderTest extends AbstractSemverMavenPluginTest {
+@RunWith(MockitoJUnitRunner.class)
+public class VersionProviderTest {
 
-  private final Log LOG = null;
+  @Mock private RepositoryProvider repositoryProvider;
+
+  private VersionProvider versionProvider;
+
+  @Before
+  public void setUp() {
+    versionProvider = new VersionProviderImpl(repositoryProvider);
+  }
 
   private SemverConfiguration getConfigurationRelease() {
     SemverConfiguration configuration = new SemverConfiguration(null);
@@ -62,9 +64,6 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
   @Test
   public void createReleaseTest() {
-
-    VersionProvider versionProvider = new VersionProviderImpl();
-
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
@@ -81,8 +80,6 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
   @Test
   public void createReleaseBranchTest() {
-
-    VersionProvider versionProvider = new VersionProviderImpl();
 
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
@@ -105,8 +102,6 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
   @Test
   public void createReleaseBranchRpmTest() {
 
-    VersionProvider versionProvider = new VersionProviderImpl();
-
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
@@ -128,8 +123,6 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
   @Test
   public void createNativeTest() {
 
-    VersionProvider versionProvider = new VersionProviderImpl();
-
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
@@ -146,8 +139,6 @@ public class VersionProviderTest extends AbstractSemverMavenPluginTest {
 
   @Test
   public void createNativeBranchTest() {
-
-    VersionProvider versionProvider = new VersionProviderImpl();
 
     Map<RAW_VERSION, String> rawVersions = new HashMap<>();
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");

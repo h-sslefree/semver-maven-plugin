@@ -76,6 +76,7 @@
 
         <maven.plugin.testing.harness-version>3.3.0</maven.plugin.testing.harness-version>
         <junit-version>4.12</junit-version>
+        <mockito.core-version>3.5.13</mockito.core-version>
     </properties>
 
     <build>
@@ -197,6 +198,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${maven.plugin-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.plugin-version}</version>
         </dependency>
@@ -251,6 +257,17 @@
             <artifactId>junit</artifactId>
             <version>${junit-version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.plugin-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.core-version}</version>
         </dependency>
 
     </dependencies>

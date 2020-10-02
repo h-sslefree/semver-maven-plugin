@@ -2,16 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.bicat</groupId>
+	<groupId>nl.hasslefree</groupId>
 	<artifactId>semver-maven-plugin-test</artifactId>
 	<version>0.0.12-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Test Semver Plugin</name>
 
 	<scm>
-		<url>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</url>
-		<connection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/bronsenproject/semver-maven-plugin-test.git</developerConnection>
+		<url>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</url>
+		<connection>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</connection>
+		<developerConnection>scm:git:https://github.com/h-sslefree/semver-maven-plugin-test.git</developerConnection>
 	</scm>
 	
 	<dependencies>
@@ -26,11 +26,11 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.bicat</groupId>
+				<groupId>nl.hasslefree.maven.plugins</groupId>
 				<artifactId>semver-maven-plugin</artifactId>
 				<configuration>
 					<runMode>RELEASE</runMode>
-					<branchVersion>6.3.4</branchVersion>
+					<branchVersion>1.0.0</branchVersion>
 				</configuration>
 			</plugin>
 		</plugins>
