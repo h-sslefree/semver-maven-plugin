@@ -1,6 +1,6 @@
 # semver-maven-plugin
 
-[![Build Status](https://travis-ci.org/h-sslefree/semver-maven-plugin.svg?branch=master)](https://travis-ci.org/h-sslefree/semver-maven-plugin)[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=semver-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=semver-maven-plugin)
+[![Build Status](https://travis-ci.org/h-sslefree/semver-maven-plugin.svg?branch=master)](https://travis-ci.org/h-sslefree/semver-maven-plugin) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=semver-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=semver-maven-plugin)
 
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
 
