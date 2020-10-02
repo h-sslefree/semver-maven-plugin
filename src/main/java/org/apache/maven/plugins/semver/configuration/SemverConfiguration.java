@@ -268,7 +268,6 @@ public class SemverConfiguration {
     return this.checkRemoteVersionTags;
   }
 
-
   public boolean pushTags() {
     return this.pushTags;
   }

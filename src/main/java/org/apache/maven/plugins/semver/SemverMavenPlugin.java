@@ -5,8 +5,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
-import org.apache.maven.plugins.semver.goals.SemverGoal;
-import org.apache.maven.plugins.semver.goals.SemverGoal.SEMVER_GOAL;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
@@ -16,8 +14,6 @@ import org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * Abstract class to use as template for each goal in the plugin.
@@ -239,5 +235,4 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
       configuration.setBranchVersion(branchVersion);
     }
   }
-
 }

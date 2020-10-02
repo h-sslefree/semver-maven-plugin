@@ -32,7 +32,7 @@ public interface RepositoryProvider {
    * @param configScmPassword scmPassword from {@link SemverConfiguration}
    */
   void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword)
-          throws RepositoryInitialisationException;
+      throws RepositoryInitialisationException;
 
   /**
    * Is the repotistory succesfully initialized?
