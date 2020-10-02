@@ -1,5 +1,7 @@
 # semver-maven-plugin
 
+[![Build Status](https://travis-ci.org/h-sslefree/semver-maven-plugin.svg?branch=master)](https://travis-ci.org/h-sslefree/semver-maven-plugin)
+
 The semver-maven-plugin is used to determine the next version of a MAVEN project. Symantic versioning is used to specify the version symantics.
 
 Check: [semver.org](https://www.semver.org) for more information
