@@ -8,6 +8,7 @@ import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.exceptions.RepositoryInitialisationException;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.providers.PomProvider;
 import org.apache.maven.plugins.semver.providers.RepositoryProvider;
@@ -53,13 +54,17 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
     if (getConfiguration().pushTags() && mavenProject.getScm() != null) {
       scmConnection = mavenProject.getScm().getConnection();
       scmRoot = mavenProject.getBasedir();
-      getRepositoryProvider()
-          .initialize(
-              scmRoot,
-              scmConnection,
-              getConfiguration().getScmUsername(),
-              getConfiguration().getScmPassword());
-    } else {
+      try {
+        getRepositoryProvider()
+            .initialize(
+                scmRoot,
+                scmConnection,
+                getConfiguration().getScmUsername(),
+                getConfiguration().getScmPassword());
+      } catch (RepositoryInitialisationException e) {
+        logger.error(e.getMessage());
+      }
+    } else if (getConfiguration().pushTags()) {
       logger.error(" * No SCM information supplied");
       logger.error(" * Please described the scm block in the pom.xml");
       Runtime.getRuntime().exit(1);

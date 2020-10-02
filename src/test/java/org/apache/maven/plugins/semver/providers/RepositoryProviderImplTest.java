@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import org.apache.maven.plugins.semver.exceptions.RepositoryInitialisationException;
-import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,7 @@ public class RepositoryProviderImplTest {
     repositoryProvider = new RepositoryProviderImpl();
   }
 
-  @Test(expected = SemverException.class)
+  @Test(expected = RepositoryInitialisationException.class)
   public void testInitialize() throws RepositoryInitialisationException {
     String scmUrl = "https://github.com/h-sslefree/test";
     String scmUsername = "test";

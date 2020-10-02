@@ -9,6 +9,7 @@ import java.io.File;
 import javax.inject.Inject;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.exceptions.RepositoryInitialisationException;
 import org.apache.maven.plugins.semver.factories.FileWriterFactory;
 import org.apache.maven.plugins.semver.providers.BranchProvider;
 import org.apache.maven.plugins.semver.providers.PomProvider;
@@ -39,12 +40,16 @@ public class SemverMavenPluginGoalRollback extends SemverMavenPlugin {
     String version = mavenProject.getVersion();
     String scmConnection = mavenProject.getScm().getConnection();
     File scmRoot = mavenProject.getBasedir();
-    getRepositoryProvider()
-        .initialize(
-            scmRoot,
-            scmConnection,
-            getConfiguration().getScmUsername(),
-            getConfiguration().getScmPassword());
+    try {
+      getRepositoryProvider()
+          .initialize(
+              scmRoot,
+              scmConnection,
+              getConfiguration().getScmUsername(),
+              getConfiguration().getScmPassword());
+    } catch (RepositoryInitialisationException e) {
+      logger.error(e.getMessage());
+    }
 
     logger.info(FUNCTION_LINE_BREAK);
     logger.info("Semver-goal                        : {}", ROLLBACK.getDescription());
