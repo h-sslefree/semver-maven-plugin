@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
+import org.apache.maven.plugins.semver.exceptions.RepositoryInitialisationException;
 import org.apache.maven.plugins.semver.exceptions.SemverException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
@@ -30,7 +31,8 @@ public interface RepositoryProvider {
    * @param configScmUsername scmUsername from {@link SemverConfiguration}
    * @param configScmPassword scmPassword from {@link SemverConfiguration}
    */
-  void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword);
+  void initialize(File baseDir, String scmUrl, String configScmUsername, String configScmPassword)
+          throws RepositoryInitialisationException;
 
   /**
    * Is the repotistory succesfully initialized?

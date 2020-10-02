@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class VersionProviderImpl implements VersionProvider {
 
-  private Logger LOG = LoggerFactory.getLogger(VersionProviderImpl.class);
+  private Logger logger = LoggerFactory.getLogger(VersionProviderImpl.class);
 
-  private RepositoryProvider repositoryProvider;
+  private final RepositoryProvider repositoryProvider;
 
   @Inject
   public VersionProviderImpl(RepositoryProvider repositoryProvider) {
@@ -45,23 +45,23 @@ public class VersionProviderImpl implements VersionProvider {
 
     String[] rawVersion = pomVersion.split("\\.");
     if (rawVersion.length == 3) {
-      LOG.debug("Set version-variables from POM.xml");
-      LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+      logger.debug("Set version-variables from POM.xml");
+      logger.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
       majorVersion = Integer.parseInt(rawVersion[0]);
       minorVersion = Integer.parseInt(rawVersion[1]);
       patchVersion = Integer.parseInt(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
     } else {
-      LOG.error("Unrecognized version-pattern");
-      LOG.error("Semver plugin is terminating");
+      logger.error("Unrecognized version-pattern");
+      logger.error("Semver plugin is terminating");
       throw new SemverException(
           "Unrecognized version-pattern",
           "Could not parse version from POM.xml because of not parsable version-pattern");
     }
 
-    LOG.debug("MAJOR-version                     : [ {} ]", majorVersion);
-    LOG.debug("MINOR-version                     : [ {} ]", minorVersion);
-    LOG.debug("PATCH-version                     : [ {} ]", patchVersion);
-    LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.debug("MAJOR-version                     : [ {} ]", majorVersion);
+    logger.debug("MINOR-version                     : [ {} ]", minorVersion);
+    logger.debug("PATCH-version                     : [ {} ]", patchVersion);
+    logger.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
 
     if (semverGoal == SemverGoal.SEMVER_GOAL.MAJOR) {
       majorVersion = majorVersion + 1;
@@ -94,10 +94,10 @@ public class VersionProviderImpl implements VersionProvider {
     String metaData =
         determineBuildMetaData(runMode, configMetaData, patchVersion, minorVersion, majorVersion);
 
-    LOG.info("New DEVELOPMENT-version            : [ {} ]", developmentVersion);
-    LOG.info("New GIT-version                    : [ {}{} ]", scmVersion, metaData);
-    LOG.info("New RELEASE-version                : [ {} ]", releaseVersion);
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info("New DEVELOPMENT-version            : [ {} ]", developmentVersion);
+    logger.info("New GIT-version                    : [ {}{} ]", scmVersion, metaData);
+    logger.info("New RELEASE-version                : [ {} ]", releaseVersion);
+    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
 
     versions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, developmentVersion);
     versions.put(VersionProvider.RAW_VERSION.RELEASE, releaseVersion);
@@ -144,14 +144,14 @@ public class VersionProviderImpl implements VersionProvider {
     scmVersion.append(releaseVersion);
     scmVersion.append(buildMetaData);
 
-    LOG.info(
+    logger.info(
         "New DEVELOPMENT-version            : [ {} ]",
         rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
-    LOG.info(
+    logger.info(
         "New BRANCH GIT build-metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
-    LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
-    LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
+    logger.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
 
     Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
     finalVersions.put(
@@ -232,24 +232,24 @@ public class VersionProviderImpl implements VersionProvider {
   @Override
   public boolean isVersionCorrupt(String pomVersion) throws SemverException {
     boolean isVersionCorrupt = false;
-    LOG.info("Check on pom-version");
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info("Check on pom-version");
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     if (pomVersion == null || pomVersion.isEmpty()) {
       isVersionCorrupt = true;
-      LOG.error("");
-      LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
-      LOG.error("");
+      logger.error("");
+      logger.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
+      logger.error("");
     } else if (pomVersion.contains("-SNAPSHOT")) {
       isVersionCorrupt = true;
-      LOG.error("");
-      LOG.error(
+      logger.error("");
+      logger.error(
           "The version in the pom.xml [ {} ] does not contain -SNAPSHOT. Please repair the version-string",
           pomVersion);
-      LOG.error("");
+      logger.error("");
     } else {
-      LOG.info("Pom-version is correct             : [ {} ]", pomVersion);
+      logger.info("Pom-version is correct             : [ {} ]", pomVersion);
     }
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
     return isVersionCorrupt;
   }
 }
