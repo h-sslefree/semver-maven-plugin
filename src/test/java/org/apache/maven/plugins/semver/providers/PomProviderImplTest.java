@@ -18,8 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PomProviderImplTest
-{
+public class PomProviderImplTest {
   @Mock private BuildPluginManager buildPluginManager;
   @Mock private MavenSession mavenSession;
   @Mock private MavenProject mavenProject;
@@ -52,7 +51,7 @@ public class PomProviderImplTest
     Map<FINAL_VERSION, String> finalVersions =
         versionProvider.determineReleaseVersions(rawVersions);
     assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.RELEASE));
-    assertEquals( "1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
-    assertEquals( "1.0.0", finalVersions.get(FINAL_VERSION.SCM));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 }
