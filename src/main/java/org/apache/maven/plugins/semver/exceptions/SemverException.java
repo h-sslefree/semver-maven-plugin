@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SemverException extends Exception {
 
-  private static final Log LOG = LogFactory.getLog(SemverException.class);
+  private static final Log logger = LogFactory.getLog(SemverException.class);
 
   /**
    * <h>Constructor to initialize SemverException</h>
@@ -19,7 +19,7 @@ public class SemverException extends Exception {
    * @param message body of the error-message
    */
   public SemverException(String header, String message) {
-    LOG.error(header);
-    LOG.error(message);
+    logger.error(header);
+    logger.error(message);
   }
 }

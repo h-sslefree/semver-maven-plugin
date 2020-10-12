@@ -3,12 +3,13 @@ package org.apache.maven.plugins.semver.factories;
 import static java.lang.String.format;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.delete;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.FUNCTION_LINE_BREAK;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.MOJO_LINE_BREAK;
 
 import java.io.*;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
-import org.apache.maven.plugins.semver.SemverMavenPlugin;
-import org.apache.maven.plugins.semver.providers.VersionProvider;
+import org.apache.maven.plugins.semver.providers.VersionProvider.FINAL_VERSION;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,22 +37,22 @@ public class FileWriterFactory {
    * @param finalVersions map with development, release and scm version
    */
   public static void createReleaseProperties(
-      MavenProject project, Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
+      MavenProject project, Map<FINAL_VERSION, String> finalVersions) {
     String mavenProjectRelease =
         "project.rel."
             + project.getGroupId()
             + "\\\u003A"
             + project.getArtifactId()
             + "\u003D"
-            + finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE);
+            + finalVersions.get(FINAL_VERSION.RELEASE);
     String mavenProjectDevelopment =
         "project.dev."
             + project.getGroupId()
             + "\\\u003A"
             + project.getArtifactId()
             + "\u003D"
-            + finalVersions.get(VersionProvider.FINAL_VERSION.DEVELOPMENT);
-    String mavenProjectScm = "scm.tag=" + finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
+            + finalVersions.get(FINAL_VERSION.DEVELOPMENT);
+    String mavenProjectScm = "scm.tag=" + finalVersions.get(FINAL_VERSION.SCM);
 
     String releaseText =
         mavenProjectRelease + "\n" + mavenProjectDevelopment + "\n" + mavenProjectScm;
@@ -61,7 +62,7 @@ public class FileWriterFactory {
   /** Backup the old pom to make sure when the build fails it can be set back. */
   public static void backupSemverPom() {
     logger.info("Backup pom.xml");
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     try {
       File pomXmlOriginal = new File("pom.xml");
       File pomXmlSemverBackup = new File(SEMVER_BACKUP);
@@ -80,7 +81,7 @@ public class FileWriterFactory {
       logger.error("Error when creating new pom.xml.semverBackup", err);
       Runtime.getRuntime().exit(1);
     }
-    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(FUNCTION_LINE_BREAK);
   }
 
   /**
@@ -95,7 +96,7 @@ public class FileWriterFactory {
     File pomXmlSemverBackup = new File(SEMVER_BACKUP);
     logger.info(" * Replace pom.xml with            : pom.xml.semverBackup");
     try {
-      copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      copy(pomXmlSemverBackup.toPath(), pomXml.toPath(), REPLACE_EXISTING);
     } catch (IOException err) {
       logger.error(err.getMessage());
     }
@@ -108,7 +109,7 @@ public class FileWriterFactory {
    */
   public static void removeBackupSemverPom() {
     logger.info("Cleanup pom.xml.semverBackup");
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     File pomXmlSemverBackup = new File(SEMVER_BACKUP);
     if (pomXmlSemverBackup.exists()) {
       try {
@@ -119,7 +120,7 @@ public class FileWriterFactory {
         Runtime.getRuntime().exit(1);
       }
     }
-    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(FUNCTION_LINE_BREAK);
   }
 
   /**

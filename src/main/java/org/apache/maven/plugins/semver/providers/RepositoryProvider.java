@@ -44,7 +44,7 @@ public interface RepositoryProvider {
    *
    * @return is pull completed?
    */
-  boolean pull();
+  void pull();
 
   /**
    * Get currentbranch which you are working in
@@ -73,7 +73,7 @@ public interface RepositoryProvider {
    * @param tag SCM-tag to create
    * @return is the SCM-tag succesfully created
    */
-  boolean createTag(String tag);
+  void createTag(String tag);
 
   /**
    * Delete a local SCM-tag
@@ -81,7 +81,7 @@ public interface RepositoryProvider {
    * @param tag SCM-tag to delete
    * @return is the tag succesfully deleted?
    */
-  boolean deleteTag(String tag);
+  void deleteTag(String tag);
 
   /**
    * Perform a commit on the local repository
@@ -89,21 +89,21 @@ public interface RepositoryProvider {
    * @param message SCM-commit message
    * @return is the commit completed?
    */
-  boolean commit(String message);
+  void commit(String message);
 
   /**
    * Push all changes to remote.
    *
    * @return is push successfull
    */
-  boolean push();
+  void push();
 
   /**
    * Push a SCM-tag to the remote SCM-repository.
    *
    * @return is the tag succesfully pushed
    */
-  boolean pushTag();
+  void pushTag();
 
   /** Close the repository when finished. */
   void closeRepository();

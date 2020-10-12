@@ -1,9 +1,13 @@
 package org.apache.maven.plugins.semver.providers;
 
+import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.FUNCTION_LINE_BREAK;
+import static org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE.NATIVE_BRANCH;
+import static org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE.NATIVE_BRANCH_RPM;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,16 +24,16 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class VersionProviderImpl implements VersionProvider {
 
-  private Logger LOG = LoggerFactory.getLogger(VersionProviderImpl.class);
+  private Logger logger = LoggerFactory.getLogger(VersionProviderImpl.class);
 
-  private RepositoryProvider repositoryProvider;
+  private final RepositoryProvider repositoryProvider;
 
   @Inject
   public VersionProviderImpl(RepositoryProvider repositoryProvider) {
     this.repositoryProvider = requireNonNull(repositoryProvider);
   }
 
-  public Map<VersionProvider.RAW_VERSION, String> determineRawVersions(
+  public Map<RAW_VERSION, String> determineRawVersions(
       SemverGoal.SEMVER_GOAL semverGoal,
       RunMode.RUN_MODE runMode,
       String configBranchVersion,
@@ -37,7 +41,7 @@ public class VersionProviderImpl implements VersionProvider {
       String pomVersion)
       throws SemverException, IOException, GitAPIException {
 
-    Map<VersionProvider.RAW_VERSION, String> versions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> versions = new EnumMap<>(RAW_VERSION.class);
 
     int majorVersion;
     int minorVersion;
@@ -45,23 +49,23 @@ public class VersionProviderImpl implements VersionProvider {
 
     String[] rawVersion = pomVersion.split("\\.");
     if (rawVersion.length == 3) {
-      LOG.debug("Set version-variables from POM.xml");
-      LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
-      majorVersion = Integer.parseInt(rawVersion[0]);
-      minorVersion = Integer.parseInt(rawVersion[1]);
-      patchVersion = Integer.parseInt(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
+      logger.debug("Set version-variables from POM.xml");
+      logger.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+      majorVersion = parseInt(rawVersion[0]);
+      minorVersion = parseInt(rawVersion[1]);
+      patchVersion = parseInt(rawVersion[2].substring(0, rawVersion[2].lastIndexOf('-')));
     } else {
-      LOG.error("Unrecognized version-pattern");
-      LOG.error("Semver plugin is terminating");
+      logger.error("Unrecognized version-pattern");
+      logger.error("Semver plugin is terminating");
       throw new SemverException(
           "Unrecognized version-pattern",
           "Could not parse version from POM.xml because of not parsable version-pattern");
     }
 
-    LOG.debug("MAJOR-version                     : [ {} ]", majorVersion);
-    LOG.debug("MINOR-version                     : [ {} ]", minorVersion);
-    LOG.debug("PATCH-version                     : [ {} ]", patchVersion);
-    LOG.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.debug("MAJOR-version                     : [ {} ]", majorVersion);
+    logger.debug("MINOR-version                     : [ {} ]", minorVersion);
+    logger.debug("PATCH-version                     : [ {} ]", patchVersion);
+    logger.debug(SemverMavenPlugin.MOJO_LINE_BREAK);
 
     if (semverGoal == SemverGoal.SEMVER_GOAL.MAJOR) {
       majorVersion = majorVersion + 1;
@@ -80,8 +84,7 @@ public class VersionProviderImpl implements VersionProvider {
     // TODO:SH move this part to a RunModeNative and RunModeNativeRpm implementation
     String releaseVersion;
     String scmVersion;
-    if (runMode.equals(RunMode.RUN_MODE.NATIVE_BRANCH)
-        || runMode.equals(RunMode.RUN_MODE.NATIVE_BRANCH_RPM)) {
+    if (runMode.equals(NATIVE_BRANCH) || runMode.equals(NATIVE_BRANCH_RPM)) {
       scmVersion =
           determineReleaseBranchTag(
               runMode, configBranchVersion, patchVersion, minorVersion, majorVersion);
@@ -94,17 +97,17 @@ public class VersionProviderImpl implements VersionProvider {
     String metaData =
         determineBuildMetaData(runMode, configMetaData, patchVersion, minorVersion, majorVersion);
 
-    LOG.info("New DEVELOPMENT-version            : [ {} ]", developmentVersion);
-    LOG.info("New GIT-version                    : [ {}{} ]", scmVersion, metaData);
-    LOG.info("New RELEASE-version                : [ {} ]", releaseVersion);
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info("New DEVELOPMENT-version            : [ {} ]", developmentVersion);
+    logger.info("New GIT-version                    : [ {}{} ]", scmVersion, metaData);
+    logger.info("New RELEASE-version                : [ {} ]", releaseVersion);
+    logger.info(FUNCTION_LINE_BREAK);
 
-    versions.put(VersionProvider.RAW_VERSION.DEVELOPMENT, developmentVersion);
-    versions.put(VersionProvider.RAW_VERSION.RELEASE, releaseVersion);
-    versions.put(VersionProvider.RAW_VERSION.SCM, scmVersion + metaData);
-    versions.put(VersionProvider.RAW_VERSION.MAJOR, String.valueOf(majorVersion));
-    versions.put(VersionProvider.RAW_VERSION.MINOR, String.valueOf(minorVersion));
-    versions.put(VersionProvider.RAW_VERSION.PATCH, String.valueOf(patchVersion));
+    versions.put(RAW_VERSION.DEVELOPMENT, developmentVersion);
+    versions.put(RAW_VERSION.RELEASE, releaseVersion);
+    versions.put(RAW_VERSION.SCM, scmVersion + metaData);
+    versions.put(RAW_VERSION.MAJOR, String.valueOf(majorVersion));
+    versions.put(RAW_VERSION.MINOR, String.valueOf(minorVersion));
+    versions.put(RAW_VERSION.PATCH, String.valueOf(patchVersion));
 
     repositoryProvider.isLocalVersionCorrupt(scmVersion);
     return versions;
@@ -112,7 +115,7 @@ public class VersionProviderImpl implements VersionProvider {
 
   @Override
   public Map<FINAL_VERSION, String> determineReleaseVersions(Map<RAW_VERSION, String> rawVersions) {
-    Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
+    EnumMap<FINAL_VERSION, String> finalVersions = new EnumMap<>(FINAL_VERSION.class);
     finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(RAW_VERSION.DEVELOPMENT));
     finalVersions.put(FINAL_VERSION.RELEASE, rawVersions.get(RAW_VERSION.RELEASE));
     finalVersions.put(FINAL_VERSION.SCM, rawVersions.get(RAW_VERSION.RELEASE));
@@ -121,14 +124,14 @@ public class VersionProviderImpl implements VersionProvider {
 
   @Override
   public Map<FINAL_VERSION, String> determineReleaseBranchVersions(
-      Map<VersionProvider.RAW_VERSION, String> rawVersions,
+      Map<RAW_VERSION, String> rawVersions,
       RunMode.RUN_MODE runMode,
       String metaData,
       String branchVersion) {
 
-    int patch = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.PATCH));
-    int minor = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.MINOR));
-    int major = Integer.parseInt(rawVersions.get(VersionProvider.RAW_VERSION.MAJOR));
+    int patch = parseInt(rawVersions.get(RAW_VERSION.PATCH));
+    int minor = parseInt(rawVersions.get(RAW_VERSION.MINOR));
+    int major = parseInt(rawVersions.get(RAW_VERSION.MAJOR));
 
     String releaseTag = determineReleaseTag(runMode, patch, minor, major);
     String buildMetaData = determineBuildMetaData(runMode, metaData, patch, minor, major);
@@ -144,18 +147,16 @@ public class VersionProviderImpl implements VersionProvider {
     scmVersion.append(releaseVersion);
     scmVersion.append(buildMetaData);
 
-    LOG.info(
-        "New DEVELOPMENT-version            : [ {} ]",
-        rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
-    LOG.info(
+    logger.info(
+        "New DEVELOPMENT-version            : [ {} ]", rawVersions.get(RAW_VERSION.DEVELOPMENT));
+    logger.info(
         "New BRANCH GIT build-metadata      : [ {} ]", determineLogBuildMetaData(buildMetaData));
-    LOG.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
-    LOG.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info("New BRANCH GIT-version             : [ {} ]", scmVersion);
+    logger.info("New BRANCH RELEASE-version         : [ {} ]", releaseVersion);
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
 
-    Map<FINAL_VERSION, String> finalVersions = new HashMap<>();
-    finalVersions.put(
-        FINAL_VERSION.DEVELOPMENT, rawVersions.get(VersionProvider.RAW_VERSION.DEVELOPMENT));
+    EnumMap<FINAL_VERSION, String> finalVersions = new EnumMap<>(FINAL_VERSION.class);
+    finalVersions.put(FINAL_VERSION.DEVELOPMENT, rawVersions.get(RAW_VERSION.DEVELOPMENT));
     finalVersions.put(FINAL_VERSION.BUILD_METADATA, buildMetaData);
     finalVersions.put(FINAL_VERSION.SCM, scmVersion.toString());
     finalVersions.put(FINAL_VERSION.RELEASE, releaseVersion.toString());
@@ -187,8 +188,7 @@ public class VersionProviderImpl implements VersionProvider {
     releaseTag.append(minor);
     releaseTag.append(".");
     releaseTag.append(patch);
-    if (runMode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM
-        || runMode == RunMode.RUN_MODE.NATIVE_BRANCH_RPM) {
+    if (runMode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM || runMode == NATIVE_BRANCH_RPM) {
       releaseTag = new StringBuilder();
       releaseTag.append(branchVersion);
       releaseTag.append(String.format("%03d%03d%03d", major, minor, patch));
@@ -204,8 +204,7 @@ public class VersionProviderImpl implements VersionProvider {
     releaseTag.append(minor);
     releaseTag.append(".");
     releaseTag.append(patch);
-    if (runMode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM
-        || runMode == RunMode.RUN_MODE.NATIVE_BRANCH_RPM) {
+    if (runMode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM || runMode == NATIVE_BRANCH_RPM) {
       releaseTag = new StringBuilder();
       releaseTag.append(String.format("%03d%03d%03d", major, minor, patch));
     }
@@ -216,8 +215,7 @@ public class VersionProviderImpl implements VersionProvider {
   public String determineBuildMetaData(
       RunMode.RUN_MODE runmode, String metaData, int patch, int minor, int major) {
     StringBuilder buildMetaData = new StringBuilder();
-    if (runmode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM
-        || runmode == RunMode.RUN_MODE.NATIVE_BRANCH_RPM) {
+    if (runmode == RunMode.RUN_MODE.RELEASE_BRANCH_RPM || runmode == NATIVE_BRANCH_RPM) {
       String buildMetaDataBranch = major + "." + minor + "." + patch;
       buildMetaData.append("+");
       buildMetaData.append(buildMetaDataBranch);
@@ -230,26 +228,26 @@ public class VersionProviderImpl implements VersionProvider {
   }
 
   @Override
-  public boolean isVersionCorrupt(String pomVersion) throws SemverException {
+  public boolean isVersionCorrupt(String pomVersion) {
     boolean isVersionCorrupt = false;
-    LOG.info("Check on pom-version");
-    LOG.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info("Check on pom-version");
+    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
     if (pomVersion == null || pomVersion.isEmpty()) {
       isVersionCorrupt = true;
-      LOG.error("");
-      LOG.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
-      LOG.error("");
+      logger.error("");
+      logger.error("The version in the pom.xml is NULL of empty please correct the pom.xml");
+      logger.error("");
     } else if (pomVersion.contains("-SNAPSHOT")) {
       isVersionCorrupt = true;
-      LOG.error("");
-      LOG.error(
+      logger.error("");
+      logger.error(
           "The version in the pom.xml [ {} ] does not contain -SNAPSHOT. Please repair the version-string",
           pomVersion);
-      LOG.error("");
+      logger.error("");
     } else {
-      LOG.info("Pom-version is correct             : [ {} ]", pomVersion);
+      logger.info("Pom-version is correct             : [ {} ]", pomVersion);
     }
-    LOG.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(FUNCTION_LINE_BREAK);
     return isVersionCorrupt;
   }
 }

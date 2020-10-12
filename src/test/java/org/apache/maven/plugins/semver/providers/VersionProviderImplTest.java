@@ -1,8 +1,9 @@
 package org.apache.maven.plugins.semver.providers;
 
+import static org.apache.maven.plugins.semver.runmodes.RunMode.RUN_MODE.*;
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import org.apache.maven.plugins.semver.configuration.SemverConfiguration;
 import org.apache.maven.plugins.semver.providers.VersionProvider.FINAL_VERSION;
@@ -15,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class VersionProviderTest {
+public class VersionProviderImplTest {
 
   @Mock private RepositoryProvider repositoryProvider;
 
@@ -34,34 +35,34 @@ public class VersionProviderTest {
 
   private SemverConfiguration getConfigurationReleaseBranch() {
     SemverConfiguration configuration = new SemverConfiguration(null);
-    configuration.setRunMode(RunMode.RUN_MODE.RELEASE_BRANCH);
+    configuration.setRunMode(RELEASE_BRANCH);
     configuration.setBranchVersion("6.4.0");
     return configuration;
   }
 
   private SemverConfiguration getConfigurationReleaseBranchRpm() {
     SemverConfiguration configuration = new SemverConfiguration(null);
-    configuration.setRunMode(RunMode.RUN_MODE.RELEASE_BRANCH_RPM);
+    configuration.setRunMode(RELEASE_BRANCH_RPM);
     configuration.setBranchVersion("6.4.0");
     return configuration;
   }
 
   private SemverConfiguration getConfigurationNative() {
     SemverConfiguration configuration = new SemverConfiguration(null);
-    configuration.setRunMode(RunMode.RUN_MODE.NATIVE);
+    configuration.setRunMode(NATIVE);
     return configuration;
   }
 
   private SemverConfiguration getConfigurationNativeBranch() {
     SemverConfiguration configuration = new SemverConfiguration(null);
-    configuration.setRunMode(RunMode.RUN_MODE.NATIVE_BRANCH);
+    configuration.setRunMode(NATIVE_BRANCH);
     configuration.setBranchVersion("6.4.0");
     return configuration;
   }
 
   @Test
   public void createReleaseTest() {
-    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> rawVersions = new EnumMap<>(RAW_VERSION.class);
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
     rawVersions.put(RAW_VERSION.PATCH, "0");
@@ -70,15 +71,14 @@ public class VersionProviderTest {
 
     Map<FINAL_VERSION, String> finalVersions =
         versionProvider.determineReleaseVersions(rawVersions);
-    assertEquals(finalVersions.get(FINAL_VERSION.RELEASE), "1.0.0");
-    assertEquals(finalVersions.get(FINAL_VERSION.DEVELOPMENT), "1.0.1-SNAPSHOT");
-    assertEquals(finalVersions.get(FINAL_VERSION.SCM), "1.0.0");
+    assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.RELEASE));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 
   @Test
   public void createReleaseBranchTest() {
-
-    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> rawVersions = new EnumMap<>(RAW_VERSION.class);
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
     rawVersions.put(RAW_VERSION.PATCH, "0");
@@ -91,15 +91,14 @@ public class VersionProviderTest {
             getConfigurationReleaseBranch().getRunMode(),
             getConfigurationReleaseBranch().getMetaData(),
             getConfigurationReleaseBranch().getBranchVersion());
-    assertEquals(finalVersions.get(FINAL_VERSION.RELEASE), "6.4.0-1.0.0");
-    assertEquals(finalVersions.get(FINAL_VERSION.DEVELOPMENT), "1.0.1-SNAPSHOT");
-    assertEquals(finalVersions.get(FINAL_VERSION.SCM), "6.4.0-1.0.0");
+    assertEquals("6.4.0-1.0.0", finalVersions.get(FINAL_VERSION.RELEASE));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("6.4.0-1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 
   @Test
   public void createReleaseBranchRpmTest() {
-
-    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> rawVersions = new EnumMap<>(RAW_VERSION.class);
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
     rawVersions.put(RAW_VERSION.PATCH, "0");
@@ -112,15 +111,14 @@ public class VersionProviderTest {
             getConfigurationReleaseBranchRpm().getRunMode(),
             getConfigurationReleaseBranchRpm().getMetaData(),
             getConfigurationReleaseBranchRpm().getBranchVersion());
-    assertEquals(finalVersions.get(FINAL_VERSION.RELEASE), "6.4.0-001000000");
-    assertEquals(finalVersions.get(FINAL_VERSION.DEVELOPMENT), "1.0.1-SNAPSHOT");
-    assertEquals(finalVersions.get(FINAL_VERSION.SCM), "6.4.0-001000000+1.0.0");
+    assertEquals("6.4.0-001000000", finalVersions.get(FINAL_VERSION.RELEASE));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("6.4.0-001000000+1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 
   @Test
   public void createNativeTest() {
-
-    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> rawVersions = new EnumMap<>(RAW_VERSION.class);
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
     rawVersions.put(RAW_VERSION.PATCH, "0");
@@ -129,15 +127,14 @@ public class VersionProviderTest {
 
     Map<FINAL_VERSION, String> finalVersions =
         versionProvider.determineReleaseVersions(rawVersions);
-    assertEquals(finalVersions.get(FINAL_VERSION.RELEASE), "1.0.0");
-    assertEquals(finalVersions.get(FINAL_VERSION.DEVELOPMENT), "1.0.1-SNAPSHOT");
-    assertEquals(finalVersions.get(FINAL_VERSION.SCM), "1.0.0");
+    assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.RELEASE));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 
   @Test
   public void createNativeBranchTest() {
-
-    Map<RAW_VERSION, String> rawVersions = new HashMap<>();
+    EnumMap<RAW_VERSION, String> rawVersions = new EnumMap<>(RAW_VERSION.class);
     rawVersions.put(RAW_VERSION.DEVELOPMENT, "1.0.1-SNAPSHOT");
     rawVersions.put(RAW_VERSION.RELEASE, "1.0.0");
     rawVersions.put(RAW_VERSION.PATCH, "0");
@@ -150,8 +147,8 @@ public class VersionProviderTest {
             getConfigurationNativeBranch().getRunMode(),
             getConfigurationNativeBranch().getMetaData(),
             getConfigurationNativeBranch().getBranchVersion());
-    assertEquals(finalVersions.get(FINAL_VERSION.RELEASE), "6.4.0-1.0.0");
-    assertEquals(finalVersions.get(FINAL_VERSION.DEVELOPMENT), "1.0.1-SNAPSHOT");
-    assertEquals(finalVersions.get(FINAL_VERSION.SCM), "6.4.0-1.0.0");
+    assertEquals("6.4.0-1.0.0", finalVersions.get(FINAL_VERSION.RELEASE));
+    assertEquals("1.0.1-SNAPSHOT", finalVersions.get(FINAL_VERSION.DEVELOPMENT));
+    assertEquals("6.4.0-1.0.0", finalVersions.get(FINAL_VERSION.SCM));
   }
 }

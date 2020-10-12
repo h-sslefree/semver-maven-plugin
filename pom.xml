@@ -61,11 +61,19 @@
         <gpg.publicKeyring>${env.GPG_DIR}/pubring.gpg</gpg.publicKeyring>
         <gpg.secretKeyring>${env.GPG_DIR}/secring.gpg</gpg.secretKeyring>
 
+        <!-- code quality monitoring properties -->
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>h-sslefree</sonar.organization>
+        <sonar.github.repository>h-sslefree/semver-maven-plugin</sonar.github.repository>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+
         <maven.gitlog.plugin-version>1.13.2</maven.gitlog.plugin-version>
         <maven.nexus.staging.plugin-version>1.6.3</maven.nexus.staging.plugin-version>
         <fmt-maven-plugin.version>2.9</fmt-maven-plugin.version>
         <maven.plugin-version>3.6.3</maven.plugin-version>
         <helper.maven.plugin-version>2.3.2</helper.maven.plugin-version>
+        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
 
         <org.eclipse.jgit-version>5.9.0.202009080501-r</org.eclipse.jgit-version>
         <httpclient-version>4.5.12</httpclient-version>
@@ -81,6 +89,31 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${maven.test.skip}</skip>
+                    <output>file</output>
+                    <append>true</append>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
@@ -269,6 +302,7 @@
             <artifactId>mockito-core</artifactId>
             <version>${mockito.core-version}</version>
         </dependency>
+
 
     </dependencies>
 </project>

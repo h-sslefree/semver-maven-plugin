@@ -1,6 +1,8 @@
 package org.apache.maven.plugins.semver.providers;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.FUNCTION_LINE_BREAK;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.MOJO_LINE_BREAK;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 import java.util.Map;
@@ -9,7 +11,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugins.semver.SemverMavenPlugin;
+import org.apache.maven.plugins.semver.providers.VersionProvider.FINAL_VERSION;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +40,17 @@ public class PomProviderImpl implements PomProvider {
   }
 
   @Override
-  public void createReleasePom(Map<VersionProvider.FINAL_VERSION, String> finalVersions) {
+  public void createReleasePom(Map<FINAL_VERSION, String> finalVersions) {
     logger.info("Create release-pom");
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     MavenProject releasePom = mavenProject;
-    String scmTag = finalVersions.get(VersionProvider.FINAL_VERSION.SCM);
+    String scmTag = finalVersions.get(FINAL_VERSION.SCM);
     releasePom.getScm().setTag(scmTag);
-    updateVersion(releasePom, finalVersions.get(VersionProvider.FINAL_VERSION.RELEASE));
+    updateVersion(releasePom, finalVersions.get(FINAL_VERSION.RELEASE));
     releasePom.setVersion(scmTag);
     String commitMessage =
         "[semver-maven-plugin] create new release-pom for tag : [ " + scmTag + " ]";
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     logger.info("Commit new release-pom             : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
     logger.info("Push new release-pom to remote     : {}", commitMessage);
@@ -57,24 +59,24 @@ public class PomProviderImpl implements PomProvider {
     repositoryProvider.createTag(scmTag);
     logger.info("Create remote scm-tag              : [ {} ]", scmTag);
     repositoryProvider.pushTag();
-    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(FUNCTION_LINE_BREAK);
   }
 
   @Override
   public void createNextDevelopmentPom(String developmentVersion) {
     logger.info("Create next development-pom");
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     MavenProject nextDevelopementPom = mavenProject;
     nextDevelopementPom.getScm().setTag("");
     updateVersion(nextDevelopementPom, developmentVersion);
     String commitMessage =
         "[semver-maven-plugin] create next dev-pom version : [ " + developmentVersion + " ]";
-    logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+    logger.info(MOJO_LINE_BREAK);
     logger.info("Commit next dev-pom                : {}", commitMessage);
     repositoryProvider.commit(commitMessage);
     logger.info("Push next dev-pom to remote        : {}", commitMessage);
     repositoryProvider.push();
-    logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
+    logger.info(FUNCTION_LINE_BREAK);
   }
 
   private void checkSnapshotVersions(String version) {

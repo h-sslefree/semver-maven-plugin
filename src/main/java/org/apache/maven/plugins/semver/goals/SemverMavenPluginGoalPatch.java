@@ -1,5 +1,7 @@
 package org.apache.maven.plugins.semver.goals;
 
+import static org.apache.maven.plugins.semver.goals.SemverGoal.SEMVER_GOAL.PATCH;
+
 import java.io.File;
 import javax.inject.Inject;
 import org.apache.maven.plugins.annotations.Execute;
@@ -45,33 +47,36 @@ public class SemverMavenPluginGoalPatch extends SemverMavenPlugin {
 
   @Override
   public void execute() {
-
     String pomVersion = mavenProject.getVersion();
-    if (mavenProject.getScm() == null) {
-      logger.error("No source control information available");
+    String scmConnection = null;
+    File scmRoot = null;
+    if (getConfiguration().pushTags() && mavenProject.getScm() != null) {
+      scmConnection = mavenProject.getScm().getConnection();
+      scmRoot = mavenProject.getBasedir();
+      getRepositoryProvider()
+          .initialize(
+              scmRoot,
+              scmConnection,
+              getConfiguration().getScmUsername(),
+              getConfiguration().getScmPassword());
+    } else if (getConfiguration().pushTags()) {
+      logger.error(" * No SCM information supplied");
+      logger.error(" * Please described the scm block in the pom.xml");
       Runtime.getRuntime().exit(1);
     }
-    String scmConnection = mavenProject.getScm().getConnection();
-
-    File scmRoot = mavenProject.getBasedir();
-    getRepositoryProvider()
-        .initialize(
-            scmRoot,
-            scmConnection,
-            getConfiguration().getScmUsername(),
-            getConfiguration().getScmPassword());
 
     logger.info(FUNCTION_LINE_BREAK);
-    logger.info(
-        "Semver-goal                        : {}", SemverGoal.SEMVER_GOAL.PATCH.getDescription());
+    logger.info("Semver-goal                        : {}", PATCH.getDescription());
     logger.info("Run-mode                           : {}", getConfiguration().getRunMode());
     logger.info("Version from POM                   : [ {} ]", pomVersion);
-    logger.info("SCM-connection                     : {}", scmConnection);
-    logger.info("SCM-root                           : {}", scmRoot);
+    if (getConfiguration().pushTags()) {
+      logger.info("SCM-connection                     : {}", scmConnection);
+      logger.info("SCM-root                           : {}", scmRoot);
+    }
     logger.info(FUNCTION_LINE_BREAK);
 
     try {
-      runModeImpl.execute(SemverGoal.SEMVER_GOAL.PATCH, getConfiguration(), pomVersion);
+      runModeImpl.execute(PATCH, getConfiguration(), pomVersion);
     } catch (Exception e) {
       logger.error(e.getMessage());
     }

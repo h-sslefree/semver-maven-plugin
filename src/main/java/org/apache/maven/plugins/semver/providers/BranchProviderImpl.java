@@ -1,19 +1,19 @@
 package org.apache.maven.plugins.semver.providers;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.StringUtils.ordinalIndexOf;
+import static org.apache.maven.plugins.semver.SemverMavenPlugin.MOJO_LINE_BREAK;
 
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.maven.plugins.semver.SemverMavenPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class BranchProviderImpl implements BranchProvider {
       String branchVersion, String branchConversionUrl) {
     String value = null;
     if (branchVersion == null || branchVersion.isEmpty()) {
-      logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+      logger.info(MOJO_LINE_BREAK);
       logger.info("Determine current branchVersion from GIT-repository");
       try {
         String branch = "master";
@@ -49,8 +49,8 @@ public class BranchProviderImpl implements BranchProvider {
             value = branch;
           } else if (branch.matches("v\\d+_\\d+_\\d+.*")) {
             logger.info("Current branch matches            : v\\d+_\\d+_\\d+.*");
-            String rawBranch = branch.replaceAll("v", "").replaceAll("_", ".");
-            value = rawBranch.substring(0, StringUtils.ordinalIndexOf(rawBranch, ".", 3));
+            String rawBranch = branch.replace("v", "").replace("_", ".");
+            value = rawBranch.substring(0, ordinalIndexOf(rawBranch, ".", 3));
           } else if (branch.equals("master")) {
             logger.info("Current branch matches            : [ master ]");
             value = determineVersionFromMasterBranch(branch, branchConversionUrl);
@@ -73,7 +73,7 @@ public class BranchProviderImpl implements BranchProvider {
       } catch (Exception err) {
         logger.error("An error occured while trying to reach GIT-repo: ", err);
       }
-      logger.info(SemverMavenPlugin.MOJO_LINE_BREAK);
+      logger.info(MOJO_LINE_BREAK);
     } else {
       value = branchVersion;
     }
@@ -84,13 +84,16 @@ public class BranchProviderImpl implements BranchProvider {
    * <h>Master branch version detemination</h>
    *
    * <p>Which new version is to be determined from the master-branch. This is done by an external
-   * service defined in the configuration of the plugin
+   * service defined in the configuration of the plugin.
+   *
+   * <p>It determines the new version based upon the old version: 1.0.0 --> 2.0.0 dependant on what
+   * service you are using.
    *
    * <p>Example:
    *
    * <pre>{@code
    * <configuration>
-   *     <branchConversionUrl>http://branchvconversion.com/</branchConversionUrl>
+   *     <branchConversionUrl>http://branchconversion.com/</branchConversionUrl>
    * </configuration>
    * }</pre>
    *

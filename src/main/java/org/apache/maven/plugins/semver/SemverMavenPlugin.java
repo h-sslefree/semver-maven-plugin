@@ -94,6 +94,9 @@ public abstract class SemverMavenPlugin extends AbstractMojo {
   @Parameter(property = "checkRemoteRepository", defaultValue = "false")
   private Boolean checkRemoteVersionTags;
 
+  @Parameter(property = "pushTags", defaultValue = "true")
+  private Boolean pushTags;
+
   private SemverConfiguration configuration;
 
   private final VersionProvider versionProvider;
