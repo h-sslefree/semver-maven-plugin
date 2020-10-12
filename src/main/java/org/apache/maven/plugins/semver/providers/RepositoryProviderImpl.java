@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -380,6 +381,11 @@ public class RepositoryProviderImpl implements RepositoryProvider {
         Status status = repository.status().call();
         if (!status.isClean()) {
           isChanged = true;
+          this.logChanges(status);
+          this.logConflicts(status);
+          this.logUntracked(status);
+          this.logModified(status);
+          this.logMissing(status);
         } else {
           logger.info("Local changes                      : workingtree is clean");
           logger.info(SemverMavenPlugin.FUNCTION_LINE_BREAK);
@@ -397,6 +403,46 @@ public class RepositoryProviderImpl implements RepositoryProvider {
       logger.error("Please pull remote changes and/or commit and push the open changes");
     }
     return isChanged;
+  }
+
+  private void logChanges(Status status) {
+    Set<String> changes = status.getChanged();
+    logger.info("git changes:");
+    for (String change : changes) {
+      logger.info(" * " + change);
+    }
+  }
+
+  private void logConflicts(Status status) {
+    Set<String> conflicts = status.getConflicting();
+    logger.info("git conflicts:");
+    for (String conflict : conflicts) {
+      logger.info(" * " + conflict);
+    }
+  }
+
+  private void logUntracked(Status status) {
+    Set<String> untrackeds = status.getUntracked();
+    logger.info("git untracked:");
+    for (String untracked : untrackeds) {
+      logger.info(" * " + untracked);
+    }
+  }
+
+  private void logModified(Status status) {
+    Set<String> modifieds = status.getModified();
+    logger.info("git modified:");
+    for (String modified : modifieds) {
+      logger.info(" * " + modified);
+    }
+  }
+
+  private void logMissing(Status status) {
+    Set<String> missings = status.getMissing();
+    logger.info("git missing:");
+    for (String missing : missings) {
+      logger.info(" * " + missing);
+    }
   }
 
   @Override
