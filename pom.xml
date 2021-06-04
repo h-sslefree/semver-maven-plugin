@@ -76,7 +76,7 @@
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
 
         <org.eclipse.jgit-version>5.9.0.202009080501-r</org.eclipse.jgit-version>
-        <httpclient-version>4.5.12</httpclient-version>
+        <httpclient-version>4.5.13</httpclient-version>
         <httpcore-version>4.4.13</httpcore-version>
         <plexus.interactivity.api-version>1.0-alpha-6</plexus.interactivity.api-version>
         <plexus.components-version>1.7.1</plexus.components-version>
